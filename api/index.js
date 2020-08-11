@@ -24,14 +24,40 @@ const getPasswordHash = password => bcrypt.hashSync(password, 12);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use("/user/:id", (req, res) => {
+  res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
+  res.append("Access-Control-Allow-Headers", "*");
+  res.append("Access-Control-Allow-Methods", "*");
+  if (req.method == "OPTIONS") return res.status(200).send();
+  if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
+  User.findOne({
+    $or: [
+        { id: req.params.id },
+        { username: req.params.id },
+        { uuid: req.params.id }
+      ]
+    },
+  async (err, user) => {
+    if (err) return;
+    if (!user) return res.status(404).send({ error: "User not found" });
+    res.json({
+      id: user.id,
+      role: user.role,
+      status: user.status,
+      username: user.username
+    });
+  });
+})
+
 app.use(function(req, res, next) {
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
   res.append("Access-Control-Allow-Headers", "*");
   res.append("Access-Control-Allow-Methods", "*");
-  if(req.method == "OPTIONS") return res.status(200).send();
+  if (req.method == "OPTIONS") return res.status(200).send();
 
   var token = req.headers["authorization"];
   if (req.path.startsWith("/auth")) return next();
+  // if (req.path.startsWith("/user") && req.path != "/user/@me") return next();
   if (!token) return res.status(403).send("--- Пшёл вон ---");
 
   token = token.replace("Bearer ", "");
