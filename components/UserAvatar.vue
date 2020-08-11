@@ -1,6 +1,6 @@
 <template>
   <div class="user-avatar">
-    <img :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
+    <img :src="`https://minotar.net/armor/bust/${user.username}/300.png`">
     <div>
       <div v-for="badge in badges" :key="badge.tooltip" :tooltip="badge.tooltip" class="user-avatar__badge">
         <img :src="badge.url">
@@ -14,13 +14,14 @@ const numbers = {
   8: {tooltip: "Разраб", url:"http://icons.iconarchive.com/icons/elegantthemes/beautiful-flat-one-color/128/dev-icon.png"}
 }
 export default {
+  props: ["user"],
   data: () => ({
     badges: []
   }),
   mounted () {this.mount()},
   methods: {
     mount () {
-      let badgenum = this.$auth.user.badges || 0;
+      let badgenum = this.user.badges || 0;
       if (isNaN(badgenum)) return;
       for (let i in numbers) {
         if (badgenum - i < 0) continue;

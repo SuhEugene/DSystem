@@ -4,7 +4,7 @@
       <div class="profile-header__overlay"></div>
       <div class="profile-header__holder">
         <div class="profile-header__holder__spacer profile-header__holder__spacer--0"></div>
-        <UserAvatar />
+        <UserAvatar :user="this.$auth.user" />
         <div class="profile-header__holder--nick-bal">
           <div class="profile-header__nickname">
             <div class="profile-header__nickname--name">{{$auth.user.username}}</div>

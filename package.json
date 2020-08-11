@@ -18,6 +18,7 @@
     "bcryptjs": "2.4.3",
     "dotenv": "8.2.0",
     "express": "4.17.1",
+    "fs": "0.0.1-security",
     "jsonwebtoken": "8.5.1",
     "mdi-vue": "1.6.3",
     "mongoose": "5.9.25",

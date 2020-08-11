@@ -5,6 +5,9 @@ export default {
     color: "#346db3",
     height: "4px"
   },
+  env: {
+    axiosBase: process.env.API_URL || 'http://localhost:8081'
+  },
   /*
    ** Rendering mode
    ** Doc: https://nuxtjs.org/api/configuration-mode
@@ -55,6 +58,10 @@ export default {
       //   rel: "stylesheet",
       //   href: "https://fonts.googleapis.com/css2?family=Scada:wght@400;700&display=swap"
       // }
+      {
+        rel: "icon",
+        href: "/favicon.ico"
+      },
       {
         rel: "stylesheet",
         href:
