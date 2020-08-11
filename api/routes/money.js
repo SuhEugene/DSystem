@@ -69,7 +69,7 @@ moneyRouter
       u2 && req.io.to(u2.io).emit("balance", user.balance);
     });
   }).post("/send/:id", (req, res) => {
-    if (isNaN(req.params.id)) return res.status(400).json({ error: "Invalid id" });
+    if (isNaN(req.params.id) || req.params.id == req.user.id) return res.status(400).json({ error: "Invalid id" });
     if (isNaN(req.body.sum) ||
         !parseInt(req.body.sum, 10) ||
         parseInt(req.body.sum, 10) > 64*36*27 ||
@@ -100,7 +100,7 @@ moneyRouter
       u2 && req.io.to(u2.io).emit("balance", user.balance);
     });
   }).post("/pass/send/:id", (req, res) => {
-    if (isNaN(req.params.id)) return res.status(400).json({ error: "Invalid id" });
+    if (isNaN(req.params.id) || req.params.id == req.user.id) return res.status(400).json({ error: "Invalid id" });
     if (isNaN(req.body.sum) ||
         !parseInt(req.body.sum, 10) ||
         parseInt(req.body.sum, 10) > 64*36*27 ||
