@@ -79,7 +79,7 @@
 import UserAvatar from "~/components/UserAvatar.vue";
 
 export default {
-  // auth: "guest",
+  auth: "guest",
   layout: "loginLayout",
   components: {
     UserAvatar

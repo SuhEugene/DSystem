@@ -25,40 +25,11 @@ export default {
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
-        hid: "description",
-        name: "description",
-        content: "Оплати всё и везде"
-      },
-      {
-        property: "og:title",
-        content: "Dromon"
-      },
-      {
-        name: "title",
-        content: "Dromon"
-      },
-      {
-        property: "og:url",
-        content: process.env.BASE_URL
-      },
-      {
         property: "theme-color",
         content: "#346db3"
-      },
-      // {
-      //   property: "og:image",
-      //   content: "http://diamond.sp.net.ru/favicon.png"
-      // },
-      {
-        property: "og:description",
-        content: "Оплати всё и везде"
       }
     ],
     link: [
-      // {
-      //   rel: "stylesheet",
-      //   href: "https://fonts.googleapis.com/css2?family=Scada:wght@400;700&display=swap"
-      // }
       {
         rel: "icon",
         href: "/favicon.ico"
