@@ -5,6 +5,9 @@ const Logs = require("../models/logs");
 const Post = require("../models/post");
 const moneyRouter = express.Router();
 const getLogs = require("./getLogs");
+const bcrypt = require("bcryptjs");
+
+const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
 
 let cooldown = {};
 function getPost(id) {
@@ -83,6 +86,41 @@ moneyRouter
       logs.sum = parseInt(req.body.sum, 10);
       logs.action = "send-to";
       logs.more = req.body.comment ? String(req.body.comment).substr(0, 100) : "";
+      user.balance += parseInt(req.body.sum, 10);
+      req.user.balance -= parseInt(req.body.sum, 10);
+      await logs.save();
+      await req.user.save();
+      await user.save();
+      res.send();
+      let u1 = req.io.users.find(u => u.id == req.user.id);
+      let u2 = req.io.users.find(u => u.id == user.id);
+      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
+      u1 && req.io.to(u1.io).emit("balance", req.user.balance);
+      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
+      u2 && req.io.to(u2.io).emit("balance", user.balance);
+    });
+  }).post("/pass/send/:id", (req, res) => {
+    if (isNaN(req.params.id)) return res.status(400).json({ error: "Invalid id" });
+    if (isNaN(req.body.sum) ||
+        !parseInt(req.body.sum, 10) ||
+        parseInt(req.body.sum, 10) > 64*36*27 ||
+        parseInt(req.body.sum, 10) < 0)
+      return res.status(400).json({ error: "Invalid body" });
+    if (!req.body.password || req.body.password.length < 6)
+      return res.status(400).json({ error: "Invalid body" });
+    if (!verifyPassword(req.body.password, req.user.password))
+      return res.status(403).json({ error: "Invalid password" });
+    User.findOne({ id: req.params.id }, async (err, user) => {
+      if (err) return;
+      if (!user) return res.status(404).json({ error: "User not found" });
+      if (req.user.balance - parseInt(req.body.sum, 10) < 0)
+        return res.status(400).json({ error: "Not enough money" });
+      let logs = new Logs();
+      logs.from = {id: req.user.id, username: req.user.username};
+      logs.to = {id: user.id, username: user.username};
+      logs.sum = parseInt(req.body.sum, 10);
+      logs.action = "send-to";
+      logs.more = "Перевод по запросу";
       user.balance += parseInt(req.body.sum, 10);
       req.user.balance -= parseInt(req.body.sum, 10);
       await logs.save();

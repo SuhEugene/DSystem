@@ -59,19 +59,25 @@ userRouter
     });
   })
   .get("/:id", (req, res) => {
-    if (isNaN(req.params.id)) return res.status(400).send({ error: "Invalid id" });
-    User.findOne({ id: req.params.id }, async (err, user1) => {
+    if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
+    User.findOne({
+      $or: [
+          { id: req.params.id },
+          { username: req.params.id },
+          { uuid: req.params.id }
+        ]
+      },
+    async (err, user) => {
       if (err) return;
-      if (!user1.length)
-        return res.status(404).send({ error: "User not found" });
+      if (!user) return res.status(404).send({ error: "User not found" });
       let data = {
-        id: user1.id,
-        role: user1.role,
-        status: user1.status,
-        username: user1.username
+        id: user.id,
+        role: user.role,
+        status: user.status,
+        username: user.username
       };
       if (req.user.role > 2) {
-        data.balance = user1.balance;
+        data.balance = user.balance;
       }
       res.json(data);
     });

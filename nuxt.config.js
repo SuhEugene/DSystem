@@ -6,7 +6,8 @@ export default {
     height: "4px"
   },
   env: {
-    axiosBase: process.env.API_URL || 'http://localhost:8081'
+    axiosBase: process.env.API_URL || 'http://localhost:8081',
+    thisUrl: process.env.SELF_URL || 'http://localhost:8080'
   },
   /*
    ** Rendering mode
@@ -19,7 +20,7 @@ export default {
    ** Doc: https://vue-meta.nuxtjs.org/api/#metainfo-properties
    */
   head: {
-    title: "Diamond",
+    title: "Dromon",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -30,19 +31,19 @@ export default {
       },
       {
         property: "og:title",
-        content: "Diamond"
+        content: "Dromon"
       },
       {
         name: "title",
-        content: "Diamond"
+        content: "Dromon"
       },
       {
         property: "og:url",
-        content: "http://diamond.sp.net.ru/"
+        content: process.env.BASE_URL
       },
       {
         property: "theme-color",
-        content: "#357aff"
+        content: "#346db3"
       },
       // {
       //   property: "og:image",
@@ -50,7 +51,7 @@ export default {
       // },
       {
         property: "og:description",
-        content: "Город, в котором ты будешь жить, а не выживать"
+        content: "Оплати всё и везде"
       }
     ],
     link: [

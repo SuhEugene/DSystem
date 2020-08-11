@@ -29,7 +29,6 @@
         <p v-if="!$auth.user.logs.length">Операций не найдено</p>
         <HistoryEl v-for="log in $store.state.logs" :key="log._id" :log="log"/>
       </div>
-      <!-- <button @click="$auth.fetchUser('discord')">Перезагрузка</button> -->
     </div>
     <Call v-for="call in calls" :key="call.id" :user="call.user" :bank="call.bank"/>
   </section>
@@ -80,6 +79,7 @@ export default {
   },
   mounted () {
     if (this.$auth.user.role == 0) return this.$router.push("/registration");
+    setTimeout(()=>{this.$auth.fetchUser()}, 500);
     this.status = this.$auth.user.status;
     this.banker = this.$auth.user.role > 1;
     this.$store.commit("setLogs", this.$auth.user.logs);

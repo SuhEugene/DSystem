@@ -808,6 +808,41 @@ button, a.btn {
 @keyframes yellowbg {
   from {background: $always-primary;}
 }
+.send-money {
+  max-width: 480px!important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  &__all {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+  &__avatar {
+    margin-bottom: 0!important;
+  }
+  &__data {
+    margin-left: 20px;
+    margin-bottom: 0!important;
+    & > * {
+      margin-bottom: 0!important;
+    }
+    & > .heading {
+      text-align: left!important;
+    }
+    & > div {
+      margin-bottom: 5px!important;
+    }
+    & > div.last {
+      margin-bottom: 10px!important;
+    }
+  }
+  .user-avatar {
+    margin-bottom: 10px!important;
+  }
+}
 
 .history {
   padding: 40px 64px;
@@ -872,6 +907,9 @@ button, a.btn {
     display: inline-block;
     text-align: center;
     color: $text-heading;
+    &--2 {
+      font-size: 22px;
+    }
   }
   button,
   input {
@@ -991,6 +1029,11 @@ button, a.btn {
   }
 }
 @media (max-width: 550px) {
+  .send-money > .heading {margin-bottom: 15px!important;}
+  .send-money__all {flex-direction: column;}
+  .send-money__avatar {margin-bottom: 10px!important;}
+  .send-money__data {margin-left: 0!important;}
+  .send-money__link {text-align: center!important;}
   .history {
     padding: 40px 20px;
   }
@@ -1027,6 +1070,9 @@ button, a.btn {
   }
 }
 @media (max-width: 380px) {
+  .login form {
+    padding: 15px 20px;
+  }
   .history-el {
     &__user--value {
       font-size: 20px;

@@ -10,7 +10,7 @@ export default {
     dark: false
   }),
   mounted() {
-    this.$axios.defaults.baseURL = process.env.axiosBase;
+    // this.$axios.defaults.baseURL = process.env.axiosBase;
     if (process.browser) {
       this.dark = localStorage.getItem("dark") === "true";
     }
