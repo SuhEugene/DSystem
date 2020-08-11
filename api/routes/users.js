@@ -7,7 +7,7 @@ let cooldown = {};
 const getLogs = require("./getLogs");
 userRouter
   .use((req, res, next) => {
-    console.log(req.method, req.path)
+    // console.log(req.method, req.path)
       // if (cooldown[req.user.id] && cooldown[req.user.id][req.path] && Date.now() - cooldown[req.user.id][req.path] < 2000)
         // return res.status(400).send({ error: "Cooldown" });
       if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
