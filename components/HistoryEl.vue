@@ -34,7 +34,8 @@
 <script>
 const icons = {
   "banker-void" : "AccountArrowLeftOutline",
-  "send-to": "SendCircleOutline",
+  "send-to": "CashPlus",
+  "send-from": "CashMinus",
   "app-to": "CubeSend"
 }
 const tooltips = {
@@ -43,7 +44,8 @@ const tooltips = {
   "app-to": "Приложение"
 }
 import AccountArrowLeftOutlineIcon from "mdi-vue/AccountArrowLeftOutline.vue";
-import SendCircleOutlineIcon from "mdi-vue/SendCircleOutline.vue";
+import CashPlusIcon from "mdi-vue/CashPlus.vue";
+import CashMinusIcon from "mdi-vue/CashMinus.vue";
 import CubeSendIcon from "mdi-vue/CubeSend.vue";
 export default {
   props: ["log"],
@@ -52,7 +54,7 @@ export default {
       if (this.log.action == "banker-void") return this.log.sum;
       if (this.log.action == "send-to") {
         if (this.log.from.id == this.$auth.user.id) return -this.log.sum;
-        return -this.log.sum
+        return this.log.sum
       }
       // return this.log.sum;
     },
@@ -68,6 +70,10 @@ export default {
              `${now.getMinutes() >= 10 ? now.getMinutes() : "0"+now.getMinutes()}`;
     },
     icon () {
+      if (this.log.action == "send-to") {
+        if (this.log.from.id == this.$auth.user.id) return icons["send-from"];
+        return icons["send-to"];
+      }
       return icons[this.log.action];
     },
     tooltip () {
@@ -76,7 +82,8 @@ export default {
   },
   components: {
     AccountArrowLeftOutlineIcon,
-    SendCircleOutlineIcon,
+    CashPlusIcon,
+    CashMinusIcon,
     CubeSendIcon
   }
 };

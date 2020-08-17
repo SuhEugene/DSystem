@@ -11,7 +11,7 @@
           <div tooltip="Вызвать банкира" class="profile-nav__button">
             <AccountTieVoiceOutlineIcon size="26"/>
           </div>
-          <div tooltip="Приложения" class="profile-nav__button">
+          <div @click="$router.push('/apps')" tooltip="Приложения" class="profile-nav__button">
             <CubeScanIcon size="26"/>
           </div>
           <div tooltip="Настройки" class="profile-nav__button">

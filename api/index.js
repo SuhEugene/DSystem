@@ -70,15 +70,12 @@ app.use(function(req, res, next) {
 });
 
 const userRouter = require("./routes/users");
+const appRouter = require("./routes/apps");
 const authRouter = require("./routes/auth");
 const moneyRouter = require("./routes/money");
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
 app.use("/money", moneyRouter);
-
-app.get("/", (req, res) => {
-  res.send("App loaded");
-});
 
 app.get("/posts", (req, res) => {
   Post.find((err, posts) => {
@@ -106,8 +103,6 @@ app.post("/posts", (req, res) => {
     return res.json(post);
   });
 });
-
-// app.delete("/posts/:id")
 
 app.post("/reg", (req, res) => {
   if (!req.body.username || !req.body.username.length    ||

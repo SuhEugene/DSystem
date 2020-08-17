@@ -221,6 +221,12 @@ button, a.btn {
   align-items: center;
   font-weight: 500;
   cursor: pointer;
+  &.icon {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   &.primary {
     background: $always-primary;
     color: white;
@@ -335,7 +341,6 @@ button, a.btn {
     }
   }
 }
-
 @keyframes optohelp {
   from {opacity: 0;}
 }
@@ -657,7 +662,6 @@ button, a.btn {
     }
   }
 }
-
 .history-el {
   display: flex;
   justify-content: flex-start;
@@ -805,9 +809,44 @@ button, a.btn {
     }
   }
 }
+.history {
+  padding: 40px 64px;
+  &__inner {
+    max-height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: $background;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: $card-stroke;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: #aaa;
+    }
+    .dark & {
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+      &::-webkit-scrollbar-track {
+        background: $dark-background;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: $dark-card-stroke;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background: #444;
+      }
+    }
+  }
+}
 @keyframes yellowbg {
   from {background: $always-primary;}
 }
+
 .send-money {
   max-width: 480px!important;
   display: flex;
@@ -844,40 +883,75 @@ button, a.btn {
   }
 }
 
-.history {
-  padding: 40px 64px;
-  &__inner {
-    max-height: 400px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    &::-webkit-scrollbar {
-      width: 5px;
+
+#apps-page {
+  header {
+    padding: 10px 20px;
+    background-color: $card-background;
+    box-shadow: inset -1px -3px 0 -2px $card-stroke;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    h1 {margin: 0; margin-left: 16px;}
+  }
+  main {
+    padding: 20px 30px;
+    .apps {
+      display: grid;
+      grid-template-columns: auto auto auto auto;
+      place-items: center;
     }
-    &::-webkit-scrollbar-track {
-      background: $background;
+  }
+  .app {
+    padding: 15px;
+    margin: 0 5px;
+    margin-bottom: 15px;
+    background-color: $card-background;
+    box-shadow: inset 0 0 0 1px $card-stroke;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    border-radius: 24px;
+    min-width: 90%;
+    cursor: pointer;
+    transition: background .13s;
+    &:hover {
+      background-color: $card-hover;
     }
-    &::-webkit-scrollbar-thumb {
-      background: $card-stroke;
+    &__data {
+      display: flex;
+      flex-direction: column;
+      margin-left: 15px;
     }
-    &::-webkit-scrollbar-thumb:hover {
-      background: #aaa;
+    &__title {
+      color: $text-heading;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
     }
-    .dark & {
-      &::-webkit-scrollbar {
-        width: 5px;
+    &__image {
+      height: 64px;
+      width: 64px;
+      border-radius: 12px;
+    }
+  }
+  .dark & {
+    header {
+      background-color: $dark-card-background;
+      box-shadow: inset -1px -3px 0 -2px $dark-card-stroke;
+    }
+    .app {
+      background-color: $dark-card-background;
+      box-shadow: inset 0 0 0 1px $dark-card-stroke;
+      &:hover {
+        background-color: $dark-card-hover;
       }
-      &::-webkit-scrollbar-track {
-        background: $dark-background;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: $dark-card-stroke;
-      }
-      &::-webkit-scrollbar-thumb:hover {
-        background: #444;
-      }
+      &__title {color: $dark-text-heading;}
     }
   }
 }
+
 
 .login {
   background: url("https://image.freepik.com/free-vector/sunset-mountains-with-pine-forest_7993-2327.jpg")!important;
@@ -951,7 +1025,11 @@ button, a.btn {
 @media (max-width: 830px) {
   .profile-header__holder__spacer {display: none!important;}
 }
-
+@media (max-width: 1200px) {
+  #apps-page main .apps {
+    grid-template-columns: auto auto auto;
+  }
+}
 @media (max-width: 1000px) {
   .profile-header {
     &__holder {
@@ -980,6 +1058,11 @@ button, a.btn {
     }
   }
 }
+@media (max-width: 900px) {
+  #apps-page main .apps {
+    grid-template-columns: auto auto;
+  }
+}
 @media (max-width: 800px) {
   .history-el {
     height: auto;
@@ -998,6 +1081,9 @@ button, a.btn {
   }
 }
 @media (max-width: 680px) {
+  #apps-page main .apps {
+    grid-template-columns: auto;
+  }
   .history__inner::-webkit-scrollbar {
     width: 1px;
   }
