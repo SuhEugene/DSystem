@@ -74,6 +74,7 @@ const appRouter = require("./routes/apps");
 const authRouter = require("./routes/auth");
 const moneyRouter = require("./routes/money");
 app.use("/users", userRouter);
+app.use("/apps", appRouter);
 app.use("/auth", authRouter);
 app.use("/money", moneyRouter);
 
