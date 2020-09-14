@@ -32,10 +32,12 @@ async function getDiscordTokens(client_id, code, redirect_uri) {
 
 async function getDiscord(client_id, code, redirect_uri) {
   let { access_token } = await getDiscordTokens(client_id, code, redirect_uri);
-  return await (await fetch("https://discord.com/api/v6/users/@me", {
+  let data = await (await fetch("https://discord.com/api/v6/users/@me", {
     method: "get",
     headers: { Authorization: `Bearer ${access_token}` }
   })).json();
+  // console.log("discord returned ->", data);
+  return data;
 }
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
@@ -69,7 +71,7 @@ router
       if (err) return;
       if (user && user.role != 0)
         return res.status(401).send({ error: "Already registred" });
-      
+
       if (user && user.role == 0) await users[0].delete();
       let newUser = new User({
         id,
@@ -94,6 +96,7 @@ router
     );
     User.findOne({ id }, async (err, user) => {
       if (err) return;
+      // console.log("ufoid -> ", id);
       if (!user)
         return res.status(404).send({ error: "User not found" });
       let token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {

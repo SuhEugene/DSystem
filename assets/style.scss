@@ -6,7 +6,7 @@ $always-error: #ff2222;
 $always-danger: #ffaa00;
 $always-success: #77dd11;
 $always-primary: #346db3;
-  
+
 $background: #ffffff;
 $text-light: #aaaaaa;
 $text-subtext: #777777;
@@ -26,6 +26,7 @@ $dark-card-hover: #272727;
 $dark-card-background: #222222;
 
 $font: "Rubik", Arial, sans-serif;
+
 
 html {
   font-family: $font;
@@ -79,12 +80,16 @@ form p {
   font-size: 18px;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
+p, .p {
+  color: $text-subtext;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none!important;
     -moz-appearance: none!important;
     appearance: none!important;
-    margin: 0!important; 
+    margin: 0!important;
 }
 
 .input {
@@ -277,7 +282,7 @@ button, a.btn {
     pointer-events: all;
     animation: optohelp .13s;
     opacity: 1;
-  } 
+  }
   &__help {
     // pointer-events: none;
     opacity: 0;
@@ -583,8 +588,7 @@ button, a.btn {
 }
 .profile-header {
   color: $always-white;
-  background: url("https://cdn.dribbble.com/users/1016207/screenshots/3391077/14.jpg");
-  background-position: center center;
+  background: url("https://cdn.dribbble.com/users/1016207/screenshots/3391077/14.jpg") center center;
   background-size: cover;
   display: flex;
   flex-direction: row;
@@ -892,20 +896,31 @@ button, a.btn {
     display: flex;
     flex-direction: row;
     align-items: center;
-    h1 {margin: 0; margin-left: 16px;}
+    h1 {
+      margin: 0 0 0 16px;
+    }
   }
   main {
     padding: 20px 30px;
     .apps {
-      display: grid;
-      grid-template-columns: auto auto auto auto;
-      place-items: center;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      flex-direction: column;
+      flex-wrap: wrap;
+      padding-right: 20px;
+      flex-shrink: 0;
     }
+  }
+  .wrap {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
   }
   .app {
     padding: 15px;
-    margin: 0 5px;
-    margin-bottom: 15px;
+    margin: 7px 0;
     background-color: $card-background;
     box-shadow: inset 0 0 0 1px $card-stroke;
     display: flex;
@@ -913,11 +928,15 @@ button, a.btn {
     align-items: center;
     justify-content: flex-start;
     border-radius: 24px;
-    min-width: 90%;
+    width: 100%;
+    max-width: 300px;
     cursor: pointer;
     transition: background .13s;
     &:hover {
       background-color: $card-hover;
+    }
+    &.active {
+      box-shadow: inset 0 0 0 1px $always-primary;
     }
     &__data {
       display: flex;
@@ -929,11 +948,45 @@ button, a.btn {
       font-size: 20px;
       font-weight: bold;
       margin-bottom: 5px;
+      word-break: break-word;
     }
-    &__image {
+    &__image, img {
       height: 64px;
       width: 64px;
       border-radius: 12px;
+      position: relative;
+      .verify {
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        background: #346db3;
+        right: -6px;
+        bottom: -6px;
+        border-radius: 50%;
+        z-index: 999;
+        box-shadow: inset 0 0 0 2px $card-stroke;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        span {
+          line-height: 12px;
+        }
+      }
+    }
+  }
+  #one-app {
+    border: 1px solid $card-stroke;
+    border-right: none;
+    padding: 15px 20px;
+    border-radius: 26px 0 0 26px;
+    width: 100%;
+    .input {
+      margin-top: 15px;
+      font-weight: bold;
+      input {
+        font-weight: normal;
+        margin-top: 2px;
+      }
     }
   }
   .dark & {
@@ -949,14 +1002,16 @@ button, a.btn {
       }
       &__title {color: $dark-text-heading;}
     }
+    #one-app {
+      border-color: $dark-card-stroke;
+    }
   }
 }
 
 
 .login {
-  background: url("https://image.freepik.com/free-vector/sunset-mountains-with-pine-forest_7993-2327.jpg")!important;
+  background: url("https://image.freepik.com/free-vector/sunset-mountains-with-pine-forest_7993-2327.jpg") 50% 50% !important;
   background-size: cover!important;
-  background-position: 50% 50%!important;
   padding: 10px;
   min-height: 100vh;
   height: 100%;
@@ -1074,8 +1129,7 @@ button, a.btn {
     &__sum {order: 2}
     &__comm {
       order: 3;
-      margin: 0;
-      margin-top: 16px;
+      margin: 16px 0 0;
       width: 100%;
     }
   }
@@ -1094,18 +1148,15 @@ button, a.btn {
     justify-content: space-between;
     &__icon {
       order: 1;
-      margin: 0 10px;
-      margin-bottom: 16px;
+      margin: 0 10px 16px;
     }
     &__sum {
       order: 2;
-      margin: 0 10px;
-      margin-bottom: 16px;
+      margin: 0 10px 16px;
     }
     &__user {
       order: 3;
-      margin: 0 10px;
-      margin-bottom: 16px;
+      margin: 0 10px 16px;
     }
     &__comm {
       order: 4;
@@ -1164,8 +1215,7 @@ button, a.btn {
       font-size: 20px;
     }
     &__icon, &__sum, &__user {
-      margin: 0 5px;
-      margin-bottom: 16px;
+      margin: 0 5px 16px;
     }
   }
 }

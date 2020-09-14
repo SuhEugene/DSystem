@@ -26,8 +26,8 @@ export default {
   layout: "loginLayout",
   data: () => ({
     login: {
-      username: "SuhEugene",
-      password: "123123"
+      username: "",
+      password: ""
     }
   }),
   methods: {
