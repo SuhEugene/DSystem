@@ -1,18 +1,20 @@
 const Logs = require("../models/logs");
 module.exports = (req) => {
-  return new Promise((send, reject) => {
-    Logs.find({
+  return new Promise(async (send, reject) => {
+    let logs_data = await Logs.find({
       $or: [
-        {"from.id": req.user.id/*, action: {$ne: "banker-void"}*/},
-        {"to.id": req.user.id}
-      ],
-      action: {$ne: "comissia"}
-    },
-    (err, logs) => {
-      if (err) return reject();
-      let logs_data = logs;
-      logs_data.reverse()
-      send(logs_data);
-    });
+        { fromUser: req.user._id },
+        { toUser: req.user._id }
+      ]
+    }, [], {
+      limit: 20,
+      sort:{ timestamp: -1 }
+    }).populate("fromApp")
+      .populate("fromUser")
+      .populate("toApp")
+      .populate("toUser");
+    // logs_data.reverse();
+    console.log("LOGS_DATA", logs_data);
+    send(logs_data);
   })
 }

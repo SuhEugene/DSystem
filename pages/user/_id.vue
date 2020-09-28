@@ -79,7 +79,7 @@
 import UserAvatar from "~/components/UserAvatar.vue";
 
 export default {
-  auth: "guest",
+  auth: false,
   layout: "loginLayout",
   components: {
     UserAvatar
@@ -140,13 +140,9 @@ export default {
         },
       ],
       link: [
-        {
-          rel: "canonical",
-          href: `${process.env.thisUrl}${this.$route.path}`
-        }
+        { rel: "canonical", href: `${process.env.thisUrl}${this.$route.path}` }
       ]
-    });
-        
+    });    
   },
   validate({ params }) {
     return /^[a-zA-Z0-9_]{3,40}$/.test(params.id) && (params.sum == null || parseInt(params.sum, 10))

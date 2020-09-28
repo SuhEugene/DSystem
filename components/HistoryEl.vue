@@ -12,11 +12,11 @@
     <div class="history-el__space history-el__space--2"></div>
     <div class="history-el__user">
       <div class="history-el__user--title">От</div>
-      <div class="history-el__user--value">{{log.from.username}}</div>
+      <div class="history-el__user--value">{{from}}</div>
     </div>
     <div class="history-el__user">
       <div class="history-el__user--title">Кому</div>
-      <div class="history-el__user--value">{{log.to.username}}</div>
+      <div class="history-el__user--value">{{to}}</div>
     </div>
     <div class="history-el__space history-el__space--3"></div>
     <div class="history-el__comm">
@@ -49,11 +49,14 @@ import CashMinusIcon from "mdi-vue/CashMinus.vue";
 import CubeSendIcon from "mdi-vue/CubeSend.vue";
 export default {
   props: ["log"],
+  mounted () {
+    console.log(this.log);
+  },
   computed: {
     sum () {
       if (this.log.action == "banker-void") return this.log.sum;
-      if (this.log.action == "send-to") {
-        if (this.log.from.id == this.$auth.user.id) return -this.log.sum;
+      if (this.log.action == "send-to" || this.log.action == "app-to") {
+        if (this.log.fromUser && this.log.fromUser._id == this.$auth.user._id) return -this.log.sum;
         return this.log.sum
       }
       // return this.log.sum;
@@ -71,13 +74,19 @@ export default {
     },
     icon () {
       if (this.log.action == "send-to") {
-        if (this.log.from.id == this.$auth.user.id) return icons["send-from"];
+        if (this.log.fromUser == this.$auth.user._id) return icons["send-from"];
         return icons["send-to"];
       }
       return icons[this.log.action];
     },
     tooltip () {
       return tooltips[this.log.action];
+    },
+    from () {
+      return (this.log.fromApp ? this.log.fromApp.name : '') || (this.log.fromUser ? this.log.fromUser.username : '');
+    },
+    to () {
+      return (this.log.toApp ? this.log.toApp.name : '') || (this.log.toUser ? this.log.toUser.username : '');
     }
   },
   components: {

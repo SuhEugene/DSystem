@@ -1,17 +1,26 @@
 <template>
   <div class="container login" :class="{dark}">
-    <Nuxt/>
+    <transition name="page">
+      <div v-if="readyState" class="main-loading-page" :class="rand">
+        <DromonLogo />
+      </div>
+    </transition>
+    <Nuxt />
   </div>
 </template>
 <script>
 /* global process */
+import DromonLogo from "~/components/DromonLogo";
 export default {
   data: () => ({
-    dark: false
+    dark: false,
+    readyState: true,
+    rand: `a${(new Date().getHours() % 6) + 1}`
   }),
   mounted() {
     if (process.browser) {
       this.dark = localStorage.getItem("dark") === "true";
+      this.readyState = false;
     }
   },
   head () {
@@ -41,6 +50,7 @@ export default {
         }
       ]
     })
-  }
+  },
+  components: { DromonLogo }
 };
 </script>

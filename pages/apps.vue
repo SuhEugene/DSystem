@@ -1,39 +1,86 @@
 <template>
   <section id="apps-page">
     <header>
-      <NLink to="/profile" class="btn primary icon"><HomeOutlineIcon size="24" /></NLink>
-      <h1>Приложения</h1>
+      <div class="all">
+        <NLink to="/profile" class="btn primary icon"><HomeOutlineIcon size="24" /></NLink>
+        <h1>Приложения</h1>
+      </div>
     </header>
     <main>
-      <h1>Ваши приложения</h1>
-      <div class="wrap">
-        <div class="apps">
-          <div @click="setApp(app)" :class="{'active': currentApp.id == app.id & appOpened}" class="app" v-for="app in myApps" :key="app.id">
-            <img src="https://www.penpublishing.com/squaresMobileTest.jpg" class="app__image">
-            <div class="app__data">
-              <div class="app__title">{{app.name}}</div>
-              <div class="app__info">Баланс: {{app.balance}}АР</div>
+      <div id="my-apps">
+        <h1>Ваши приложения</h1>
+        <!-- <div v-if="createAppMenu" id="hidden-form-container">
+          <form class="hidden-form">
+            
+          </form>
+        </div> -->
+        <div class="wrap">
+          <div class="apps">
+            <div @click="setApp(app)" :class="{'active': currentApp._id == app._id & appOpened}" class="app" v-for="app in myApps" :key="app.id">
+              <img src="https://www.penpublishing.com/squaresMobileTest.jpg" class="app__image">
+              <div class="app__data">
+                <div class="app__title">{{app.name}}</div>
+                <div class="app__info">Баланс: {{app.balance}}АР</div>
+              </div>
+            </div>
+            <div @click="createAppMenu = !createAppMenu; appOpened = false" class="app"
+                 v-if="myApps.length < 3 || ($auth.user.mayHave && myApps.length < $auth.user.mayHave)">
+              <img src="http://docs.updatefactory.io/images/plus-icon.png" class="app__image">
+              <div class="app__data">
+                <div class="app__title">Создать</div>
+                <div class="app__info">приложение</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div id="one-app">
-          <template v-if="appOpened">
-            <h1 ref="appName" @blur="checkName" contenteditable class="app-name" v-text="currentApp.name"></h1>
-            <div ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
-            <div class="input">
-              Короткий url
-              <input placeholder="testapp" type="text" @blur="checkShortName" v-model="shortname">
-            </div>
-            <div class="input">
-              Ссылка на аватар
-              <input placeholder="https://example.com/image.png" @blur="checkAvatar" type="url" v-model="avatar">
-            </div>
-            <div class="input">
-              Ссылка на сайт
-              <input placeholder="https://example.com/" @blur="checkUrl" type="url" v-model="url">
-            </div>
-          </template>
-          <h2 style="opacity: 0.5" v-else>Выберите приложение</h2>
+          <div id="one-app">
+            <template v-if="createAppMenu">
+              <h1 contenteditable="false" class="app-name">Создание приложения</h1>
+              <div contenteditable="false" class="input">
+                Название приложения
+                <input placeholder="TheBeautifulShop" type="text" v-model="appName">
+              </div>
+              <div class="input"><button @click="createApp" class="primary" type="button">Создать</button></div>
+            </template>
+            <template v-if="appOpened">
+              <div class="error" style="margin-bottom: 3px" v-if="appError"><b>
+                <span>Ошибка отправки данных.</span>
+                <span v-if="appError == 'Cooldown'">Причина: "Кулдаун"</span>
+              </b></div>
+              <h1 ref="appName" @blur="checkName" contenteditable class="app-name" v-text="currentApp.name"></h1>
+              <div ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
+              <div style="margin-top:7px"><b>ID:</b> {{currentApp._id}}</div>
+              <div style="margin-top:7px">
+                <b>Secret:</b> 
+                <span v-if="secretShow">{{currentApp.secret}}</span>
+                <a @click="secretShow = !secretShow" href="javascript:void(0)">{{secretShow ? "Скрыть" : "Показать"}}</a>
+              </div>
+              <div style="margin-top:7px">
+                <b>Ссылка:</b> 
+                <span>{{`https://drom.one/${currentApp.shortname || currentApp._id}`}}</span>
+                <a target="_blank" :href="`http://${loc}/app/${currentApp.shortname || currentApp._id}`">Открыть</a>
+              </div>
+              <div class="input">
+                Короткий url
+                <input placeholder="testapp" type="text" @blur="checkShortName" v-model="shortname">
+                <small v-if="appError == 'url'">Такой url уже существует</small>
+              </div>
+              <div class="input">
+                Ссылка на аватар
+                <input placeholder="https://example.com/image.png" @blur="checkAvatar" type="url" v-model="avatar">
+              </div>
+              <div class="input">
+                Ссылка на сайт
+                <input placeholder="https://example.com/" @blur="checkUrl" type="url" v-model="url">
+              </div>
+              <div class="input">
+                URL на который будет отправлено событие
+                <input placeholder="https://example.com/handler.php" @blur="checkEventUrl" type="url" v-model="eventUrl">
+              </div>
+              <div class="input"><button type="button" @click="sendAllOfUs" class="primary">Сохранить</button></div>
+              <div class="input"><button tooltip="fuck" type="button" @click="deleteApp" class="error">Удалить</button></div>
+            </template>
+            <h2 style="opacity: 0.5" v-if="!createAppMenu && !appOpened">Выберите приложение</h2>
+          </div>
         </div>
       </div>
       <h1 style="margin-top: 30px;">Все приложения</h1>
@@ -55,106 +102,121 @@
 import HomeOutlineIcon from "mdi-vue/HomeOutline.vue";
 import CheckIcon from "mdi-vue/Check.vue";
 
+
 export default {
+  async asyncData({ app }) {
+    const apps = await app.$axios.get('/apps');
+    return { myApps: apps.data };
+  },
   data: () => ({
     appOpened: false,
+    createAppMenu: false,
+    appName: "",
     shortname: '',
     avatar: '',
     url: '',
-    myApps: [
-      {
-        id: 0,
-        secret: 0,
-        balance: 0,
-        name: "The shop",
-        avatar: "https://www.penpublishing.com/squaresMobileTest.jpg",
-        shortname: "tsh",
-        description: "The beautiful shop",
-        owner: {},
-        coowners: [],
-        public: false,
-        verified: false,
-        super: false,
-        nonChecked: true
-      },
-      {
-        id: 1,
-        secret: 0,
-        balance: 0,
-        name: "The shop",
-        avatar: "https://www.penpublishing.com/squaresMobileTest.jpg",
-        shortname: "tsh1",
-        description: "The beautiful shop",
-        owner: {},
-        coowners: [],
-        public: false,
-        verified: false,
-        super: false,
-        nonChecked: true
-      },
-      {
-        id: 2,
-        secret: 0,
-        balance: 0,
-        name: "The shop",
-        avatar: "https://www.penpublishing.com/squaresMobileTest.jpg",
-        shortname: "tsh2",
-        description: "The beautiful shop",
-        owner: {},
-        coowners: [],
-        public: false,
-        verified: false,
-        super: false,
-        nonChecked: true
-      }
-    ],
-    currentApp: {}
+    eventUrl: '',
+    myApps: [],
+    secretShow: false,
+    currentApp: {},
+    loc: null,
+    appError: false
   }),
+  mounted () {
+    if (process.browser) this.loc = window.location.host;
+  },
   methods: {
     setApp (app) {
+      this.createAppMenu = false;
       this.appOpened = this.currentApp != app || !this.appOpened;
       this.currentApp = app;
+      this.shortname = this.currentApp.shortname;
+      this.avatar = this.currentApp.avatar;
+      this.url = this.currentApp.url;
+      this.appError = false;
     },
     checkName () {
-      this.$refs.appName.innerText = this.$refs.appName.innerText.replace("\n", "")
+      this.$refs.appName.innerText = this.$refs.appName.innerText.trim().replace("\n", "")
       if (!this.$refs.appName.innerText.length) {
         this.$refs.appName.innerText = this.currentApp.name;
         return;
       }
-      this.currentApp.name = this.$refs.appName.innerText.substr(0, 32);
+      this.$refs.appName.innerText = this.$refs.appName.innerText.trim().substr(0, 32);
     },
     checkDesc () {
-      this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.replace("\n", "")
+      this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.trim().replace("\n", "")
       if (!this.$refs.appDesc.innerText.length) {
         this.$refs.appDesc.innerText = this.currentApp.description;
         return;
       }
-      this.currentApp.description = this.$refs.appDesc.innerText.substr(0, 300);
+      this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.trim().substr(0, 300);
     },
     checkShortName () {
-      if (!this.shortname.length) {
+      if (!this.shortname || !this.shortname.length) {
         this.shortname = this.currentApp.shortname;
         return;
       }
-      this.currentApp.shortname = this.shortname.substr(0, 12);
+      this.shortname = this.shortname.trim().substr(0, 12);
     },
     checkAvatar () {
-      if (!this.avatar.length) {
+      if (!this.avatar || !this.avatar.length) {
         this.avatar = this.currentApp.avatar;
         return;
       }
-      this.currentApp.avatar = this.avatar.substr(0, 64);
+      this.avatar = this.avatar.trim().substr(0, 64);
     },
     checkUrl () {
-      if (!this.url.length) {
+      if (!this.url || !this.url.length) {
         this.url = this.currentApp.url;
         return;
       }
-      this.currentApp.url = this.url.substr(0, 64);
+      this.url = this.url.trim().substr(0, 64);
+    },
+    checkEventUrl () {
+      if (!this.eventUrl || !this.eventUrl.length) {
+        this.eventUrl = this.currentApp.eventUrl;
+        return;
+      }
+      this.eventUrl = this.eventUrl.trim().substr(0, 64);
+    },
+    createApp () {
+      this.$axios.post("/apps", {
+        name: this.appName
+      }).then(this.refreshApps).catch(this.errorRefresh);
+      this.appName = "";
+    },
+    sendAllOfUs () {
+      this.$refs.appName.innerText = this.$refs.appName.innerText.replace("\n", "");
+      this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.replace("\n", "");
+      let data = {
+        name: this.$refs.appName.innerText.trim().substr(0, 32),
+        description: this.$refs.appDesc.innerText.trim().substr(0, 300),
+        shortname: (this.shortname) ? this.shortname.trim().substr(0, 12) : '',
+        avatar: (this.avatar) ? this.avatar.trim().substr(0, 64) : '',
+        url: (this.url) ? this.url.trim().substr(0, 64) : '',
+        eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : ''
+      }
+      this.$axios.put(`/apps/${this.currentApp._id}`, data)
+      .then(_r => {this.refreshApps(true)}).catch(this.errorRefresh);
+    },
+    deleteApp () {
+      this.$axios.delete(`/apps/${this.currentApp._id}`)
+      .then(this.refreshApps).catch(this.errorRefresh);
+    },
+    async refreshApps (save=false) {
+      this.appError = false;
+      let apps = await this.$axios.get('/apps');
+      this.myApps = apps.data;
+      if (save) return;
+      this.appOpened = false;
+      this.createAppMenu = false;
+      this.currentApp = {};
+    },
+    async errorRefresh(e) {
+      this.appError = e.response.data.error;
+      console.log(e.response)
+      this.currentApp = this.apps.find(a => a._id == this.currentApp._id) || {};
     }
-  },
-  async asyncData ({ app }) {
-    // return { apps: (await app.$axios.get("/apps")).data };
   },
   components: { HomeOutlineIcon, CheckIcon }
 };

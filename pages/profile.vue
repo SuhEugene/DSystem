@@ -24,10 +24,12 @@
       </div>
     </div>
     <div class="history">
-      <h1>История операций</h1>
       <div class="history__inner">
-        <p v-if="!$auth.user.logs.length">Операций не найдено</p>
-        <HistoryEl v-for="log in $store.state.logs" :key="log._id" :log="log"/>
+        <h1>История операций</h1>
+        <div class="history__inner__data">
+          <p v-if="!$auth.user.logs.length">Операций не найдено</p>
+          <HistoryEl v-for="log in $store.state.logs" :key="log._id" :log="log"/>
+        </div>
       </div>
     </div>
     <Call v-for="call in calls" :key="call.id" :user="call.user" :bank="call.bank"/>
@@ -42,7 +44,6 @@ import HistoryEl from "~/components/HistoryEl.vue";
 import UserAvatar from "~/components/UserAvatar.vue";
 
 export default {
-  // auth: "guest",
   components: {
     HeaderButtons,
     Call,
@@ -54,7 +55,7 @@ export default {
     banker: false,
     calls: [],
     status: "",
-    socket: 123
+    socket: null
   }),
   async asyncData({app}) {
     const posts = await app.$axios.get('/posts');
@@ -86,24 +87,24 @@ export default {
     this.socket = this.$nuxtSocket({persist: true});
     this.socket.on("connect", () => {
       console.log("[WS] connected");
+      this.socket.on("hello", err => {
+        this.$nuxt.$loading.finish();
+        console.log("[WS] logged in");
+      });
+      this.socket.on("logs", logs => {
+        console.log("[WS] recieved logs");
+        this.$store.commit("setLogs", logs);
+      });
+      this.socket.on("balance", bal => {
+        console.log("[WS] recieved balance");
+        this.$store.commit("setBal", bal);
+      });
       this.socket.emit("hello",
         localStorage.getItem("auth._token.discord") ||
         localStorage.getItem("auth._token.discord-reg") ||
         localStorage.getItem("auth._token.local"))
-        this.$nuxt.$loading.start();
+      this.$nuxt.$loading.start();
     })
-    this.socket.on("hello", err => {
-      this.$nuxt.$loading.finish();
-      console.log("[WS] logged in");
-    });
-    this.socket.on("logs", logs => {
-      console.log("[WS] recieved logs");
-      this.$store.commit("setLogs", logs);
-    });
-    this.socket.on("balance", bal => {
-      console.log("[WS] recieved balance");
-      this.$store.commit("setBal", bal);
-    });
   }
 };
 </script>

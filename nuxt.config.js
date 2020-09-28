@@ -5,6 +5,7 @@ export default {
     color: "#346db3",
     height: "4px"
   },
+  // loading: "~/components/LoadingBar.vue",
   env: {
     axiosBase: process.env.API_URL || 'http://localhost:8081',
     thisUrl: process.env.SELF_URL || 'http://localhost:8080'
@@ -14,6 +15,13 @@ export default {
    ** Doc: https://nuxtjs.org/api/configuration-mode
    */
   mode: "universal",
+  // mode: "spa",
+
+  loadingIndicator: {
+    name: 'three-bounce',
+    color: '#346db3',
+    background: '#222222'
+  },
 
   /*
    ** Headers of the page
@@ -36,8 +44,11 @@ export default {
       },
       {
         rel: "stylesheet",
-        href:
-          "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap"
+        href: "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap"
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap"
       }
     ]
   },

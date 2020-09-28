@@ -35,9 +35,13 @@ userRouter
     res.json({
       balance: req.user.balance,
       id: req.user.id,
+      uuid: req.user.uuid,
+      _id: req.user._id,
       role: req.user.role,
       status: req.user.status,
       username: req.user.username,
+      mayHave: req.user.mayHave,
+      sex: req.user.sex,
       logs: await getLogs(req)
     });
   })
@@ -52,6 +56,7 @@ userRouter
     res.json({
       balance: req.user.balance,
       id: req.user.id,
+      _id: req.user._id,
       role: req.user.role,
       status: req.user.status,
       username: req.user.username,
@@ -72,6 +77,8 @@ userRouter
       if (!user) return res.status(404).send({ error: "User not found" });
       let data = {
         id: user.id,
+        _id: user._id,
+        uuid: user.uuid,
         role: user.role,
         status: user.status,
         username: user.username

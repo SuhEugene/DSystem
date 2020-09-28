@@ -1,10 +1,11 @@
 $always-white: #ffffff;
 $always-black: #000000;
 $always-transp: transparent;
+$always-transp1: rgba(0,0,0,.2);
 $always-white-stroke: rgba(0, 0, 0, 0.1);
 $always-error: #ff2222;
 $always-danger: #ffaa00;
-$always-success: #77dd11;
+$always-success: #11dd33;
 $always-primary: #346db3;
 
 $background: #ffffff;
@@ -12,9 +13,12 @@ $text-light: #aaaaaa;
 $text-subtext: #777777;
 $text-simple: #000000;
 $text-heading: #000000;
+$card-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
+$card-hshadow: 0 2px 10px 0 rgba(0,0,0,.2);
 $card-stroke: rgba(0,0,0,.15);
-$card-hover: #f8f8f8;
+$card-hover: #fafafa;
 $card-background: #ffffff;
+$card-border-radius: 4px;
 
 $dark-background: #111111;
 $dark-text-light: #777777;
@@ -22,10 +26,33 @@ $dark-text-subtext: #aaaaaa;
 $dark-text-simple: #eeeeee;
 $dark-text-heading: #ffffff;
 $dark-card-stroke: rgba(255,255,255,.15);
+$dark-card-shadow: 0 2px 6px 0 rgba(0,0,0,.2);
 $dark-card-hover: #272727;
 $dark-card-background: #222222;
 
+$font-bold: 500;
+
 $font: "Rubik", Arial, sans-serif;
+// $font: "Inter", Arial, sans-serif;
+
+@mixin bcontainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin bcontainer-in {
+  max-width: 1200px;
+  width: 100%;
+}
+
+::selection {
+  background: #00000044;
+  .dark & {
+    background: #ffffff33;
+  }
+}
 
 
 html {
@@ -84,6 +111,127 @@ p, .p {
   color: $text-subtext;
 }
 
+.error   { color: $always-error; }
+.danger  { color: $always-danger; }
+.success { color: $always-success; }
+.primary { color: $always-primary; }
+
+#nonetwork {
+  background-color: $always-error;
+  color: $always-white;
+  padding: 3px 0;
+  font-size: 14px;
+  line-height: 14px;
+  width: 100%;
+  text-align: center
+}
+
+.hidden {
+  display: none;
+}
+
+[tooltip] {
+  &::before {
+    font-weight: normal;
+    content: attr(tooltip);
+    color: $always-white;
+    background: $always-black;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 16px;
+    display: block;
+    position: absolute;
+    top: -35px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  &::after {
+    font-weight: normal;
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid $always-black;
+    position: absolute;
+    top: -7px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  &:hover {
+    &[tooltip]::before, &[tooltip]::after {
+      opacity: 1;
+    }
+  }
+}
+
+.main-loading-page, .loading-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #222;
+  text-align: center;
+  font-family: $font;
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.main-loading-page {
+  background: $always-primary;
+  svg {
+    width: 70%;
+    max-width: 200px;
+    color: white;
+  }
+  &.a1 svg { animation: blinkLogo1 2s ease-in-out infinite both; }
+  &.a2 svg { animation: blinkLogo2 2s ease-in-out infinite both; }
+  &.a3 svg { animation: blinkLogo3 2s ease-in-out infinite both; }
+  &.a4 svg { animation: blinkLogo4 2s ease-in-out infinite both; }
+  &.a5 svg { animation: blinkLogo5 2s linear infinite both; }
+  &.a6 svg { animation: blinkLogo6 2s ease-in-out infinite both; }
+}
+
+@keyframes blinkLogo1 {
+  from { opacity: 1; }
+  50%  { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+@keyframes blinkLogo2 {
+  from { transform: translateX(-30px); }
+  50%  { transform: translateX(30px); }
+  to   { transform: translateX(-30px); }
+}
+@keyframes blinkLogo3 {
+  from { transform: translateY(-30px); }
+  50%  { transform: translateY(30px); }
+  to   { transform: translateY(-30px); }
+}
+@keyframes blinkLogo4 {
+  from { transform: rotate(45deg); }
+  50%  { transform: rotate(-45deg); }
+  to   { transform: rotate(45deg); }
+}
+@keyframes blinkLogo5 {
+  from { transform: rotate(0deg); }
+  50%  { transform: rotate(-180deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes blinkLogo6 {
+  from { transform: translateY(0) rotate(0deg); }
+  30%  { transform: translateY(0) rotate(-45deg); }
+  50%  { transform: translateY(-200px) rotate(360deg); }
+  // 60%  { transform: translateY(-100vh) rotate(90deg); }
+  to   { transform: translateY(0) rotate(360deg); }
+}
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none!important;
@@ -129,9 +277,9 @@ input[type=number]::-webkit-outer-spin-button {
 input[type=text], input[type=password], input[type=number], input[type=email], input[type=url] {
   height: 40px;
   width: 100%;
-  box-shadow: 0 0 0 1px $text-light;
+  box-shadow: 0 0 0 1px $card-stroke;
   border:none;
-  border-radius: 12px;
+  border-radius: $card-border-radius;
   font-family: $font;
   color: $text-simple;
   font-size: 18px;
@@ -139,7 +287,7 @@ input[type=text], input[type=password], input[type=number], input[type=email], i
   transition: box-shadow .13s;
   background: $background;
   &:hover {
-    box-shadow: 0 0 0 1px $text-subtext;
+    box-shadow: 0 0 0 1px $text-light;
   }
   &:focus {
     box-shadow: 0 0 0 2px $always-primary;
@@ -148,12 +296,18 @@ input[type=text], input[type=password], input[type=number], input[type=email], i
     pointer-events: none;
     opacity: 0.5;
   }
+  & + small {
+    color: $always-error;
+  }
   .dark & {
-    box-shadow: 0 0 0 1px $dark-text-light;
+    box-shadow: 0 0 0 1px $dark-card-stroke;
     background: $dark-background;
     color: $dark-text-simple;
     &:hover {
-      box-shadow: 0 0 0 1px $dark-text-subtext;
+      box-shadow: 0 0 0 1px $dark-text-light;
+    }
+    &:focus {
+      box-shadow: 0 0 0 2px $always-primary;
     }
   }
 }
@@ -201,7 +355,7 @@ label.radio {
 
 a {
   color: $text-subtext;
-  font-weight: 500;
+  font-weight: $font-bold;
   text-decoration: underline;
   transition: color .13s;
   &:hover {
@@ -224,7 +378,7 @@ button, a.btn {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-weight: 500;
+  font-weight: $font-bold;
   cursor: pointer;
   &.icon {
     width: 40px;
@@ -241,6 +395,17 @@ button, a.btn {
     }
     &:active {
       background: darken($color: $always-primary, $amount: 7);
+    }
+  }
+  &.error {
+    background: $always-error;
+    color: white;
+    transition: background .13s, opacity .13s;
+    &:hover {
+      background: darken($color: $always-error, $amount: 4);
+    }
+    &:active {
+      background: darken($color: $always-error, $amount: 7);
     }
   }
   &.secondary {
@@ -293,7 +458,7 @@ button, a.btn {
     width: 100%;
     z-index: 10000;
     background: $card-background;
-    box-shadow: 0 0 0 1px $card-stroke;
+    box-shadow: $card-shadow;
     max-height: 400px;
     overflow: auto;
     &__item {
@@ -333,7 +498,7 @@ button, a.btn {
         background: #444;
       }
       background: $dark-card-background;
-      box-shadow: 0 0 0 1px $dark-card-stroke;
+      box-shadow: $dark-card-shadow;
       &__item {
         color: $dark-text-simple;
         &--selected {
@@ -360,8 +525,8 @@ button, a.btn {
   align-items: flex-start;
   flex-direction: column;
   padding: 20px 25px;
-  box-shadow: inset 0 0 0 1px $card-stroke;
-  border-radius: 24px;
+  box-shadow: $card-shadow;
+  border-radius: $card-border-radius;
   z-index: 9999;
   background: $background;
   &__title {
@@ -390,7 +555,7 @@ button, a.btn {
     align-items: center;
   }
   .dark & {
-    box-shadow: inset 0 0 0 1px $dark-card-stroke;
+    box-shadow: $dark-card-shadow;
     background: $dark-background;
     &__descr {
       color: $dark-text-subtext;
@@ -404,7 +569,7 @@ button, a.btn {
 
 .user-avatar {
   background: $always-white;
-  box-shadow: inset 0 0 0 2px $always-white-stroke;
+  box-shadow: inset 0 0 0 1px $always-white-stroke;
   padding: 20px;
   border-radius: 30px;
   overflow: hidden;
@@ -436,7 +601,7 @@ button, a.btn {
     border-radius: 50%;
     &:hover {
       background: $card-stroke;
-      box-shadow: 0 0 0 2px $card-stroke;
+      box-shadow: $card-shadow;
     }
     &[tooltip]::before {
       font-weight: normal;
@@ -455,7 +620,7 @@ button, a.btn {
       opacity: 0;
       transition: opacity 0.2s;
       pointer-events: none;
-      box-shadow: 0 0 0 2px $card-stroke;
+      box-shadow: $card-shadow;
     }
     &[tooltip]::after {
       font-weight: normal;
@@ -500,7 +665,7 @@ button, a.btn {
     color: $always-white!important;
     border-radius: 15px;
     border: 3px solid $always-white!important;
-    background: $always-transp!important;
+    background: $always-transp1!important;
     transition: .13s border-color, .13s box-shadow!important;
     box-shadow: none!important;
     min-width: auto!important;
@@ -529,7 +694,7 @@ button, a.btn {
     transition: all 0.13s;
     cursor: pointer;
     position: relative;
-    font-weight: 500;
+    font-weight: $font-bold;
     &--w2 {
       width: 105px;
     }
@@ -587,13 +752,26 @@ button, a.btn {
   }
 }
 .profile-header {
+  @include bcontainer;
   color: $always-white;
-  background: url("https://cdn.dribbble.com/users/1016207/screenshots/3391077/14.jpg") center center;
+  // background: url("https://images.pexels.com/photos/370799/pexels-photo-370799.jpeg") center center;
+  // background: url("https://i.ytimg.com/vi/7GKZqLmL4PI/maxresdefault.jpg") center center;
+  // background: url("http://i1.ytimg.com/vi/xgh4NBSYYKA/maxresdefault.jpg") center center;
+  // background: url("http://4.bp.blogspot.com/-NRO6IfXOyWI/UFzlQf4VPeI/AAAAAAAAAGY/7GcmlF8m2tI/s1600/Abstract-purple-wallpaper.jpg") center center;
+  // background: url("http://i.ytimg.com/vi/9u6pcYWq1fY/maxresdefault.jpg") center center;
+  // background: url("http://2.bp.blogspot.com/-RiCzlsLuNnM/T3PLGnXCV3I/AAAAAAAAANM/RRyLU5ePjkY/s1600/image.png") center center;
+  // background: url("https://i.ytimg.com/vi/dg-s-7QLoB0/maxresdefault.jpg") center center;
+  // background: url("https://media.discordapp.net/attachments/734134835190300740/757229871993978880/iK3n4Xhd6GE.png") center center;
+  background: url("https://www.schematicstore.com/shopdata/529/sales/4131a83d08f5ab4190639d95446836d6.jpg") center center;
+  // background: url("https://cdn-asset-mel-1.airsquare.com/cyclewerks/managed/image/product/DA04ABC3-8D99-11E5-9CFF4902151E9189-zoom.jpg") center center;
+  // background: url("http://4.bp.blogspot.com/-5vhEElaEwt8/VAKIkxBnS8I/AAAAAAAAAOY/3a63DLiUp0o/s1600/Minecraft+wallpapers+7minecraft.com+053.jpg") center 20%;
+  // background: url("https://i.ytimg.com/vi/-U1PjstoBVs/maxresdefault.jpg") center 70%;
+  // background: url("https://i.ytimg.com/vi/Wqi0_OsgbAE/maxresdefault.jpg") center 20%;
+  // background: url("https://i.ytimg.com/vi/wVWJHoPG5fE/maxresdefault.jpg") center 30%;
+  // background: linear-gradient(20deg, #144d93, #548dd3);
+  // background: linear-gradient(20deg, #ff00d4, #00f3ff);
+  // background: white;
   background-size: cover;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
   position: relative;
   padding: 32px 64px;
   &__overlay {
@@ -614,6 +792,7 @@ button, a.btn {
     }
   }
   &__holder {
+    @include bcontainer-in;
     width: 100%;
     z-index: 1;
     display: flex;
@@ -636,7 +815,7 @@ button, a.btn {
     margin-left: 64px;
     &--name {
       font-size: 32px;
-      font-weight: 500;
+      font-weight: $font-bold;
     }
     &--status {
       font-size: 16px!important;
@@ -662,7 +841,7 @@ button, a.btn {
     }
     &--value {
       font-size: 32px;
-      font-weight: 500;
+      font-weight: $font-bold;
     }
   }
 }
@@ -672,20 +851,21 @@ button, a.btn {
   align-items: center;
   flex-direction: row;
   padding: 20px 30px;
-  border-radius: 20px;
-  transition: 0.1s all;
+  border-radius: $card-border-radius;
+  transition: 0.13s all;
   height: 80px;
   // cursor: pointer;
   background: $card-background;
-  box-shadow: inset 0 0 0 1px $card-stroke;
-  margin-bottom: 10px;
+  box-shadow: $card-shadow;
+  margin-bottom: 8px;
   animation: yellowbg 2s;
   &:last-child {
     margin-bottom: 0;
   }
-  // &:hover {
-  //   background: $card-hover;
-  // }
+  &:hover {
+    // background: $card-hover;
+    box-shadow: $card-hshadow;
+  }
   &__space {display:none; flex-grow: 1;}
   &__icon {
     display: flex;
@@ -752,7 +932,7 @@ button, a.btn {
       overflow: hidden;
       display: inline-block;
       max-height: 40px;
-      // font-weight: 500;
+      // font-weight: $font-bold;
     }
   }
   &__comm {
@@ -786,7 +966,7 @@ button, a.btn {
   }
   .dark & {
     background: $dark-card-background;
-    box-shadow: inset 0 0 0 1px $dark-card-stroke;
+    box-shadow: $dark-card-shadow;
     &:hover {
       background: $dark-card-hover;
     }
@@ -814,35 +994,43 @@ button, a.btn {
   }
 }
 .history {
+  @include bcontainer;
   padding: 40px 64px;
+  h1 {
+    width: 100%;
+  }
   &__inner {
-    max-height: 400px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    &::-webkit-scrollbar {
-      width: 5px;
-    }
-    &::-webkit-scrollbar-track {
-      background: $background;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: $card-stroke;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background: #aaa;
-    }
-    .dark & {
+    @include bcontainer-in;
+    &__data {
+      padding: 5px 10px;
+      max-height: 400px;
+      overflow-x: hidden;
+      overflow-y: auto;
       &::-webkit-scrollbar {
         width: 5px;
       }
       &::-webkit-scrollbar-track {
-        background: $dark-background;
+        background: $background;
       }
       &::-webkit-scrollbar-thumb {
-        background: $dark-card-stroke;
+        background: $card-stroke;
       }
       &::-webkit-scrollbar-thumb:hover {
-        background: #444;
+        background: #aaa;
+      }
+      .dark & {
+        &::-webkit-scrollbar {
+          width: 5px;
+        }
+        &::-webkit-scrollbar-track {
+          background: $dark-background;
+        }
+        &::-webkit-scrollbar-thumb {
+          background: $dark-card-stroke;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+          background: #444;
+        }
       }
     }
   }
@@ -889,26 +1077,33 @@ button, a.btn {
 
 
 #apps-page {
+  @include bcontainer;
   header {
+    width: 100%;
     padding: 10px 20px;
     background-color: $card-background;
-    box-shadow: inset -1px -3px 0 -2px $card-stroke;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    h1 {
-      margin: 0 0 0 16px;
+    box-shadow: $card-shadow;
+    @include bcontainer;
+    .all {
+      @include bcontainer-in;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      h1 {
+        margin: 0 0 0 16px;
+      }
     }
   }
   main {
     padding: 20px 30px;
+    @include bcontainer-in;
     .apps {
       display: flex;
       align-items: flex-start;
       justify-content: flex-start;
       flex-direction: column;
       flex-wrap: wrap;
-      padding-right: 20px;
+      padding-right: 30px;
       flex-shrink: 0;
     }
   }
@@ -922,21 +1117,24 @@ button, a.btn {
     padding: 15px;
     margin: 7px 0;
     background-color: $card-background;
-    box-shadow: inset 0 0 0 1px $card-stroke;
+    box-shadow: $card-shadow;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
-    border-radius: 24px;
+    border-radius: $card-border-radius;
     width: 100%;
     max-width: 300px;
     cursor: pointer;
-    transition: background .13s;
+    transition: box-shadow .13s;
     &:hover {
-      background-color: $card-hover;
+      box-shadow: $card-hshadow;
     }
     &.active {
-      box-shadow: inset 0 0 0 1px $always-primary;
+      box-shadow: $card-shadow, inset 0 0 0 1px $always-primary;
+      &:hover {
+        box-shadow: $card-hshadow, inset 0 0 0 1px $always-primary;
+      }
     }
     &__data {
       display: flex;
@@ -968,42 +1166,51 @@ button, a.btn {
         display: flex;
         justify-content: center;
         align-items: center;
+        color: $always-white;
         span {
           line-height: 12px;
+          color: $always-white;
         }
       }
     }
   }
   #one-app {
-    border: 1px solid $card-stroke;
-    border-right: none;
+    box-shadow: $card-shadow;
+    background: $card-background;
     padding: 15px 20px;
-    border-radius: 26px 0 0 26px;
+    border-radius: $card-border-radius;
     width: 100%;
     .input {
       margin-top: 15px;
       font-weight: bold;
       input {
         font-weight: normal;
-        margin-top: 2px;
+        margin-top: 4px;
       }
+    }
+    .dark & {
+      background: $dark-card-background;
+      box-shadow: $dark-card-shadow;
     }
   }
   .dark & {
     header {
       background-color: $dark-card-background;
-      box-shadow: inset -1px -3px 0 -2px $dark-card-stroke;
+      box-shadow: $dark-card-shadow;
     }
     .app {
       background-color: $dark-card-background;
-      box-shadow: inset 0 0 0 1px $dark-card-stroke;
+      box-shadow: $dark-card-shadow;
       &:hover {
         background-color: $dark-card-hover;
+      }
+      &.active {
+        box-shadow: $dark-card-shadow, inset 0 0 0 1px $always-primary;
       }
       &__title {color: $dark-text-heading;}
     }
     #one-app {
-      border-color: $dark-card-stroke;
+      box-shadow: $dark-card-shadow;
     }
   }
 }
@@ -1055,17 +1262,17 @@ button, a.btn {
   }
   form {
     padding: 20px 25px;
-    box-shadow: inset 0 0 0 2px $card-stroke;
+    box-shadow: $card-shadow;
     background: $card-background;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 16px;
+    border-radius: $card-border-radius;
   }
 }
 .dark {
   form {
-    box-shadow: inset 0 0 0 2px $dark-card-stroke;
+    box-shadow: $dark-card-shadow;
     background: $dark-card-background;
   }
   p {
@@ -1075,6 +1282,150 @@ button, a.btn {
     color: $dark-text-heading;
   }
 }
+
+
+.app-img {
+  height: 64px;
+  width: 64px;
+  border-radius: 12px;
+  position: relative;
+  &--big, &--big img {
+    height: 80px!important;
+    width: 80px!important;
+  }
+  img {
+    height: 64px;
+    width: 64px;
+    border-radius: 14px;
+  }
+  .verify {
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    background: #346db3;
+    right: -6px;
+    bottom: -6px;
+    border-radius: 50%;
+    z-index: 999;
+    box-shadow: inset 0 0 0 2px $card-stroke;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    color: $always-white;
+    span {
+      line-height: 12px;
+      color: $always-white;
+    }
+  }
+}
+
+#app-send {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-width: 300px;
+  word-break: break-word;
+  .title {
+    font-size: 16px;
+    opacity: 0.75;
+    font-weight: bold;
+    text-align: center;
+  }
+  .icons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    & > div {
+      margin: 10px;
+      &:first-child { margin-left: 0 }
+      &:last-child { margin-right: 0 }
+    }
+    .arrow {
+      height: 5px;
+      width: 40px;
+      position: relative;
+      &::before, &::after {
+        content: "";
+        width: 15px;
+        height: 5px;
+        background: $card-stroke;
+        display: block;
+        position: absolute;
+        top: 0;
+      }
+      &::before { left: 0; }
+      &::after { right: 0; }
+    }
+  }
+  .attrs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    &__one {
+      min-width: 50%;
+      &__title {
+        font-size: 14px;
+        margin-bottom: 4px;
+        opacity: 0.7;
+      }
+      &__text {
+        font-size: 20px;
+        font-weight: bold;
+        word-break: break-word;
+      }
+    }
+  }
+  .sum {
+    &__title {
+      font-size: 14px;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+    &__num {
+      font-size: 38px;
+      font-weight: bold;
+    }
+  }
+  .buttons {
+    margin-top: 17px;
+    width: 100%;
+  }
+  .dark & {
+    .arrow::before, .arrow::after {
+      background: $dark-card-stroke;
+    }
+  }
+}
+
+#hidden-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden-form {
+  padding: 20px;
+  max-width: 400px;
+  width: 100%;
+  border-radius: $card-border-radius;
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  // input {
+  //   margin-top: 5px;
+  // }
+  label {
+    margin-bottom: 10px;
+    display: block;
+  }
+  margin-bottom: 20px;
+}
+
 
 
 @media (max-width: 830px) {
@@ -1137,6 +1488,9 @@ button, a.btn {
 @media (max-width: 680px) {
   #apps-page main .apps {
     grid-template-columns: auto;
+  }
+  #my-apps {
+    display: none;
   }
   .history__inner::-webkit-scrollbar {
     width: 1px;

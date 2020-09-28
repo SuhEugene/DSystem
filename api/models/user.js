@@ -9,6 +9,7 @@ const userModel = new Schema({
   status:   { type: String },
   sex:      { type: Number },
   balance:  { type: Number },
-  role:     { type: Number }
+  role:     { type: Number },
+  mayHave:  { type: Number }
 });
 module.exports = mongoose.model("users", userModel);

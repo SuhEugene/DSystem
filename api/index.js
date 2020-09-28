@@ -10,25 +10,32 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const Post = require("./models/post");
+const App = require("./models/app");
 require("dotenv").config();
 
 io.users = [];
 
-const db = mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
+
+
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/user/:id", (req, res) => {
+app.use((req, res, next) => {
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
   res.append("Access-Control-Allow-Headers", "*");
   res.append("Access-Control-Allow-Methods", "*");
   if (req.method == "OPTIONS") return res.status(200).send();
+  next();
+})
+
+app.get("/user/:id", (req, res) => {
   if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
   User.findOne({
     $or: [
@@ -49,20 +56,29 @@ app.use("/user/:id", (req, res) => {
   });
 })
 
-app.use(function(req, res, next) {
-  res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
-  res.append("Access-Control-Allow-Headers", "*");
-  res.append("Access-Control-Allow-Methods", "*");
-  if (req.method == "OPTIONS") return res.status(200).send();
+app.get("/apps/:id", async (req, res) => {
+  if (!req.params.id) return res.status(400).send();
+  let app = await App.findOne({shortname: String(req.params.id)});
+  if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
+    app = await App.findOne({ _id: req.params.id });
+  }
+  if (!app) return res.status(404).send({ error: "App not found" });
+  req.app = app;
+  res.status(200).send(app);
+})
 
+const authRouter = require("./routes/auth");
+const oauth2Router = require("./oauth2");
+app.use("/auth", authRouter);
+app.use("/oauth2", oauth2Router);
+
+app.use(function(req, res, next) {
   var token = req.headers["authorization"];
-  if (req.path.startsWith("/auth")) return next();
-  // if (req.path.startsWith("/user") && req.path != "/user/@me") return next();
   if (!token) return res.status(403).send("--- Пшёл вон ---");
 
   token = token.replace("Bearer ", "");
-  jwt.verify(token, process.env.JWT_SECRET, function(err, user) {
-    if (err) return res.status(401).json({ error: true, message: "Token Err" });
+  jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
+    if (err) return res.status(401).json({ error: "Invalid token" });
     req.user = user;
     req.io = io;
     next();
@@ -71,11 +87,9 @@ app.use(function(req, res, next) {
 
 const userRouter = require("./routes/users");
 const appRouter = require("./routes/apps");
-const authRouter = require("./routes/auth");
 const moneyRouter = require("./routes/money");
 app.use("/users", userRouter);
 app.use("/apps", appRouter);
-app.use("/auth", authRouter);
 app.use("/money", moneyRouter);
 
 app.get("/posts", (req, res) => {

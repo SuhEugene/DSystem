@@ -81,8 +81,8 @@ router
         balance: 0,
         role: 0
       });
-      newUser.save();
-      let token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
+      await newUser.save();
+      let token = jwt.sign({ id: newUser.id, _id: newUser._id }, process.env.JWT_SECRET, {
         expiresIn: 604800 // 1 Week
       });
       res.json({ token });
@@ -96,10 +96,9 @@ router
     );
     User.findOne({ id }, async (err, user) => {
       if (err) return;
-      // console.log("ufoid -> ", id);
       if (!user)
         return res.status(404).send({ error: "User not found" });
-      let token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      let token = jwt.sign({ id: user.id, _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: 604800 // 1 Week
       });
       res.json({ token });
