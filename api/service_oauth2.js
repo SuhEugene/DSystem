@@ -42,6 +42,16 @@ const generateCode = () => Math.round(Math.random()*10000000);
 //   next();
 // })
 router
+  // .use((req, res, next) => {
+  //   if (cooldown[req.user.id] &&
+  //       cooldown[req.user.id][req.path] &&
+  //       cooldown[req.user.id][req.path][req.method] &&
+  //       Date.now() - cooldown[req.user.id][req.path][req.method] < 2000)
+  //     return res.status(400).send({ error: "Cooldown" });
+  //   if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
+  //   if (!cooldown[req.user.id][req.path]) cooldown[req.user.id][req.path] = {};
+  //   cooldown[req.user.id][req.path][req.method] = Date.now();
+  // })
   .get("/code", async (req, res) => {
     var token = req.headers["authorization"];
     if (!token) return res.status(403).send("--- Пшёл вон ---");
@@ -61,16 +71,6 @@ router
       codes[code] = req.body.concat({ user_id: user._id });
       res.send({ code });
     });
-  })
-  .use((req, res, next) => {
-    if (cooldown[req.user.id] &&
-        cooldown[req.user.id][req.path] &&
-        cooldown[req.user.id][req.path][req.method] &&
-        Date.now() - cooldown[req.user.id][req.path][req.method] < 2000)
-      return res.status(400).send({ error: "Cooldown" });
-    if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
-    if (!cooldown[req.user.id][req.path]) cooldown[req.user.id][req.path] = {};
-    cooldown[req.user.id][req.path][req.method] = Date.now();
   })
   .post("/token", (req, res) => {
     const test = validator.tokenExchange.validate(req.body);
@@ -125,6 +125,6 @@ router
     });
   })
 
-express.listen(8082, () => console.log("> OAuth2 service started on *:8082"))
+// express.listen(8082, () => console.log("> OAuth2 service started on *:8082"))
 
 module.exports = router;

@@ -51,7 +51,7 @@ userRouter
     .catch(()=>{ res.status(500).send() })
   })
   .patch("/@me/status", async (req, res) => {
-    req.user.status = req.body.status || null;
+    req.user.status = req.body.status.substr(0, 32) || null;
     await req.user.save();
     res.json({
       balance: req.user.balance,
