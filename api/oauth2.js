@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 // const bcrypt = require("bcryptjs");
 // const fetch = require("node-fetch");
 const User = require("../models/user");
-// const App = require("../models/app");
+const App = require("../models/app");
 // const Logs = require("../models/logs");
 
 // const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);

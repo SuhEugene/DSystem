@@ -95,10 +95,8 @@ app.use("/money", moneyRouter);
 app.get("/posts", (req, res) => {
   Post.find((err, posts) => {
     if (err) return;
-    // console.log("POSTS", posts);
     User.findOne({ id: req.user.id }, (err, user) => {
       if (err) return console.error(err);
-      // console.log("user.role", user.role);
       if (user.role > 2) return res.json(posts);
       return res.json(posts.filter(p => p.id != 0).map(p => ({ name: p.name, id: p.id })))
     });
