@@ -5,14 +5,10 @@ const router = express.Router();
 const Joi = require('joi');
 
 const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcryptjs");
-// const fetch = require("node-fetch");
 const User = require("../models/user");
 const App = require("../models/app");
-// const Logs = require("../models/logs");
 
-// const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
-// let cooldown = {};
+let cooldown = {};
 
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(20).required(),
@@ -86,11 +82,11 @@ router
     if (!app || app.secret != req.body.client_secret || app.url != req.body.redirect_uri)
       return res.status(400).send({ error: "Invalid app" });
 
-    const user_id = codes[code].user_id;
+    const { user_id, scope } = codes[code];
     delete codes[code];
 
-    const access_token = jwt.sign({ user_id }, process.env.ACCESS_SECRET, { expiresIn: 604800 }); // 1 Week
-    const refresh_token = jwt.sign({ user_id }, process.env.REFRESH_SECRET, { expiresIn: 1814400 }); // 3 Weeks
+    const access_token = jwt.sign({ user_id, scope }, process.env.ACCESS_SECRET, { expiresIn: 604800 }); // 1 Week
+    const refresh_token = jwt.sign({ user_id, scope }, process.env.REFRESH_SECRET, { expiresIn: 1814400 }); // 3 Weeks
     res.send({
       access_token,
       refresh_token,
@@ -109,8 +105,16 @@ router
     jwt.verify(req.body.resfresh_token, process.env.JWT_SECRET, (err, user) => {
       if (err) return res.status(401).json({ error: "Invalid token" });
 
-      const access_token = jwt.sign({ user.user_id }, process.env.ACCESS_SECRET, { expiresIn: 604800 }); // 1 Week
-      const refresh_token = jwt.sign({ user.user_id }, process.env.REFRESH_SECRET, { expiresIn: 1814400 }); // 3 Weeks
+      const access_token = jwt.sign(
+        { user_id: user.user_id, scope: user.scope },
+        process.env.ACCESS_SECRET,
+        { expiresIn: 604800 } // 1 Week
+      ); 
+      const refresh_token = jwt.sign(
+        { user_id: user.user_id, scope: user.scope },
+        process.env.REFRESH_SECRET,
+        { expiresIn: 1814400 } // 3 Weeks
+      );
 
       res.send({
         access_token,

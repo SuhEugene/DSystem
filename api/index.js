@@ -68,7 +68,7 @@ app.get("/apps/:id", async (req, res) => {
 })
 
 const authRouter = require("./routes/auth");
-const oauth2Router = require("./oauth2");
+const oauth2Router = require("./service_oauth2");
 app.use("/auth", authRouter);
 app.use("/oauth2", oauth2Router);
 
