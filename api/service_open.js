@@ -5,8 +5,8 @@ const router = express.Router();
 const Joi = require('joi');
 
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const App = require("../models/app");
+const User = require("./models/user");
+const App = require("./models/app");
 
 let cooldown = {};
 

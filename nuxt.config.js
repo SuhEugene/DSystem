@@ -38,6 +38,18 @@ export default {
       }
     ],
     link: [
+      // {
+      //   rel: "canonical",
+      //   href: "https://dromon.ru/"
+      // },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com"
+      },
+      {
+        rel: "preconnect",
+        href: process.env.API_URL || 'http://localhost:8081'
+      },
       {
         rel: "icon",
         href: "/favicon.ico"
@@ -158,6 +170,6 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+    extend(config, ctx) { },
   }
 };

@@ -1,5 +1,5 @@
 <template>
-  <form style="position: relative; overflow: hidden" id="app-send" onsubmit="() => false">
+  <form id="app-send" onsubmit="() => false">
     <div v-if="app === false">
       <h2>Ошибка</h2>
       <p>Приложение не найдено</p>
@@ -13,18 +13,20 @@
       </div>
       <div class="icons">
         <div class="app-img app-img--big">
-          <img v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
+          <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
         <div class="app-img">
           <div class="verify"><CheckIcon size="12"/></div>
-          <img src="https://www.penpublishing.com/squaresMobileTest.jpg">
+          <img alt="App avatar" src="https://www.penpublishing.com/squaresMobileTest.jpg">
         </div>
       </div>
       <div class="sum">
         <div class="sum__title">Сумма</div>
         <div class="sum__num" v-if="$route.params.sum || page > 0">{{$route.params.sum || sum}} АР</div>
-        <input type="number" v-if="!$route.params.sum && page == 0" v-model="sum">
+        <label>
+          <input type="number" v-if="!$route.params.sum && page == 0" v-model="sum">
+        </label>
       </div>
       <!-- <transition-group name="swipe" style="position: relative"> -->
         <div class="attrs" v-if="page == 0" key="0">
@@ -94,7 +96,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     layout: "loginLayout",
     data: () => ({
       password: "",
-      page: 2,
+      page: 0,
       loading: false,
       sum: 0,
       app: {},

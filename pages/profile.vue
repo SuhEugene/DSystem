@@ -8,11 +8,14 @@
         <div class="profile-header__holder--nick-bal">
           <div class="profile-header__nickname">
             <div class="profile-header__nickname--name">{{$auth.user.username}}</div>
-            <input class="profile-header__nickname--status"
-                   @blur="sendStatus"
-                   v-model="status"
-                   placeholder="Укажите статус"
-                   type="text">
+            <label>
+              <input class="profile-header__nickname--status"
+                     @blur="sendStatus"
+                     v-model="status"
+                     placeholder="Укажите статус"
+                     type="text" id="sendStatus"
+                     name="sendStatus">
+           </label>
           </div>
           <div class="profile-header__balance">
             <div class="profile-header__balance--title">Баланс</div>

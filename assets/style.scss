@@ -9,8 +9,8 @@ $always-success: #11dd33;
 $always-primary: #346db3;
 
 $background: #ffffff;
-$text-light: #aaaaaa;
-$text-subtext: #777777;
+$text-light: #757575;
+$text-subtext: #565656;
 $text-simple: #000000;
 $text-heading: #000000;
 $card-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
@@ -294,7 +294,7 @@ input[type=text], input[type=password], input[type=number], input[type=email], i
   }
   &.disabled {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.8;
   }
   & + small {
     color: $always-error;
@@ -762,7 +762,6 @@ button, a.btn {
   // background: url("http://2.bp.blogspot.com/-RiCzlsLuNnM/T3PLGnXCV3I/AAAAAAAAANM/RRyLU5ePjkY/s1600/image.png") center center;
   // background: url("https://i.ytimg.com/vi/dg-s-7QLoB0/maxresdefault.jpg") center center;
   // background: url("https://media.discordapp.net/attachments/734134835190300740/757229871993978880/iK3n4Xhd6GE.png") center center;
-  background: url("https://www.schematicstore.com/shopdata/529/sales/4131a83d08f5ab4190639d95446836d6.jpg") center center;
   // background: url("https://cdn-asset-mel-1.airsquare.com/cyclewerks/managed/image/product/DA04ABC3-8D99-11E5-9CFF4902151E9189-zoom.jpg") center center;
   // background: url("http://4.bp.blogspot.com/-5vhEElaEwt8/VAKIkxBnS8I/AAAAAAAAAOY/3a63DLiUp0o/s1600/Minecraft+wallpapers+7minecraft.com+053.jpg") center 20%;
   // background: url("https://i.ytimg.com/vi/-U1PjstoBVs/maxresdefault.jpg") center 70%;
@@ -771,6 +770,7 @@ button, a.btn {
   // background: linear-gradient(20deg, #144d93, #548dd3);
   // background: linear-gradient(20deg, #ff00d4, #00f3ff);
   // background: white;
+  background: url("~@/assets/profile_bg.webp") center center;
   background-size: cover;
   position: relative;
   padding: 32px 64px;
@@ -924,7 +924,7 @@ button, a.btn {
   &__user {
     &--title {
       font-size: 12px;
-      color: $text-subtext;
+      color: $text-light;
     }
     &--value {
       font-size: 20px;
@@ -957,7 +957,7 @@ button, a.btn {
     }
     &::after {
       content: "АР";
-      color: $text-subtext;
+      color: $text-light;
       font-size: 16px;
     }
     &--minus::before {
@@ -1235,6 +1235,12 @@ button, a.btn {
     margin-bottom: 5px;
     color: $text-subtext;
   }
+  .title {
+    font-size: 16px;
+    opacity: 0.75;
+    font-weight: bold;
+    text-align: center;
+  }
   .heading {
     font-size: 26px;
     font-weight: bold;
@@ -1263,6 +1269,9 @@ button, a.btn {
   form {
     padding: 20px 25px;
     box-shadow: $card-shadow;
+    max-width: 300px;
+    overflow: hidden;
+    position: relative;
     background: $card-background;
     display: flex;
     justify-content: center;
@@ -1327,12 +1336,6 @@ button, a.btn {
   flex-direction: column;
   max-width: 300px;
   word-break: break-word;
-  .title {
-    font-size: 16px;
-    opacity: 0.75;
-    font-weight: bold;
-    text-align: center;
-  }
   .icons {
     display: flex;
     justify-content: space-between;

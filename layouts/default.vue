@@ -25,6 +25,9 @@ export default {
   }),
   head () {
     return ({
+      htmlAttrs: {
+        lang: 'ru'
+      },
       meta: [
         {
           hid: "description",

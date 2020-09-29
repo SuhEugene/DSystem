@@ -1,9 +1,9 @@
 <template>
   <div class="user-avatar">
-    <img :src="`https://minotar.net/armor/bust/${user.username}/300.png`">
+    <img alt="User's avatar" :src="`https://minotar.net/armor/bust/${user.username}/300.png`">
     <div>
       <div v-for="badge in badges" :key="badge.tooltip" :tooltip="badge.tooltip" class="user-avatar__badge">
-        <img :src="badge.url">
+        <img alt="badge" :src="badge.url">
       </div>
     </div>
   </div>

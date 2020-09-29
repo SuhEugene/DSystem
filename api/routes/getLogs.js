@@ -13,8 +13,6 @@ module.exports = (req) => {
       .populate("fromUser")
       .populate("toApp")
       .populate("toUser");
-    // logs_data.reverse();
-    console.log("LOGS_DATA", logs_data);
     send(logs_data);
   })
 }

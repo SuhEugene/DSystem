@@ -26,6 +26,9 @@ export default {
   head () {
     if (this.$route.path.startsWith("/user")) return;
     return ({
+      htmlAttrs: {
+        lang: 'ru'
+      },
       meta: [
         {
           hid: "description",

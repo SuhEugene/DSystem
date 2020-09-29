@@ -5,19 +5,17 @@ const router = express.Router();
 const Joi = require('joi');
 
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const App = require("../models/app");
+const User = require("./models/user");
+const App = require("./models/app");
 
 let cooldown = {};
 
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(20).required(),
   response_type: Joi.string().allow('token', 'code').required(),
-  prompt: Joi.string().allow('consent', 'none'),
   state: Joi.string().max(64),
   redirect_uri: Joi.string().max(64).required(),
   scope: Joi.array().items(Joi.string().max(20)).required(),
-  code: Joi.string().length(12).required()
 });
 
 const tokenExchange = Joi.object({
@@ -72,7 +70,7 @@ router
       res.send({ code });
     });
   })
-  .post("/token", (req, res) => {
+  .post("/token", async (req, res) => {
     const test = validator.tokenExchange.validate(req.body);
     if (!test) return res.status(400).send(test);
 
@@ -94,7 +92,7 @@ router
       expires_in: 604800
     });
   })
-  .post("/refresh", (req, res) => {
+  .post("/refresh", async (req, res) => {
     const test = validator.refreshExchange.validate(req.body);
     if (!test) return res.status(400).send(test);
 

@@ -17,7 +17,7 @@
         <div class="wrap">
           <div class="apps">
             <div @click="setApp(app)" :class="{'active': currentApp._id == app._id & appOpened}" class="app" v-for="app in myApps" :key="app.id">
-              <img src="https://www.penpublishing.com/squaresMobileTest.jpg" class="app__image">
+              <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg" class="app__image">
               <div class="app__data">
                 <div class="app__title">{{app.name}}</div>
                 <div class="app__info">Баланс: {{app.balance}}АР</div>
@@ -25,7 +25,7 @@
             </div>
             <div @click="createAppMenu = !createAppMenu; appOpened = false" class="app"
                  v-if="myApps.length < 3 || ($auth.user.mayHave && myApps.length < $auth.user.mayHave)">
-              <img src="http://docs.updatefactory.io/images/plus-icon.png" class="app__image">
+              <img src="https://docs.updatefactory.io/images/plus-icon.png" alt="add icon" class="app__image">
               <div class="app__data">
                 <div class="app__title">Создать</div>
                 <div class="app__info">приложение</div>
@@ -87,7 +87,7 @@
       <div class="app">
         <div class="app__image">
           <div class="verify"><CheckIcon size="12"/></div>
-          <img src="https://www.penpublishing.com/squaresMobileTest.jpg">
+          <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg">
         </div>
         <div class="app__data">
           <div class="app__title">Hello world</div>

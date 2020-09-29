@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /app/
+Disallow: /user/
+Disallow: /apps/
+Disallow: /profile/
