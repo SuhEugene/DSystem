@@ -1,17 +1,18 @@
 <template>
     <form>
+      <div v-if="ck" :class="$style.fly">Этот вход не робит. Юзай дискорд</div>
       <main>
         <div class="heading">Вход</div>
         <div>
           <p>Ник</p>
-          <input type="text" v-model="login.username">
+          <input @focus="ck = false" type="text" v-model="login.username">
         </div>
         <div>
           <p>Пароль</p>
-          <input type="password" v-model="login.password">
+          <input @focus="ck = false" type="password" v-model="login.password">
         </div>
         <div>
-          <button class="primary" @click="userLogin" type="button">Войти</button>
+          <button class="primary" @click="ck = true" type="button">Войти</button>
           <button class="secondary" @click="discordLogin" type="button">Дискорд</button>
           <NLink
             style="font-size: 16px; text-align: center; width: 100%;display:inline-block"
@@ -27,8 +28,9 @@ export default {
   data: () => ({
     login: {
       username: "",
-      password: ""
-    }
+      password: "",
+    },
+    ck: false
   }),
   methods: {
     // async userLogin() {
@@ -64,3 +66,18 @@ export default {
   }
 };
 </script>
+<style module>
+  .fly  {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    display: flex;
+    background: #fff;
+    color: black;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    position: absolute;
+  }
+</style>

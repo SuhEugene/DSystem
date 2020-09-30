@@ -368,12 +368,12 @@ a {
 
 button, a.btn {
   font-family: $font;
-  height: 40px;
+  height: 34px;
   width: 100%;
   padding: 0 10px;
-  font-size: 17px;
+  font-size: 15px;
   border: none;
-  border-radius: 12px;
+  border-radius: 7px;
   text-decoration: none;
   display: flex;
   justify-content: center;
@@ -410,6 +410,7 @@ button, a.btn {
   }
   &.secondary {
     background: $always-transp;
+    height: 36px;
     box-shadow: inset 0 0 0 3px $text-subtext;
     color: $text-subtext;
     transition: .13s color, .13s box-shadow, opacity .13s;
@@ -430,6 +431,10 @@ button, a.btn {
     &.secondary {
       box-shadow: inset 0 0 0 3px $dark-text-subtext;
       color: $dark-text-subtext;
+      &:hover {
+        box-shadow: inset 0 0 0 3px darken($color: $dark-text-subtext, $amount: 8);
+        color: darken($color: $dark-text-subtext, $amount: 8);
+      }
     }
   }
 }

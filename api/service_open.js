@@ -53,7 +53,11 @@ router
   //   cooldown[req.user.id][req.path][req.method] = Date.now();
   // })
   .get("/user", async (req, res) => {
+    if (!req.data.scope.includes("data"))
+      return res.status(403).send({ error: "Forbidden", message: "'data' scope required" });
+
     const user = await User.findOne({ _id: req.data.user_id });
+    
     let respData = {};
     for (let field of userData.free) respData[field] = user[field];
 
@@ -61,13 +65,17 @@ router
       if (!req.data.scope.includes(field)) continue;
       respData[field] = user[field];
     }
+
     res.send(respData);
   })
   .post("/user/status", async (req, res) => {
-    if (!req.data.scope.includes("set-status")) return res.status(403).send({ error: "Forbidden" });
+    if (!req.data.scope.includes("set-status"))
+      return res.status(403).send({ error: "Forbidden", message: "'set-status' scope required" });
+
     let user = await User.findOne({ _id: req.data.user_id });
     user.status = req.body.status.toString().substr(0, 32) || null;
     await user.save();
+
     res.send({ status: user.status });
   })
   
