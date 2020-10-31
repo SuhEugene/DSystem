@@ -1,12 +1,14 @@
 /* global require process module */
 const express = require("express");
-// const app = express();
+const app = express();
 const router = express.Router();
 const Joi = require('joi');
 
+const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const User = require("./models/user");
 const App = require("./models/app");
+require("dotenv").config();
 
 let cooldown = {};
 
@@ -32,14 +34,16 @@ const validator = { tokenExchange, getCode };
 let codes = {};
 const generateCode = () => Math.round(Math.random()*10000000);
 
-// app.use((req, res, next) => {
-//   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
-//   res.append("Access-Control-Allow-Headers", "*");
-//   res.append("Access-Control-Allow-Methods", "*");
-//   if (req.method == "OPTIONS") return res.status(200).send();
-//   next();
-// })
-router
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
+  res.append("Access-Control-Allow-Headers", "*");
+  res.append("Access-Control-Allow-Methods", "*");
+  if (req.method == "OPTIONS") return res.status(200).send();
+  next();
+})
+// router
   // .use((req, res, next) => {
   //   if (cooldown[req.user.id] &&
   //       cooldown[req.user.id][req.path] &&
@@ -123,6 +127,6 @@ router
     });
   })
 
-// express.listen(8082, () => console.log("> OAuth2 service started on *:8082"))
+app.listen(8082, () => console.log("> OAuth2 service started on *:8082"))
 
 module.exports = router;

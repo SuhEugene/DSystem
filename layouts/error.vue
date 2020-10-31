@@ -80,7 +80,7 @@ export default {
     color: red;
   }
   .green {
-    color: green;
+    color: #00aa00;
   }
   .blue {
     color: blue;

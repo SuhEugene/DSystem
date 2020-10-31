@@ -8,6 +8,7 @@ export default {
   // loading: "~/components/LoadingBar.vue",
   env: {
     axiosBase: process.env.API_URL || 'http://localhost:8081',
+    oauthBase: process.env.OAUTH_URL || 'http://localhost:8082',
     thisUrl: process.env.SELF_URL || 'http://localhost:8080'
   },
   /*

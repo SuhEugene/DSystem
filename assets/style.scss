@@ -391,10 +391,10 @@ button, a.btn {
     color: white;
     transition: background .13s, opacity .13s;
     &:hover {
-      background: darken($color: $always-primary, $amount: 4);
+      background: darken($color: $always-primary, $amount: 5);
     }
     &:active {
-      background: darken($color: $always-primary, $amount: 7);
+      background: darken($color: $always-primary, $amount: 8);
     }
   }
   &.error {
@@ -432,8 +432,8 @@ button, a.btn {
       box-shadow: inset 0 0 0 3px $dark-text-subtext;
       color: $dark-text-subtext;
       &:hover {
-        box-shadow: inset 0 0 0 3px darken($color: $dark-text-subtext, $amount: 8);
-        color: darken($color: $dark-text-subtext, $amount: 8);
+        box-shadow: inset 0 0 0 3px darken($color: $dark-text-subtext, $amount: 14);
+        color: darken($color: $dark-text-subtext, $amount: 14);
       }
     }
   }
@@ -1175,6 +1175,45 @@ button, a.btn {
         span {
           line-height: 12px;
           color: $always-white;
+        }
+        [tooltip] {
+          &::before {
+            font-weight: normal;
+            content: attr(tooltip);
+            color: $always-white;
+            background: $always-black;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 16px;
+            display: block;
+            position: absolute;
+            top: -35px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 999;
+          }
+          &::after {
+            font-weight: normal;
+            content: "";
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid $always-black;
+            position: absolute;
+            top: -7px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+          }
+          &:hover {
+            &[tooltip]::before, &[tooltip]::after {
+              opacity: 1;
+            }
+          }
         }
       }
     }

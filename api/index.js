@@ -68,9 +68,10 @@ app.get("/apps/:id", async (req, res) => {
 })
 
 const authRouter = require("./routes/auth");
-const oauth2Router = require("./service_oauth2");
 app.use("/auth", authRouter);
-app.use("/oauth2", oauth2Router);
+
+// const oauth2Router = require("./service_oauth2");
+// app.use("/oauth2", oauth2Router);
 
 app.use(function(req, res, next) {
   var token = req.headers["authorization"];

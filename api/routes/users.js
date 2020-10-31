@@ -5,6 +5,8 @@ const Logs = require("../models/logs");
 const userRouter = express.Router();
 let cooldown = {};
 const getLogs = require("./getLogs");
+
+// TODO логи
 userRouter
   .use((req, res, next) => {
     // console.log(req.method, req.path)

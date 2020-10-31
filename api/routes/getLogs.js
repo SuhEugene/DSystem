@@ -7,7 +7,7 @@ module.exports = (req) => {
         { toUser: req.user._id }
       ]
     }, [], {
-      limit: 20,
+      limit: 30,
       sort:{ timestamp: -1 }
     }).populate("fromApp")
       .populate("fromUser")

@@ -6,6 +6,8 @@ const bcrypt = require("bcryptjs");
 const fetch = require("node-fetch");
 const User = require("../models/user");
 
+// TODO логи
+
 async function getDiscordTokens(client_id, code, redirect_uri) {
   console.log("code ->", code);
   let data = {
@@ -16,10 +18,12 @@ async function getDiscordTokens(client_id, code, redirect_uri) {
     redirect_uri: redirect_uri,
     scope: "identify"
   };
+  // console.log(data)
   let body = [];
   for (let i in data) {
     body.push(`${i}=${data[i]}`);
   }
+  // console.log(body.join("&"))
   let headers = {
     "Content-Type": "application/x-www-form-urlencoded; charset=utf-8"
   };
@@ -64,7 +68,7 @@ router
       req.body.code,
       req.body.redirect_uri
     );
-
+    // console.log(id, username);
     if (!id) return res.status(400).send({error: "State already was. Buy lottery ticket, if you didn't press \"Back\" button"})
 
     User.findOne({ id }, async (err, user) => {
@@ -94,6 +98,7 @@ router
       req.body.code,
       req.body.redirect_uri
     );
+    // console.log(id)
     User.findOne({ id }, async (err, user) => {
       if (err) return;
       if (!user)

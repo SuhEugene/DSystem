@@ -1,4 +1,6 @@
 <template>
+    <!-- TODO Замена иконок на компонент -->
+
   <section id="apps-page">
     <header>
       <div class="all">
@@ -133,6 +135,8 @@ export default {
       this.shortname = this.currentApp.shortname;
       this.avatar = this.currentApp.avatar;
       this.url = this.currentApp.url;
+      this.eventUrl = this.currentApp.eventUrl;
+      // this.avatar = this.currentApp.avatar;
       this.appError = false;
     },
     checkName () {
@@ -159,24 +163,12 @@ export default {
       this.shortname = this.shortname.trim().substr(0, 12);
     },
     checkAvatar () {
-      if (!this.avatar || !this.avatar.length) {
-        this.avatar = this.currentApp.avatar;
-        return;
-      }
       this.avatar = this.avatar.trim().substr(0, 64);
     },
     checkUrl () {
-      if (!this.url || !this.url.length) {
-        this.url = this.currentApp.url;
-        return;
-      }
       this.url = this.url.trim().substr(0, 64);
     },
     checkEventUrl () {
-      if (!this.eventUrl || !this.eventUrl.length) {
-        this.eventUrl = this.currentApp.eventUrl;
-        return;
-      }
       this.eventUrl = this.eventUrl.trim().substr(0, 64);
     },
     createApp () {

@@ -17,8 +17,6 @@ const pass = () => true;
 
 // TODO
 // Read: https://github.com/brandonwoodruff92/asana/wiki/Database-Schema
-// Транзакции Mongo
-// JOI https://joi.dev/api/?v=17.2.1
 
 
 router
@@ -157,22 +155,33 @@ router
     if (!req.body.name && !req.body.description && !req.body.avatar && !req.body.shortname && !req.body.url)
       return res.status(400).send({ error: "Invalid body" });
 
-    if (req.body.shortname && req.app.shortname != req.body.shortname) {
-      req.body.shortname = req.body.shortname.toLowerCase().substr(0, 12);
-      let apps = await App.find({ shortname: req.body.shortname });
-      if (apps.length) return res.status(400).send({ error: 'url' });
+    if (req.app.shortname != req.body.shortname) {
+      if (req.body.shortname) {
+        req.body.shortname = req.body.shortname.toLowerCase().substr(0, 12);
+        let apps = await App.find({ shortname: req.body.shortname });
+        if (apps.length) return res.status(400).send({ error: 'url' });
+      } else {
+        req.body.shortname = '';
+      }
     }
 
     let changed = false;
     let fields = {
       name: 32,
-      description: 300,
+      description: 300
+    }
+    let changable = {
       avatar: 64,
       url: 64,
       eventUrl: 64
     }
     for (let f in fields) {
       if (!req.body[f] || req.app[f] == req.body[f]) continue;
+      changed = true;
+      req.app[f] = req.body[f].substr(0, fields[f]);
+    }
+    for (let f in changable) {
+      if (req.app[f] == req.body[f]) continue;
       changed = true;
       req.app[f] = req.body[f].substr(0, fields[f]);
     }

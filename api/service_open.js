@@ -30,6 +30,8 @@ const userData = {
   free: ["_id", "id", "uuid", "username", "sex"],
   scope: ["status", "balance", "role"]
 }
+
+// TODO отделить от роутера
 router
   .use(function(req, res, next) {
     var token = req.headers["authorization"];

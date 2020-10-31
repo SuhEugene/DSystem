@@ -16,6 +16,7 @@
           <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
+        <!-- TODO подключить иконку -->
         <div class="app-img">
           <div class="verify"><CheckIcon size="12"/></div>
           <img alt="App avatar" src="https://www.penpublishing.com/squaresMobileTest.jpg">
@@ -40,6 +41,8 @@
   </form>
 </template>
 <script>
+
+// TODO подключить API
 
 import CheckIcon from "mdi-vue/Check.vue";
 import SuccessOverlay from "~/components/SuccessOverlay";

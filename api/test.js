@@ -1,3 +1,5 @@
+// TODO удалить нахуй
+
 const Joi = require("joi");
 
 let test = Joi.object({

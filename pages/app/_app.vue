@@ -16,10 +16,8 @@
           <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
-        <div class="app-img">
-          <div class="verify"><CheckIcon size="12"/></div>
-          <img alt="App avatar" src="https://www.penpublishing.com/squaresMobileTest.jpg">
-        </div>
+        <!-- TODO подключить и настроить AppImg -->
+        <AppImg />
       </div>
       <div class="sum">
         <div class="sum__title">Сумма</div>
@@ -89,6 +87,7 @@
 <script>
 
 import CheckIcon from "mdi-vue/Check.vue";
+import SailBoatIcon from "mdi-vue/SailBoat.vue";
 import SuccessOverlay from "~/components/SuccessOverlay";
 import ErrorOverlay from "~/components/ErrorOverlay";
   export default {
