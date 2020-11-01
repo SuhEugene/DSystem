@@ -12,6 +12,8 @@ require("dotenv").config();
 
 let cooldown = {};
 
+// TODO logs
+
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(20).required(),
   response_type: Joi.string().allow('token', 'code').required(),
@@ -63,14 +65,15 @@ app.use((req, res, next) => {
     if (!test) return res.status(400).send(test);
 
     let code = generateCode();
-    while (codes[code]) code = generateCode();
+    while (codes.find(c => c.code == code)) code = generateCode();
 
     const app = await App.findOne({ _id: req.body.client_id });
-    if (!app || app.url != req.body.redirect_uri) return res.status(400).send({ error: "Invalid app" });
+    if (!app || app.url != req.body.redirect_uri) return res.status(400).send({ error: "Invalid app", e:"IA" });
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.status(401).json({ error: "Invalid token" });
-      codes[code] = req.body.concat({ user_id: user._id });
+      if (err) return res.status(401).json({ error: "Invalid token", e:"IT" });
+      codes = codes.filter(c => c.user_id != user._id)
+      codes.push(req.body.concat({ user_id: user._id, code }));
       res.send({ code });
     });
   })
@@ -78,11 +81,11 @@ app.use((req, res, next) => {
     const test = validator.tokenExchange.validate(req.body);
     if (!test) return res.status(400).send(test);
 
-    if (!codes[code]) return res.status(400).send({ error: "Invalid code" });
+    if (!codes[code]) return res.status(400).send({ error: "Invalid code", e: "IC" });
 
     const app = await App.findOne({ _id: req.body.client_id });
     if (!app || app.secret != req.body.client_secret || app.url != req.body.redirect_uri)
-      return res.status(400).send({ error: "Invalid app" });
+      return res.status(400).send({ error: "Invalid app", e: "IA" });
 
     const { user_id, scope } = codes[code];
     delete codes[code];
@@ -102,10 +105,10 @@ app.use((req, res, next) => {
 
     const app = await App.findOne({ _id: req.body.client_id });
     if (!app || app.secret != req.body.client_secret || app.url != req.body.redirect_uri)
-      return res.status(400).send({ error: "Invalid app" });
+      return res.status(400).send({ error: "Invalid app", e: "IA" });
 
-    jwt.verify(req.body.resfresh_token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.status(401).json({ error: "Invalid token" });
+    jwt.verify(req.body.resfresh_token, process.env.REFRESH_SECRET, (err, user) => {
+      if (err) return res.status(401).json({ error: "Invalid token", e: "IT" });
 
       const access_token = jwt.sign(
         { user_id: user.user_id, scope: user.scope },
