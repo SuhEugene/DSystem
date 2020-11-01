@@ -62,7 +62,7 @@ router
     if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
       app = await App.findOne({ _id: req.params.id });
     }
-    
+
     if (!app) return res.status(404).send({ error: "App not found" });
     req.app = app;
     next();
@@ -70,13 +70,13 @@ router
   .post("/:id/send", async (req, res) => {
     if (!req.body.password) return res.status(403).send({ error: "Password required" });
     if (!verifyPassword(req.body.password, req.user.password))
-      return res.status(403).send({ error: "Invalid password" });
+      return res.status(403).send({ error: "Invalid password", e: "IP" });
 
     if (!req.body.sum || !parseInt(req.body.sum, 10) || parseInt(req.body.sum, 10) < 0)
-      return res.status(400).send({ error: "Invalid body" });
+      return res.status(400).send({ error: "Invalid body", e: "IB" });
 
     let sum = parseInt(req.body.sum, 10);
-    if (req.user.balance - 1 < sum) return res.status(400).send({ error: "Not enough money" });
+    if (req.user.balance - 1 < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
 
     // console.log(req.body)
 
@@ -137,12 +137,12 @@ router
     return next();
   })
   .post("/:id/take", async (req, res) => {
-    if (!req.body.sum) return res.status(400).send({ error: "Invalid body" });
+    if (!req.body.sum) return res.status(400).send({ error: "Invalid body", e: "IB" });
 
     let sum = parseInt(req.body.sum, 10);
     if (!sum || sum <= 0) sum = req.app.balance;
 
-    if (req.app.balance < sum) return res.status(400).send({ error: "Not enough money" });
+    if (req.app.balance < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
 
     const session = await mongoose.startSession();
     session.startTransaction();

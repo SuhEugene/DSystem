@@ -133,24 +133,31 @@ import ErrorOverlay from "~/components/ErrorOverlay";
 
         (this.$route.query.text) ? data.text = this.$route.query.text : '';
         (this.$route.query.uid)  ? data.uid  = this.$route.query.uid  : '';
+        try {
+          let r = await this.$axios.post( `/apps/${this.$route.params.app}/send`, data);
 
-        let r = await this.$axios.post( `/apps/${this.$route.params.app}/send`, data);
+          console.log(r.data)
 
-        console.log(r.data)
+          this.loading = false;
 
-        this.loading = false;
-
-        if (r.data.error == "Invalid password") {
-          this.error = "Неверный пароль";
-          this.page = 3;
-          return;
-        }
-        if (r.data.error) {
+          if (r.data.error == "Invalid password") {
+            this.error = "Неверный пароль";
+            this.page = 3;
+            return;
+          }
+          if (r.data.error) {
+            this.error = "Произошла ошибка";
+            this.page = 3;
+            return;
+          }
+          this.page = 2;
+        } catch (e) {
           this.error = "Произошла ошибка";
+          if (r.data.e && r.data.e == "NEM") {
+            this.error = "Недостаточно АР на балансе"
+          }
           this.page = 3;
-          return;
         }
-        this.page = 2;
       }
     },
     computed: {
