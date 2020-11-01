@@ -6,10 +6,10 @@ const bcrypt = require("bcryptjs");
 const fetch = require("node-fetch");
 const User = require("../models/user");
 
-// TODO логи
+// +TODO логи
 
 async function getDiscordTokens(client_id, code, redirect_uri) {
-  console.log("code ->", code);
+  // console.log("code ->", code);
   let data = {
     client_id: client_id,
     client_secret: process.env.CLIENT_SECRET,
@@ -55,9 +55,10 @@ router
         return res.status(404).send({ error: "User not found" });
       if (!verifyPassword(req.body.password, users[0].password))
         return res.status(404).send({ error: "User not found" });
-      let token = jwt.sign({ id: users[0].id }, process.env.JWT_SECRET, {
+      let token = jwt.sign({ id: users[0].id, _id: users[0]._id }, process.env.JWT_SECRET, {
         expiresIn: 604800 // 1 Week
       });
+      logger.log("(Auth)", users[0].id, "logged in")
       return res.json({ token });
     });
   })
@@ -89,7 +90,8 @@ router
       let token = jwt.sign({ id: newUser.id, _id: newUser._id }, process.env.JWT_SECRET, {
         expiresIn: 604800 // 1 Week
       });
-      res.json({ token });
+      logger.log("(Auth)", newUser.id, "started registration")
+      return res.json({ token });
     });
   })
   .use("/discord", async (req, res) => {
@@ -106,7 +108,8 @@ router
       let token = jwt.sign({ id: user.id, _id: user._id }, process.env.JWT_SECRET, {
         expiresIn: 604800 // 1 Week
       });
-      res.json({ token });
+      logger.log("(Auth)", user.id, "logged in")
+      return res.json({ token });
     });
   });
 

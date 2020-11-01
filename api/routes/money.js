@@ -74,6 +74,8 @@ moneyRouter
       await session.commitTransaction();
       session.endSession();
 
+      logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
+
       res.send();
 
       let u1 = req.io.users.find(u => u.id == req.user.id);
@@ -116,6 +118,7 @@ moneyRouter
       await session.commitTransaction();
       session.endSession();
 
+      logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
 
       let u1 = req.io.users.find(u => u.id == req.user.id);
@@ -139,9 +142,11 @@ moneyRouter
       return res.status(403).json({ error: "Invalid password" });
     User.findOne({ id: req.params.id }, async (err, user) => {
       if (err) return;
+
       if (!user) return res.status(404).json({ error: "User not found" });
       if (req.user.balance - parseInt(req.body.sum, 10) < 0)
         return res.status(400).json({ error: "Not enough money" });
+
       let logs = new Logs();
       logs.fromUser = req.user._id;
       logs.toUser = user._id;
@@ -150,10 +155,14 @@ moneyRouter
       logs.more = "Перевод по запросу";
       user.balance += parseInt(req.body.sum, 10);
       req.user.balance -= parseInt(req.body.sum, 10);
+
       await logs.save();
       await req.user.save();
       await user.save();
+
+      logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
+
       let u1 = req.io.users.find(u => u.id == req.user.id);
       let u2 = req.io.users.find(u => u.id == user.id);
       u1 && req.io.to(u1.io).emit("logs", await getLogs(req));

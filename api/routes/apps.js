@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const App = require("../models/app");
 const Logs = require("../models/logs");
+let getLogs = require("./getLogs");
 
 const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
 
@@ -15,9 +16,10 @@ let cooldown = {};
 
 const pass = () => true;
 
-// TODO
+// TODO 1
 // Read: https://github.com/brandonwoodruff92/asana/wiki/Database-Schema
 
+// +TODO логи
 
 router
   .use((req, res, next) => {
@@ -44,19 +46,23 @@ router
     if (!req.body.name) return res.status(400).send({ error: "Invalid body" });
     let apps = await App.find({ owner: req.user._id });
     if (apps.length >= 3 && apps.length >= req.user.mayHave) return res.status(400).send({ error: "Limit" });
+
     let app = new App();
     app.name = req.body.name.substr(0, 32);
     app.secret = Math.round(Math.random()*9999999);
     app.owner = req.user._id;
     app.save();
-    res.send();
+
+    return res.send();
   })
   .use("/:id", async (req, res, next) => {
     if (!req.params.id) return res.status(400).send();
+
     let app = await App.findOne({ shortname: String(req.params.id) });
     if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
       app = await App.findOne({ _id: req.params.id });
     }
+    
     if (!app) return res.status(404).send({ error: "App not found" });
     req.app = app;
     next();
@@ -89,7 +95,7 @@ router
     logs.toApp = req.app._id;
     logs.sum = sum;
     logs.action = "app-to";
-    logs.more = `${req.body.text || 'Пожертвование'} [${req.body.uid || '000'}]`;
+    logs.more = `${req.body.text || 'Пожертвование'} [${req.body.uid || '0'}]`;
 
     await logs.save();
     await req.user.save();
@@ -99,13 +105,20 @@ router
     await session.commitTransaction();
     session.endSession();
 
-    res.send({ success: true })
+    logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
+
+    let u1 = req.io.users.find(u => u.id == req.user.id);
+
+    u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
+    u1 && req.io.to(u1.io).emit("balance", req.user.balance);
+
+    res.send({ success: true });
 
     if (!req.app.eventUrl) return;
     fetch(req.app.eventUrl, {
       body: JSON.stringify({
         text: req.body.text || 'Пожертвование',
-        uid: req.body.uid || '000',
+        uid: req.body.uid || '0',
         time: logs.timestamp,
         sum,
         user: {
@@ -142,7 +155,7 @@ router
     logs.toUser = req.user._id;
     logs.sum = sum;
     logs.action = "app-from";
-    logs.more = `${req.query.text} [${req.query.uid}]`;
+    logs.more = `${req.query.text} [${req.query.uid || '0'}]`;
 
     await logs.save();
     await req.app.save();
@@ -150,6 +163,13 @@ router
 
     await session.commitTransaction();
     session.endSession();
+    logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
+
+    let u1 = req.io.users.find(u => u.id == req.user.id);
+
+    u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
+    u1 && req.io.to(u1.io).emit("balance", req.user.balance);
+    return res.send({ success: true });
   })
   .put("/:id", async (req, res) => {
     if (!req.body.name && !req.body.description && !req.body.avatar && !req.body.shortname && !req.body.url)
@@ -158,7 +178,7 @@ router
     if (req.app.shortname != req.body.shortname) {
       if (req.body.shortname) {
         req.body.shortname = req.body.shortname.toLowerCase().substr(0, 12);
-        let apps = await App.find({ shortname: req.body.shortname });
+        let apps = await App.findOne({ shortname: req.body.shortname });
         if (apps.length) return res.status(400).send({ error: 'url' });
       } else {
         req.body.shortname = '';
@@ -169,12 +189,12 @@ router
     let fields = {
       name: 32,
       description: 300
-    }
+    };
     let changable = {
       avatar: 64,
       url: 64,
       eventUrl: 64
-    }
+    };
     for (let f in fields) {
       if (!req.body[f] || req.app[f] == req.body[f]) continue;
       changed = true;
@@ -185,13 +205,16 @@ router
       changed = true;
       req.app[f] = req.body[f].substr(0, fields[f]);
     }
+
     if (!changed) return res.status(204).send();
+    logger.log("(Apps)", "app", req.app._id, "sent fields change request by", req.user.id);
     await req.app.save();
-    res.send();
+
+    res.send({ success: true });
   })
-  .delete("/:id", (req, res) => {
-    req.app.delete();
-    res.send();
+  .delete("/:id", async (req, res) => {
+    await req.app.delete();
+    res.send({ success: true });
   })
 
 module.exports = router;
