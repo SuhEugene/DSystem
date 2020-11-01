@@ -20,6 +20,18 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
   useNewUrlParser: true
 });
 
+global.logger = {
+  log (...args) {
+    let d = new Date();
+    let date = `${d.getDate() < 10    ? '0'+d.getDate()    : d.getDate()}.`+
+              `${d.getMonth() < 10    ? '0'+d.getMonth()    : d.getMonth()}.`+
+              `${d.getFullYear()} `+
+              `${d.getHours() < 10   ? '0'+d.getHours()   : d.getHours()}:`+
+              `${d.getMinutes() < 10 ? '0'+d.getMinutes() : d.getMinutes()}:` +
+              `${d.getSeconds() < 10 ? '0'+d.getSeconds() : d.getSeconds()}`;
+    return console.log(date, ...args);
+  }
+}
 
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
