@@ -6,7 +6,7 @@ const appModel = new Schema({
   balance: { type: Number, default: 0 },
   name:        { type: String },
   avatar:      { type: String },
-  shortname:   { type: String },
+  shortname:   { type: String, unique: true },
   url:         { type: String },
   eventUrl:    { type: String },
   description: { type: String, default: "Описание" },
