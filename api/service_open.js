@@ -1,8 +1,9 @@
 /* global require process module */
 const express = require("express");
-// const app = express();
+const app = express();
 const router = express.Router();
 const Joi = require('joi');
+const bodyParser = require("body-parser");
 
 const jwt = require("jsonwebtoken");
 const User = require("./models/user");
@@ -10,29 +11,34 @@ const App = require("./models/app");
 
 let cooldown = {};
 
-const tokenExchange = Joi.object({
-  client_id: Joi.string().hex().length(20).required(),
-  client_secret: Joi.number().integer().required()
-});
+// const tokenExchange = Joi.object({
+//   client_id: Joi.string().hex().length(20).required(),
+//   client_secret: Joi.number().integer().required()
+// });
 
-const validator = { tokenExchange, getCode };
+// const validator = { tokenExchange, getCode };
 
-
-// app.use((req, res, next) => {
-//   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
-//   res.append("Access-Control-Allow-Headers", "*");
-//   res.append("Access-Control-Allow-Methods", "*");
-//   if (req.method == "OPTIONS") return res.status(200).send();
-//   next();
-// })
 
 const userData = {
   free: ["_id", "id", "uuid", "username", "sex"],
   scope: ["status", "balance", "role"]
 }
 
-// TODO отделить от роутера
-router
+// router
+
+
+// TODO all APIs
+// TODO logs
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
+  res.append("Access-Control-Allow-Headers", "*");
+  res.append("Access-Control-Allow-Methods", "*");
+  if (req.method == "OPTIONS") return res.status(200).send();
+  next();
+})
   .use(function(req, res, next) {
     var token = req.headers["authorization"];
     if (!token) return res.status(403).send("--- Пшёл вон ---");
@@ -81,6 +87,6 @@ router
     res.send({ status: user.status });
   })
   
-// express.listen(8083, () => console.log("> Open API service started on *:8083"))
+app.listen(8083, () => console.log("> Open API service started on *:8083"))
 
 module.exports = router;
