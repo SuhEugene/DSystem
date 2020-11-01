@@ -163,12 +163,24 @@ export default {
       this.shortname = this.shortname.trim().substr(0, 12);
     },
     checkAvatar () {
+      if (!this.avatar) {
+        this.avatar = "";
+        return;
+      }
       this.avatar = this.avatar.trim().substr(0, 64);
     },
     checkUrl () {
+      if (!this.url) {
+        this.url = "";
+        return;
+      }
       this.url = this.url.trim().substr(0, 64);
     },
     checkEventUrl () {
+      if (!this.eventUrl) {
+        this.eventUrl = "";
+        return;
+      }
       this.eventUrl = this.eventUrl.trim().substr(0, 64);
     },
     createApp () {
