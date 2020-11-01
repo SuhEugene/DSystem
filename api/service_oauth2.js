@@ -81,14 +81,14 @@ app.use((req, res, next) => {
     const test = validator.tokenExchange.validate(req.body);
     if (!test) return res.status(400).send(test);
 
-    if (!codes[code]) return res.status(400).send({ error: "Invalid code", e: "IC" });
+    if (!codes.find(c => c.code == req.body.code)) return res.status(400).send({ error: "Invalid code", e: "IC" });
 
     const app = await App.findOne({ _id: req.body.client_id });
     if (!app || app.secret != req.body.client_secret || app.url != req.body.redirect_uri)
       return res.status(400).send({ error: "Invalid app", e: "IA" });
 
-    const { user_id, scope } = codes[code];
-    delete codes[code];
+    const { user_id, scope } = codes.find(c => c.code == req.body.code);
+    codes = codes.filter(c => c.code != req.body.code);
 
     const access_token = jwt.sign({ user_id, scope }, process.env.ACCESS_SECRET, { expiresIn: 604800 }); // 1 Week
     const refresh_token = jwt.sign({ user_id, scope }, process.env.REFRESH_SECRET, { expiresIn: 1814400 }); // 3 Weeks
