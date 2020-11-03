@@ -9,6 +9,17 @@
       </div>
     </header>
     <main>
+      <h1 style="margin-top: 30px;">Все приложения</h1>
+      <div class="app" style="margin-bottom: 50px;">
+        <div class="app__image">
+          <div class="app-badge"><CheckIcon size="12"/></div>
+          <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg">
+        </div>
+        <div class="app__data">
+          <div class="app__title">Hello world</div>
+          <div class="app__info">Короткое описание приложения</div>
+        </div>
+      </div>
       <div id="my-apps">
         <h1>Ваши приложения</h1>
         <!-- <div v-if="createAppMenu" id="hidden-form-container">
@@ -83,17 +94,6 @@
             </template>
             <h2 style="opacity: 0.5" v-if="!createAppMenu && !appOpened">Выберите приложение</h2>
           </div>
-        </div>
-      </div>
-      <h1 style="margin-top: 30px;">Все приложения</h1>
-      <div class="app">
-        <div class="app__image">
-          <div class="verify"><CheckIcon size="12"/></div>
-          <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg">
-        </div>
-        <div class="app__data">
-          <div class="app__title">Hello world</div>
-          <div class="app__info">Короткое описание приложения</div>
         </div>
       </div>
     </main>

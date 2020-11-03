@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.page">
+  <div :class="$style.page" :style="$store.state.dark ? 'background:#222222' : ''">
     <div :class="$style.iconWrap">
       <div :class="$style.icon">
         <CheckIcon size="56"/>
@@ -43,7 +43,7 @@ export default {
   height: 56px;
   box-sizing: content-box;
 }
-.icon { animation: spin-icon 3s ease-out both; color: #11dd33;}
+.icon { animation: spin-icon 3s ease-out both; color: #06b10e;}
 @keyframes spin {
   from {
     transform: rotate(-720deg);
@@ -62,7 +62,7 @@ export default {
     padding: 40px;
   }
   to {
-    border-color: #11dd33;
+    border-color: #06b10e;
   }
 }
 @keyframes spin-icon {

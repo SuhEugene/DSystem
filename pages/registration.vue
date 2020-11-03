@@ -60,8 +60,8 @@
         <div class="minimizer">
           <div class="heading">На чьей ты стороне?</div>
           <div class="if">
-            <h3 :class="{'ul': !$parent.$parent.dark}">Свет</h3>
-            <h3 :class="{'ul':  $parent.$parent.dark}">Тьма</h3>
+            <h3 :class="{'ul': !$store.state.dark}">Свет</h3>
+            <h3 :class="{'ul':  $store.state.dark}">Тьма</h3>
           </div>
           <button @click="changeTheme" class="secondary">Сменить</button>
           <button @click="theEnd" style="margin-top: 15px;" class="primary">Завершить регистрацию</button>
@@ -109,11 +109,9 @@ export default {
       });
     },
     changeTheme() {
+      // FIXME Смена темы
       if (process.browser) {
-        localStorage.getItem("dark")
-          ? localStorage.removeItem("dark")
-          : localStorage.setItem("dark", "true");
-        this.$parent.$parent.dark = localStorage.getItem("dark") === "true";
+        this.$store.commit("changeTheme");
       }
     },
     theEnd() {

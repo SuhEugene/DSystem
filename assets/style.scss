@@ -13,8 +13,8 @@ $text-light: #757575;
 $text-subtext: #565656;
 $text-simple: #000000;
 $text-heading: #000000;
-$card-shadow: 0 2px 8px 0 rgba(0,0,0,.1);
-$card-hshadow: 0 2px 10px 0 rgba(0,0,0,.2);
+$card-shadow: 0 2px 8px 0 rgba(0,0,0,.15);
+$card-hshadow: 0 2px 10px 0 rgba(0,0,0,.3);
 $card-stroke: rgba(0,0,0,.15);
 $card-hover: #fafafa;
 $card-background: #ffffff;
@@ -851,14 +851,16 @@ button, a.btn {
   }
 }
 .history-el {
-  display: flex;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: 110px 150px 150px 1fr auto;
+  // grid-template-rows: auto;
+  grid-gap: 32px;
   align-items: center;
-  flex-direction: row;
+  justify-content: flex-start;
   padding: 20px 30px;
   border-radius: $card-border-radius;
   transition: 0.13s all;
-  height: 80px;
+  // height: 80px;
   // cursor: pointer;
   background: $card-background;
   box-shadow: $card-shadow;
@@ -873,6 +875,7 @@ button, a.btn {
   }
   &__space {display:none; flex-grow: 1;}
   &__icon {
+    // grid-area: icon;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -927,31 +930,54 @@ button, a.btn {
     }
   }
   &__user {
+    // &--1 { grid-area: user1; }
+    // &--2 { grid-area: user2; }
+    max-width: 100%;
+    overflow: hidden;
     &--title {
       font-size: 12px;
       color: $text-light;
     }
     &--value {
+      max-width: 100%;
       font-size: 20px;
       color: $text-simple;
       overflow: hidden;
       display: inline-block;
       max-height: 40px;
+      white-space: nowrap;
+      word-wrap: none;
+      word-break: keep-all;
+      text-overflow: ellipsis;
       // font-weight: $font-bold;
     }
   }
   &__comm {
-    flex-grow: 1;
+    // grid-area: comm;
     // .history-el__user--value {
     //   font-weight: normal;
+    max-width: 100%;
+    overflow: hidden;
     // }
+    .history-el__user {
+      &--value {
+        max-width: 100%;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: none;
+        word-break: keep-all;
+        text-overflow: ellipsis;
+      }
+    }
   }
-  &__icon,
-  &__user,
-  &__comm {
-    margin-right: 32px;
-  }
+  // &__icon,
+  // &__user,
+  // &__comm {
+  //   margin-right: 32px;
+  // }
   &__sum {
+    justify-self: end;
+    // grid-area: sum;
     font-size: 24px;
     color: $text-simple;
     &::before {
@@ -964,6 +990,7 @@ button, a.btn {
       content: "АР";
       color: $text-light;
       font-size: 16px;
+      margin-left: 2px;
     }
     &--minus::before {
       content: "-";
@@ -1176,45 +1203,6 @@ button, a.btn {
           line-height: 12px;
           color: $always-white;
         }
-        [tooltip] {
-          &::before {
-            font-weight: normal;
-            content: attr(tooltip);
-            color: $always-white;
-            background: $always-black;
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-size: 14px;
-            line-height: 16px;
-            display: block;
-            position: absolute;
-            top: -35px;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-            z-index: 999;
-          }
-          &::after {
-            font-weight: normal;
-            content: "";
-            width: 0;
-            height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-top: 5px solid $always-black;
-            position: absolute;
-            top: -7px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-          }
-          &:hover {
-            &[tooltip]::before, &[tooltip]::after {
-              opacity: 1;
-            }
-          }
-        }
       }
     }
   }
@@ -1346,16 +1334,39 @@ button, a.btn {
     height: 80px!important;
     width: 80px!important;
   }
-  img {
+  & > img, & > .app-image {
     height: 64px;
     width: 64px;
     border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    & > img {
+      height: 64px;
+      width: 64px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+    & > div {
+      height: 100%;
+      width: 100%;
+      background: $always-primary;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 14px;
+    }
   }
-  .verify {
+  .app-badge {
     position: absolute;
     height: 18px;
     width: 18px;
     background: #346db3;
+    &--gray { background: $text-subtext; }
     right: -6px;
     bottom: -6px;
     border-radius: 50%;
@@ -1370,11 +1381,51 @@ button, a.btn {
       line-height: 12px;
       color: $always-white;
     }
+    [tooltip] {
+      &::before {
+        font-weight: normal;
+        content: attr(tooltip);
+        color: $always-white;
+        background: $always-black;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 14px;
+        line-height: 16px;
+        display: block;
+        position: absolute;
+        top: -35px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+        z-index: 999;
+      }
+      &::after {
+        font-weight: normal;
+        content: "";
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid $always-black;
+        position: absolute;
+        top: -7px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+      }
+      &:hover {
+        &[tooltip]::before, &[tooltip]::after {
+          opacity: 1;
+        }
+      }
+    }
   }
 }
 
 #app-send {
   display: flex;
+  overflow: visible;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -1510,6 +1561,21 @@ button, a.btn {
         order: 2;
     }
   }
+  .history-el {
+    justify-content: space-between;
+    // grid-template-rows: none;
+    grid-gap: 16px;
+    grid-template-columns: 110px 150px 150px auto;
+    // &__icon { grid-area: icon; }
+    // &__user--1 { grid-area: user1; }
+    // &__user--2 { grid-area: user2; }
+    &__sum  { grid-row: 1; grid-column: 4;}
+    &__comm {
+      grid-row: 2;
+      grid-column-start: 1;
+      grid-column-end: 5;
+    }
+  }
 }
 @media (max-width: 900px) {
   #apps-page main .apps {
@@ -1518,17 +1584,14 @@ button, a.btn {
 }
 @media (max-width: 800px) {
   .history-el {
-    height: auto;
-    max-height: 155px;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    &__icon {order: 0}
-    &__user {order: 1}
-    &__sum {order: 2}
+    grid-template-columns: auto auto;
+    &__icon { grid-row: 1; grid-column: 1;}
+    &__user { grid-row: 2; }
+    &__sum  { grid-row: 1; grid-column: 2;}
     &__comm {
-      order: 3;
-      margin: 16px 0 0;
-      width: 100%;
+      grid-row: 3;
+      grid-column-start: 1;
+      grid-column-end: 3;
     }
   }
 }
@@ -1543,27 +1606,6 @@ button, a.btn {
     width: 1px;
   }
   .history-el {
-    height: auto;
-    max-height: 260px;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    &__icon {
-      order: 1;
-      margin: 0 10px 16px;
-    }
-    &__sum {
-      order: 2;
-      margin: 0 10px 16px;
-    }
-    &__user {
-      order: 3;
-      margin: 0 10px 16px;
-    }
-    &__comm {
-      order: 4;
-      margin: 0;
-      width: 100%;
-    }
   }
 }
 @media (max-width: 550px) {
@@ -1576,7 +1618,7 @@ button, a.btn {
     padding: 40px 20px;
   }
   .history-el__user--value {
-    font-size: 17px;
+    font-size: 18px;
   }
   .profile-header {
     flex-direction: column;
@@ -1610,14 +1652,6 @@ button, a.btn {
 @media (max-width: 380px) {
   .login form {
     padding: 15px 20px;
-  }
-  .history-el {
-    &__user--value {
-      font-size: 20px;
-    }
-    &__icon, &__sum, &__user {
-      margin: 0 5px 16px;
-    }
   }
 }
 

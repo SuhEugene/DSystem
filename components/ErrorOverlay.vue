@@ -1,5 +1,5 @@
 <template>
-  <div :class="$style.page">
+  <div :class="$style.page" :style="$store.state.dark ? 'background:#222222' : ''">
     <div :class="$style.iconWrap">
       <div :class="$style.icon">
         <CloseIcon size="56"/>

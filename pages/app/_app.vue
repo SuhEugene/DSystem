@@ -17,7 +17,7 @@
         </div>
         <div class="arrow"></div>
         <!-- TODO подключить и настроить AppImg -->
-        <AppImg />
+        <AppImg :app="app" />
       </div>
       <div class="sum">
         <div class="sum__title">Сумма</div>
@@ -85,9 +85,7 @@
   </form>
 </template>
 <script>
-
-import CheckIcon from "mdi-vue/Check.vue";
-import SailBoatIcon from "mdi-vue/SailBoat.vue";
+import AppImg from "~/components/AppImg";
 import SuccessOverlay from "~/components/SuccessOverlay";
 import ErrorOverlay from "~/components/ErrorOverlay";
   export default {
@@ -152,11 +150,11 @@ import ErrorOverlay from "~/components/ErrorOverlay";
           }
           this.page = 2;
         } catch (e) {
-          this.error = "Произошла ошибка";
-          if (r.data.e && r.data.e == "NEM") {
-            this.error = "Недостаточно АР на балансе"
-          }
+          this.error = "Неизвестная ошибка";
+          if (e.response && e.response.data.e == "NEM" || e.response.data.error == "Not enough money") { this.error = "Недостаточно АР на балансе" }
+          if (e.response && (e.response.data.e == "IP" || e.response.data.error == "Invalid password")) { this.error = "Неверный пароль" }
           this.page = 3;
+          return;
         }
       }
     },
@@ -169,7 +167,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         return (this.page == 1 && this.password.length < 6);
       }
     },
-    components: { CheckIcon, SuccessOverlay, ErrorOverlay },
+    components: { SuccessOverlay, ErrorOverlay, AppImg },
     fetchOnServer: true,
     head () {
       const title = !this.app.name ? 'Ошибка - приложение не найдено' : ((this.$route.params.sum) ?

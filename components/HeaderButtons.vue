@@ -2,6 +2,8 @@
   <div>
     <transition :name="animBack ? 'swipe-menu-back' : 'swipe-menu'">
 
+      <!-- TODO Действие по Enter -->
+
       <!-- MAIN MENU -->
       <div v-if="!menu" :key="false" class="profile-nav">
         <div class="profile-nav__row">
@@ -14,6 +16,11 @@
           <div @click="$router.push('/apps')" tooltip="Приложения" class="profile-nav__button">
             <CubeScanIcon size="26"/>
           </div>
+          <!-- TODO
+            Запрос логов
+            Смена пароля
+            Обновление ника
+           -->
           <div tooltip="Настройки" class="profile-nav__button">
             <AccountCogOutlineIcon size="26"/>
           </div>

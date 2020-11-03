@@ -1,5 +1,5 @@
 <template>
-  <form>
+  <form class="big">
     <main class="send-money">
       <Loading v-if="user === null" />
       <div class="error" v-if="user === false">

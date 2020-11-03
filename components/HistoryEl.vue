@@ -1,6 +1,6 @@
 <template>
   <div class="history-el">
-    <div class="history-el__space history-el__space--0"></div>
+    <!-- <div class="history-el__space history-el__space--0"></div> -->
     <div class="history-el__icon">
       <div class="history-el__icon--i" :tooltip="tooltip">
       <component v-bind:is="icon+'Icon'" size="40"></component></div>
@@ -8,29 +8,30 @@
         <br>{{date}}
       </div>
     </div>
-    <div class="history-el__space history-el__space--1"></div>
-    <div class="history-el__space history-el__space--2"></div>
-    <div class="history-el__user">
+    <!-- <div class="history-el__space history-el__space--1"></div> -->
+    <!-- <div class="history-el__space history-el__space--2"></div> -->
+    <div class="history-el__user history-el__user--1">
       <div class="history-el__user--title">От</div>
       <div class="history-el__user--value">{{from}}</div>
     </div>
-    <div class="history-el__user">
+    <div class="history-el__user history-el__user--2">
       <div class="history-el__user--title">Кому</div>
       <div class="history-el__user--value">{{to}}</div>
     </div>
-    <div class="history-el__space history-el__space--3"></div>
+    <!-- <div class="history-el__space history-el__space--3"></div> -->
     <div class="history-el__comm">
       <div class="history-el__user--title">Комментарий</div>
-      <div
-        class="history-el__user--value"
-      >{{log.more || "Отсутствует"}}</div>
+      <div class="history-el__user--value" :class="{'italic': !log.more}">{{log.more || "Отсутствует"}}</div>
     </div>
     <div
       class="history-el__sum"
       :class="(Number(sum) < 0) ? 'history-el__sum--minus' : ''"
-    >{{((Number(sum) < 0) ? -Number(sum) : sum)}}</div>
+    >{{ Number(sum) < 0 ? -Number(sum) : sum }}</div>
   </div>
 </template>
+<style>
+  .italic { font-style: italic }
+</style>
 <script>
 const icons = {
   "banker-void" : "AccountArrowLeftOutline",

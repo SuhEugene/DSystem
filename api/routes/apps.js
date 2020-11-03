@@ -207,6 +207,7 @@ router
     }
 
     if (!changed) return res.status(204).send();
+    req.app.public = false;
     logger.log("(Apps)", "app", req.app._id, "sent fields change request by", req.user.id);
     await req.app.save();
 

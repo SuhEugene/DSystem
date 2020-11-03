@@ -30,7 +30,7 @@
       <div class="history__inner">
         <h1>История операций</h1>
         <div class="history__inner__data">
-          <p v-if="!$auth.user.logs.length">Операций не найдено</p>
+          <p v-if="!$store.state.logs.length">Операций не найдено</p>
           <HistoryEl v-for="log in $store.state.logs" :key="log._id" :log="log"/>
         </div>
       </div>
@@ -67,12 +67,7 @@ export default {
   },
   methods: {
     themeChange() {
-      if (process.browser) {
-        localStorage.getItem("dark")
-          ? localStorage.removeItem("dark")
-          : localStorage.setItem("dark", "true");
-        this.$parent.$parent.dark = localStorage.getItem("dark") === "true";
-      }
+      if (process.browser) { this.$store.commit("changeTheme"); }
     },
     sendStatus () {
       if (this.$auth.user.status == this.status) return;

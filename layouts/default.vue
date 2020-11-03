@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :class="{dark}">
+  <div class="container" :class="{dark: $store.state.dark}">
     <div id="nonetwork" v-if="$nuxt.isOffline">Интернет соединение потеряно</div>
     <transition name="page">
       <div v-if="readyState" class="main-loading-page" :class="rand">
@@ -19,10 +19,11 @@ import DromonLogo from "~/components/DromonLogo";
 
 export default {
   data: () => ({
-    dark: false,
+    // dark: false,
     readyState: true,
     rand: `a${(new Date().getHours() % 6) + 1}`
   }),
+
   head () {
     return ({
       htmlAttrs: {
@@ -56,7 +57,7 @@ export default {
   mounted() {
     // this.$axios.defaults.baseURL = process.env.axiosBase;
     if (process.browser) {
-      this.dark = localStorage.getItem("dark") === "true";
+      this.$store.commit("setTheme", localStorage.getItem("dark") === "true");
       this.readyState = false;
     }
   },

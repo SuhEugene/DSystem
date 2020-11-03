@@ -23,12 +23,12 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
 global.logger = {
   log (...args) {
     let d = new Date();
-    let date = `${d.getDate() < 10    ? '0'+d.getDate()    : d.getDate()}.`+
+    let date = `[${d.getDate() < 10    ? '0'+d.getDate()    : d.getDate()}.`+
               `${d.getMonth() < 10    ? '0'+d.getMonth()    : d.getMonth()}.`+
               `${d.getFullYear()} `+
               `${d.getHours() < 10   ? '0'+d.getHours()   : d.getHours()}:`+
               `${d.getMinutes() < 10 ? '0'+d.getMinutes() : d.getMinutes()}:` +
-              `${d.getSeconds() < 10 ? '0'+d.getSeconds() : d.getSeconds()}`;
+              `${d.getSeconds() < 10 ? '0'+d.getSeconds() : d.getSeconds()}]`;
     return console.log(date, ...args);
   }
 }
@@ -66,7 +66,7 @@ app.get("/user/:id", (req, res) => {
       username: user.username
     });
   });
-})
+});
 
 app.get("/apps/:id", async (req, res) => {
   if (!req.params.id) return res.status(400).send();
@@ -77,7 +77,7 @@ app.get("/apps/:id", async (req, res) => {
   if (!app) return res.status(404).send({ error: "App not found" });
   req.app = app;
   res.status(200).send(app);
-})
+});
 
 const authRouter = require("./routes/auth");
 app.use("/auth", authRouter);
@@ -90,12 +90,16 @@ app.use(function(req, res, next) {
   if (!token) return res.status(403).send("--- Пшёл вон ---");
 
   token = token.replace("Bearer ", "");
-  jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
-    if (err) return res.status(401).json({ error: "Invalid token" });
-    req.user = user;
-    req.io = io;
-    next();
-  });
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
+      if (err) return res.status(401).json({ error: "Invalid token" });
+      req.user = user;
+      req.io = io;
+      next();
+    });
+  } catch (e) {
+    return res.status(401).send({ error: "Invalid token" })
+  }
 });
 
 const userRouter = require("./routes/users");
@@ -174,8 +178,8 @@ const getUser = (id) => new Promise((send, reject) => {
     if (err) return reject(err);
     if (!user) return reject("User not found");
     send(user);
-  })
-})
+  });
+});
 
 
 io.on("connection", client => {
@@ -185,13 +189,13 @@ io.on("connection", client => {
     try {
       var user = jwt.verify(token, process.env.JWT_SECRET);
     } catch(err) {
-      return client.emit("error", err);
+      return client.emit("error1", err);
     }
     io.users = io.users.filter(u => u.id != user.id);
     io.users.push({id: user.id, io: client.id});
     client.emit("hello");
-  })
-})
+  });
+});
 
 http.listen(8081, ()=>{console.log("Started at *:8081"); console.log(Date.now())});
 
