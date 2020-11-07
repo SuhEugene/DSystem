@@ -43,7 +43,7 @@ export default {
   height: 56px;
   box-sizing: content-box;
 }
-.icon { animation: spin-icon 3s ease-out both; color: #ff2222;}
+.icon { animation: spin-icon 3s ease-out both; color: #dd4444;}
 @keyframes spin {
   from {
     transform: rotate(-720deg);
@@ -62,7 +62,7 @@ export default {
     padding: 40px;
   }
   to {
-    border-color: #ff2222;
+    border-color: #dd4444;
   }
 }
 @keyframes spin-icon {

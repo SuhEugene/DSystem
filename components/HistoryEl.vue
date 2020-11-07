@@ -37,12 +37,14 @@ const icons = {
   "banker-void" : "AccountArrowLeftOutline",
   "send-to": "CashPlus",
   "send-from": "CashMinus",
-  "app-to": "CubeSend"
+  "app-to": "CubeSend",
+  "app-from": "CubeSend"
 }
 const tooltips = {
   "banker-void" : "Пополнение/снятие",
   "send-to": "Перевод",
-  "app-to": "Приложение"
+  "app-to": "Приложение",
+  "app-from": "Приложение"
 }
 import AccountArrowLeftOutlineIcon from "mdi-vue/AccountArrowLeftOutline.vue";
 import CashPlusIcon from "mdi-vue/CashPlus.vue";
@@ -55,7 +57,7 @@ export default {
   },
   computed: {
     sum () {
-      if (this.log.action == "banker-void") return this.log.sum;
+      if (this.log.action == "banker-void" || this.log.action == "app-from") return this.log.sum;
       if (this.log.action == "send-to" || this.log.action == "app-to") {
         if (this.log.fromUser && this.log.fromUser._id == this.$auth.user._id) return -this.log.sum;
         return this.log.sum

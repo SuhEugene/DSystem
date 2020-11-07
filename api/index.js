@@ -70,7 +70,7 @@ app.get("/user/:id", (req, res) => {
 
 app.get("/apps/:id", async (req, res) => {
   if (!req.params.id) return res.status(400).send();
-  let app = await App.findOne({shortname: String(req.params.id)});
+  let app = await App.findOne({shortname: String(req.params.id).toLowerCase()});
   if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
     app = await App.findOne({ _id: req.params.id });
   }
@@ -147,6 +147,7 @@ app.post("/reg", (req, res) => {
         if (error) return res.status(500).send({ error });
         if (!user) return res.status(400).send({ error: "Magic!" });
         console.log(r.data.player);
+        User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}] })
         user.username = r.data.player.username;
         user.uuid = r.data.player.raw_id;
         user.password = await getPasswordHash(req.body.password);
@@ -164,9 +165,8 @@ app.get("/mine/:username", (req, res) => {
     .then(r => r.json())
     .then(r => {
       if (r.code != "player.found") return res.status(200).send(r);
-      User.findOne({ uuid: r.data.player.uuid, username: r.data.player.username, role: {$ne: 0} }, (err, user) => {
+      User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}], role: {$ne: 0} }, (err, user) => {
         if (err) return res.status(500).send({ error: err });
-        console.log(user);
         if (user) return res.status(200).send({ code: "player.was" });
         res.json(r);
       });
@@ -177,7 +177,7 @@ const getUser = (id) => new Promise((send, reject) => {
   User.findOne({ id }, (err, user) => {
     if (err) return reject(err);
     if (!user) return reject("User not found");
-    send(user);
+    return send(user);
   });
 });
 

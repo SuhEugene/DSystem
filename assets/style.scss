@@ -3,7 +3,7 @@ $always-black: #000000;
 $always-transp: transparent;
 $always-transp1: rgba(0,0,0,.2);
 $always-white-stroke: rgba(0, 0, 0, 0.1);
-$always-error: #ff2222;
+$always-error: #dd4444;
 $always-danger: #ffaa00;
 $always-success: #11dd33;
 $always-primary: #346db3;
@@ -363,6 +363,9 @@ a {
   }
   .dark & {
     color: $dark-text-subtext;
+    &:hover {
+      color: $dark-text-light;
+    }
   }
 }
 
@@ -380,6 +383,10 @@ button, a.btn {
   align-items: center;
   font-weight: $font-bold;
   cursor: pointer;
+  &.min {
+    width: fit-content;
+    display: inline-block;
+  }
   &.icon {
     width: 40px;
     display: flex;
@@ -1180,7 +1187,7 @@ button, a.btn {
       margin-bottom: 5px;
       word-break: break-word;
     }
-    &__image, img {
+    &__image {
       height: 64px;
       width: 64px;
       border-radius: 12px;
@@ -1324,104 +1331,6 @@ button, a.btn {
   }
 }
 
-
-.app-img {
-  height: 64px;
-  width: 64px;
-  border-radius: 12px;
-  position: relative;
-  &--big, &--big img {
-    height: 80px!important;
-    width: 80px!important;
-  }
-  & > img, & > .app-image {
-    height: 64px;
-    width: 64px;
-    border-radius: 14px;
-    position: relative;
-    overflow: hidden;
-    & > img {
-      height: 64px;
-      width: 64px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      background-size: cover;
-      background-repeat: no-repeat;
-    }
-    & > div {
-      height: 100%;
-      width: 100%;
-      background: $always-primary;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 14px;
-    }
-  }
-  .app-badge {
-    position: absolute;
-    height: 18px;
-    width: 18px;
-    background: #346db3;
-    &--gray { background: $text-subtext; }
-    right: -6px;
-    bottom: -6px;
-    border-radius: 50%;
-    z-index: 999;
-    box-shadow: inset 0 0 0 2px $card-stroke;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0;
-    color: $always-white;
-    span {
-      line-height: 12px;
-      color: $always-white;
-    }
-    [tooltip] {
-      &::before {
-        font-weight: normal;
-        content: attr(tooltip);
-        color: $always-white;
-        background: $always-black;
-        padding: 6px 8px;
-        border-radius: 6px;
-        font-size: 14px;
-        line-height: 16px;
-        display: block;
-        position: absolute;
-        top: -35px;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-        z-index: 999;
-      }
-      &::after {
-        font-weight: normal;
-        content: "";
-        width: 0;
-        height: 0;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 5px solid $always-black;
-        position: absolute;
-        top: -7px;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-      }
-      &:hover {
-        &[tooltip]::before, &[tooltip]::after {
-          opacity: 1;
-        }
-      }
-    }
-  }
-}
 
 #app-send {
   display: flex;
