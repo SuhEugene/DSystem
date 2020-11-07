@@ -10,7 +10,7 @@
     </header>
     <main>
       <h1 style="margin-top: 30px;">Все приложения</h1>
-      <div class="app" style="margin-bottom: 50px;">
+      <!-- <div class="app" style="margin-bottom: 50px;">
         <div class="app__image">
           <div class="app-badge"><CheckIcon size="12"/></div>
           <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg">
@@ -19,7 +19,7 @@
           <div class="app__title">Hello world</div>
           <div class="app__info">Короткое описание приложения</div>
         </div>
-      </div>
+      </div> -->
       <div id="my-apps">
         <h1>Ваши приложения</h1>
         <!-- <div v-if="createAppMenu" id="hidden-form-container">
@@ -29,13 +29,15 @@
         </div> -->
         <div class="wrap">
           <div class="apps">
+
             <div @click="setApp(app)" :class="{'active': currentApp._id == app._id & appOpened}" class="app" v-for="app in myApps" :key="app.id">
-              <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg" class="app__image">
+              <AppImg :app="app" />
               <div class="app__data">
                 <div class="app__title">{{app.name}}</div>
                 <div class="app__info">Баланс: {{app.balance}}АР</div>
               </div>
             </div>
+
             <div @click="createAppMenu = !createAppMenu; appOpened = false" class="app"
                  v-if="myApps.length < 3 || ($auth.user.mayHave && myApps.length < $auth.user.mayHave)">
               <img src="https://docs.updatefactory.io/images/plus-icon.png" alt="add icon" class="app__image">
@@ -45,6 +47,8 @@
               </div>
             </div>
           </div>
+
+
           <div id="one-app">
             <template v-if="createAppMenu">
               <h1 contenteditable="false" class="app-name">Создание приложения</h1>
@@ -54,15 +58,19 @@
               </div>
               <div class="input"><button @click="createApp" class="primary" type="button">Создать</button></div>
             </template>
+
+
             <template v-if="appOpened">
+
               <div class="error" style="margin-bottom: 3px" v-if="appError"><b>
                 <span>Ошибка отправки данных.</span>
                 <span v-if="appError == 'Cooldown'">Причина: "Кулдаун"</span>
               </b></div>
+
               <h1 ref="appName" @blur="checkName" contenteditable class="app-name" v-text="currentApp.name"></h1>
-              <div ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
-              <div style="margin-top:7px"><b>ID:</b> {{currentApp._id}}</div>
-              <div style="margin-top:7px">
+              <div style="margin-bottom:15px;" ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
+              <div v-if="secretPage" style="margin-top:7px"><b>ID:</b> {{currentApp._id}}</div>
+              <div v-if="secretPage" style="margin-top:7px">
                 <b>Secret:</b> 
                 <span v-if="secretShow">{{currentApp.secret}}</span>
                 <a @click="secretShow = !secretShow" href="javascript:void(0)">{{secretShow ? "Скрыть" : "Показать"}}</a>
@@ -74,24 +82,67 @@
               </div>
               <div class="input">
                 Короткий url
-                <input placeholder="testapp" type="text" @blur="checkShortName" v-model="shortname">
+                <input placeholder="appname" type="text" @blur="checkShortName" v-model="shortname">
                 <small v-if="appError == 'url'">Такой url уже существует</small>
               </div>
               <div class="input">
                 Ссылка на аватар
                 <input placeholder="https://example.com/image.png" @blur="checkAvatar" type="url" v-model="avatar">
               </div>
-              <div class="input">
+              <div v-if="secretPage" class="input">
                 Ссылка на сайт
                 <input placeholder="https://example.com/" @blur="checkUrl" type="url" v-model="url">
               </div>
-              <div class="input">
-                URL на который будет отправлено событие
+              <div v-if="secretPage" class="input">
+                URL события
                 <input placeholder="https://example.com/handler.php" @blur="checkEventUrl" type="url" v-model="eventUrl">
               </div>
-              <div class="input"><button type="button" @click="sendAllOfUs" class="primary">Сохранить</button></div>
-              <div class="input"><button tooltip="fuck" type="button" @click="deleteApp" class="error">Удалить</button></div>
+
+              <div class="input">
+                <a href="javascript:void(0)" @click="secretPage=!secretPage">Режим хакера [{{secretPage ? 'Вкл' : 'Выкл'}}]</a>
+              </div>
+
+
+              <div class="input">
+                <!-- Стандарт -->
+                <template v-if="bottomMenuStep==0">
+                  <button type="button" @click="sendAllOfUs"      class="min primary">Сохранить</button>
+                  <button type="button" @click="bottomMenuStep=3" class="min primary">Вывод средств</button>
+                  <button type="button" @click="bottomMenuStep=1" class="min secondary">Удалить приложение</button>
+                </template>
+
+                <!-- Удаление подтверждение -->
+                <template v-if="bottomMenuStep==1">
+                  <button type="button" @click="bottomMenuStep=0"   class="min primary">Отмена</button>
+                  <button type="button" @click="bottomMenuStep=0"   class="min primary">Назад</button>
+                  <button type="button" @click="bottomMenuStep=0"   class="min primary">Не удалять</button>
+                  <button type="button" @click="bottomMenuStep=2"   class="min primary">Удалить</button>
+                  <button type="button" @click="bottomMenuStep=0"   class="min primary">Не хочу</button>
+                </template>
+
+                <!-- Удаление финиш -->
+                <template v-if="bottomMenuStep==2">
+                  <button type="button" @click="bottomMenuStep=0"   class="min primary">ОТМЕНА</button>
+                  <button type="button" @click="bottomMenuStep=0; deleteApp()"   class="min error">УДАЛИТЬ</button>
+                </template>
+
+                <!-- Вывод средств 1 -->
+                <template v-if="bottomMenuStep==3">
+                  <span>Сумма вывода</span>
+                  <input style="margin-bottom: 15px" type="number" placeholder="64" v-model="outSum" min="0">
+                  <button type="button" @click="outputMoney"class="min primary">Вывод</button>
+                </template>
+
+                <!-- Вывод средств успешно -->
+                <p v-if="bottomMenuStep==4">Успешно выведено {{outSum || currentApp.balance}} АР</p>
+
+                <!-- Вывод среедств ошибка -->
+                <p v-if="bottomMenuStep==5">Ошибка вывода: {{outError}}</p>
+                <button v-if="bottomMenuStep==5" type="button" @click="bottomMenuStep=3" class="min primary">Назад</button>
+              </div>
             </template>
+
+
             <h2 style="opacity: 0.5" v-if="!createAppMenu && !appOpened">Выберите приложение</h2>
           </div>
         </div>
@@ -103,6 +154,7 @@
 
 import HomeOutlineIcon from "mdi-vue/HomeOutline.vue";
 import CheckIcon from "mdi-vue/Check.vue";
+import AppImg from "~/components/AppImg.vue";
 
 
 export default {
@@ -113,7 +165,10 @@ export default {
   data: () => ({
     appOpened: false,
     createAppMenu: false,
-    appName: "",
+    secretPage: false,
+    bottomMenuStep: 0,
+    outSum: null,
+    appName: '',
     shortname: '',
     avatar: '',
     url: '',
@@ -122,13 +177,15 @@ export default {
     secretShow: false,
     currentApp: {},
     loc: null,
-    appError: false
+    appError: false,
+    outError: false
   }),
   mounted () {
     if (process.browser) this.loc = window.location.host;
   },
   methods: {
     setApp (app) {
+      this.bottomMenuStep = 0;
       this.createAppMenu = false;
       this.appOpened = this.currentApp != app || !this.appOpened;
       this.currentApp = app;
@@ -160,7 +217,7 @@ export default {
         this.shortname = this.currentApp.shortname;
         return;
       }
-      this.shortname = this.shortname.trim().substr(0, 12);
+      this.shortname = this.shortname.trim().substr(0, 24).split(/ +/).join('');
     },
     checkAvatar () {
       if (!this.avatar) {
@@ -195,7 +252,7 @@ export default {
       let data = {
         name: this.$refs.appName.innerText.trim().substr(0, 32),
         description: this.$refs.appDesc.innerText.trim().substr(0, 300),
-        shortname: (this.shortname) ? this.shortname.trim().substr(0, 12) : '',
+        shortname: (this.shortname) ? this.shortname.trim().split(/ +/).join('').substr(0, 24) : '',
         avatar: (this.avatar) ? this.avatar.trim().substr(0, 64) : '',
         url: (this.url) ? this.url.trim().substr(0, 64) : '',
         eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : ''
@@ -205,13 +262,15 @@ export default {
     },
     deleteApp () {
       this.$axios.delete(`/apps/${this.currentApp._id}`)
-      .then(this.refreshApps).catch(this.errorRefresh);
+      .then(() => {this.refreshApps(false);this.currentApp={};}).catch(this.errorRefresh);
     },
     async refreshApps (save=false) {
       this.appError = false;
       let apps = await this.$axios.get('/apps');
       this.myApps = apps.data;
+      console.log("SAVE", save)
       if (save) return;
+      this.bottomMenuStep = 0;
       this.appOpened = false;
       this.createAppMenu = false;
       this.currentApp = {};
@@ -220,8 +279,28 @@ export default {
       this.appError = e.response.data.error;
       console.log(e.response)
       this.currentApp = this.apps.find(a => a._id == this.currentApp._id) || {};
+    },
+    async outputMoney () {
+      if (parseInt(this.outSum) < 0) return;
+      this.outError = false;
+      try {
+        let r = await this.$axios.post(`/apps/${this.currentApp._id}/take`, { sum: this.outSum || 0 });
+        this.outSum = null;
+        if (!r) { this.outError = "Неизвестная ошибка"; this.bottomMenuStep = 5; return;}
+        this.bottomMenuStep = 4;
+        setTimeout(() => {this.refreshApps(false)}, 1000);
+      } catch (e) {
+        this.outError = "Неизвестная ошибка"
+        if (e && e.response && e.response.data.e == "NEM") {
+          this.outError = "Недостаточно денег на балансе";
+        }
+        if (e && e.response && e.response.data.e == "IB") {
+          this.outError = "Что-то не так с твоим числом...";
+        }
+        this.bottomMenuStep = 5;
+      }
     }
   },
-  components: { HomeOutlineIcon, CheckIcon }
+  components: { HomeOutlineIcon, CheckIcon, AppImg }
 };
 </script>

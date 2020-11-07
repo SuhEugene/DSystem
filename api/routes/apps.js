@@ -8,7 +8,12 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const App = require("../models/app");
 const Logs = require("../models/logs");
+const Joi = require('joi');
+const sanitizeUrl = require("@braintree/sanitize-url").sanitizeUrl;
 let getLogs = require("./getLogs");
+
+const sumTest = Joi.number().integer().min(1);
+const sumTestZero = Joi.number().integer().min(0);
 
 const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
 
@@ -23,14 +28,14 @@ const pass = () => true;
 
 router
   .use((req, res, next) => {
-    if (cooldown[req.user.id] &&
-        cooldown[req.user.id][req.path] &&
-        cooldown[req.user.id][req.path][req.method] &&
-        Date.now() - cooldown[req.user.id][req.path][req.method] < 2000)
-      return res.status(400).send({ error: "Cooldown" });
-    if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
-    if (!cooldown[req.user.id][req.path]) cooldown[req.user.id][req.path] = {};
-    cooldown[req.user.id][req.path][req.method] = Date.now();
+    // if (cooldown[req.user.id] &&
+    //     cooldown[req.user.id][req.path] &&
+    //     cooldown[req.user.id][req.path][req.method] &&
+    //     Date.now() - cooldown[req.user.id][req.path][req.method] < 2000)
+    //   return res.status(400).send({ error: "Cooldown" });
+    // if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
+    // if (!cooldown[req.user.id][req.path]) cooldown[req.user.id][req.path] = {};
+    // cooldown[req.user.id][req.path][req.method] = Date.now();
     User.findOne({ id: req.user.id }, async (err, user) => {
       if (err) return;
       if (!user) return res.status(404).send({ error: "User not found" });
@@ -48,9 +53,11 @@ router
     if (apps.length >= 3 && apps.length >= req.user.mayHave) return res.status(400).send({ error: "Limit" });
 
     let app = new App();
+    app._id = new mongoose.Types.ObjectId();
     app.name = req.body.name.substr(0, 32);
     app.secret = Math.round(Math.random()*9999999);
     app.owner = req.user._id;
+    app.shortname = String(app._id);
     app.save();
 
     return res.send();
@@ -72,15 +79,10 @@ router
     if (!verifyPassword(req.body.password, req.user.password))
       return res.status(403).send({ error: "Invalid password", e: "IP" });
 
-    if (!req.body.sum || !parseInt(req.body.sum, 10) || parseInt(req.body.sum, 10) < 0)
-      return res.status(400).send({ error: "Invalid body", e: "IB" });
+    let { value: sum, error } = sumTest.validate(req.body.sum);
+    if (!!error) return res.status(400).send({ error: "Invalid body", e: "IB", joie: error });
 
-    let sum = parseInt(req.body.sum, 10);
     if (req.user.balance - 1 < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
-
-    // console.log(req.body)
-
-    // return res.status(505).send();
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -137,10 +139,10 @@ router
     return next();
   })
   .post("/:id/take", async (req, res) => {
-    if (!req.body.sum) return res.status(400).send({ error: "Invalid body", e: "IB" });
+    let { value: sum, error } = sumTestZero.validate(req.body.sum);
+    if (!!error) return res.status(400).send({ error: "Invalid body", e: "IB", joie: error });
 
-    let sum = parseInt(req.body.sum, 10);
-    if (!sum || sum <= 0) sum = req.app.balance;
+    if (sum == 0) sum = req.app.balance;
 
     if (req.app.balance < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
 
@@ -155,7 +157,7 @@ router
     logs.toUser = req.user._id;
     logs.sum = sum;
     logs.action = "app-from";
-    logs.more = `${req.query.text} [${req.query.uid || '0'}]`;
+    logs.more = 'Вывод средств';
 
     await logs.save();
     await req.app.save();
@@ -175,35 +177,39 @@ router
     if (!req.body.name && !req.body.description && !req.body.avatar && !req.body.shortname && !req.body.url)
       return res.status(400).send({ error: "Invalid body" });
 
-    if (req.app.shortname != req.body.shortname) {
-      if (req.body.shortname) {
-        req.body.shortname = req.body.shortname.toLowerCase().substr(0, 12);
-        let apps = await App.findOne({ shortname: req.body.shortname });
-        if (apps.length) return res.status(400).send({ error: 'url' });
-      } else {
-        req.body.shortname = '';
-      }
-    }
-
     let changed = false;
-    let fields = {
-      name: 32,
-      description: 300
-    };
-    let changable = {
-      avatar: 64,
-      url: 64,
-      eventUrl: 64
-    };
+
+    if (req.app.shortname != req.body.shortname) {
+      changed = true;
+      if (req.body.shortname) {
+        let link = sanitizeUrl(req.body.shortname.toLowerCase().trim().split(/ +/).join('').substr(0, 24));
+        if (link == "about:blank") {
+          req.app.level = -1;
+          req.app.shortname = '';
+        } else {
+          let app = await App.findOne({ shortname: link });
+          if (app) return res.status(400).send({ error: 'url' });
+          req.app.shortname = link;
+        }
+      } else { req.body.shortname = ''; }
+    }
+    
+
+    let fields = { name: 32, description: 300 };
+    let changable = { avatar: 64, url: 64, eventUrl: 64 };
+
     for (let f in fields) {
       if (!req.body[f] || req.app[f] == req.body[f]) continue;
       changed = true;
       req.app[f] = req.body[f].substr(0, fields[f]);
     }
+
     for (let f in changable) {
       if (req.app[f] == req.body[f]) continue;
       changed = true;
-      req.app[f] = req.body[f].substr(0, fields[f]);
+      let link = sanitizeUrl(req.body[f].substr(0, fields[f]));
+      req.app[f] = link != 'about:blank' ? link : '';
+      if (link == "about:blank") { req.app.level = -1; }
     }
 
     if (!changed) return res.status(204).send();
