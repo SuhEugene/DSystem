@@ -23,14 +23,19 @@
           </div>
         </div>
         <div class="profile-header__holder__spacer profile-header__holder__spacer--1"></div>
-        <HeaderButtons :posts="posts" :users="users" :moder="moder" :banker="banker" class="profile-header__buttons"/>
+        <HeaderButtons
+          class="profile-header__buttons"
+          :posts="posts"
+          :users="users"
+          :moder="moder"
+          :banker="banker" />
       </div>
     </div>
     <div class="history">
       <div class="history__inner">
         <h1>История операций</h1>
         <div class="history__inner__data">
-          <p v-if="!$store.state.logs.length">Операций не найдено</p>
+          <p v-if="!$store.state.logs">Операций не найдено</p>
           <HistoryEl v-for="log in $store.state.logs" :key="log._id" :log="log"/>
         </div>
       </div>
@@ -106,3 +111,28 @@ export default {
   }
 };
 </script>
+
+<!-- <div style="display: none;" class="mrFear">
+      <br />***<br />
+      Привет<br />
+      Меня звать - Мистер Страх<br />
+      Хотел бы поскорее завершить<br />
+      Я здесь, чтоб управлять тобой<br />
+      Поверь, все твои желанья, весь ты мой<br />
+      Знай...<br />
+      Не исчезну никогда...<br />
+      Впусти же ты в себя...<br />
+      Поверь мне дорогой...<br />
+      Лекарства не будет, знай...<br />
+      ***<br />
+      Знай...<br />
+      Не исчезну никогда...<br />
+      Нечто внутри тебя...<br />
+      Не борись же ты со мной...<br />
+      И Что же будет с тобой...<br />
+      ***<br />
+    </div> -->
+    <!-- <div class="mrFear2">
+      Cause you make me feel... Line I'm so... Alone...
+      I know it's not real... But in my... Sooooul...
+    </div> -->

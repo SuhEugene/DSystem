@@ -2,6 +2,7 @@
 const express = require("express");
 const app = express();
 const router = express.Router();
+const mongoose = require("mongoose");
 const Joi = require('joi');
 
 const bodyParser = require("body-parser");
@@ -11,6 +12,13 @@ const App = require("./models/app");
 require("dotenv").config();
 
 let cooldown = {};
+
+
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
+  useUnifiedTopology: true,
+  useNewUrlParser: true
+});
+
 
 // TODO logs
 
