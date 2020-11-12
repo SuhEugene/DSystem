@@ -44,6 +44,7 @@
           </label>
           <p style="margin-top: 15px">Пример обращения:<br>{{username}} <b>купил{{w[sex]}}</b> товар</p>
           <button @click="step++" style="margin-top: 15px" :class="{'disabled': isNaN(sex)}" class="primary">Далее</button>
+          <button @click="step--" style="margin-top: 8px" class="secondary">Назад</button>
         </div>
       </div>
       <div :key="4" v-if="step == 4" class="step">
@@ -54,17 +55,29 @@
             <input style="text-align: left;" type="password" v-model="password" placeholder="Сложный пароль">
           </div>
           <button @click="step++" class="primary" :class="{'disabled': password.length < 6 || password == '123123'}">Далее</button>
+          <button @click="step--" style="margin-top: 8px" class="secondary">Назад</button>
         </div>
       </div>
       <div :key="5" v-if="step == 5" class="step">
         <div class="minimizer">
-          <div class="heading">На чьей ты стороне?</div>
+          <div class="heading" style="margin-bottom: 30px;">На чьей ты стороне?</div>
           <div class="if">
-            <h3 :class="{'ul': !$store.state.dark}">Свет</h3>
-            <h3 :class="{'ul':  $store.state.dark}">Тьма</h3>
+            <button
+              class="min"
+              @click="setTheme(false)"
+              :class="{'primary':  !$store.state.dark, 'secondary': !!$store.state.dark}">
+              Свет
+            </button>
+            <button
+              class="min"
+              @click="setTheme(true)" 
+              :class="{'primary': !!$store.state.dark, 'secondary':  !$store.state.dark}">
+              Тьма
+            </button>
           </div>
-          <button @click="changeTheme" class="secondary">Сменить</button>
-          <button @click="theEnd" style="margin-top: 15px;" class="primary">Завершить регистрацию</button>
+          <!-- <button @click="changeTheme" class="secondary">Сменить</button> -->
+          <button @click="theEnd" style="margin-top: 50px;" class="primary">Завершить регистрацию</button>
+          <button @click="step--" style="margin-top: 8px" class="secondary">Назад</button>
         </div>
       </div>
       <div :key="6" v-if="step == 6" class="step">
@@ -114,6 +127,9 @@ export default {
         this.$store.commit("changeTheme");
       }
     },
+    setTheme (bool) {
+      this.$store.commit("setTheme", bool);
+    },
     theEnd() {
       this.step = 6;
       this.$axios.post("/reg", {
@@ -133,7 +149,8 @@ export default {
         this.step = 2;
       }, 5000);
     }, 3000);
-  }
+  },
+  layout: "reg"
 };
 </script>
 <style lang="scss" scoped>
