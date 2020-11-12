@@ -1,30 +1,31 @@
 <template>
-    <form>
-      <!-- <div v-if="ck" :class="$style.fly">Этот вход не робит. Юзай дискорд</div> -->
-      <main>
-        <div class="heading">Вход</div>
-        <p style="font-size:16px; margin-bottom: 10px;">Эм... А... Кхм... Вход через дискорд, ты ведь помнишь, да?</p>
-        <!-- <div>
-          <p>Ник</p>
-          <input @focus="ck = false" type="text" v-model="login.username">
-        </div>
-        <div>
-          <p>Пароль</p>
-          <input @focus="ck = false" type="password" v-model="login.password">
-        </div> -->
-        <div>
-          <button class="primary" @click="discordLogin" type="button">Открыть Discord</button>
-          <!-- <button class="secondary" @click="discordLogin" type="button">Дискорд</button> -->
-          <NLink
-            style="font-size: 16px; text-align: center; width: 100%;display:inline-block"
-            to="/register"
-          >Я не зарегистрирован...</NLink>
-        </div>
-      </main>
-    </form>
+  <form>
+    <!-- <div v-if="ck" :class="$style.fly">Этот вход не робит. Юзай дискорд</div> -->
+    <main>
+      <div class="heading">Вход</div>
+      <p style="font-size:16px; margin-bottom: 10px;">Эм... А... Кхм... Вход через дискорд, ты ведь помнишь, да?</p>
+      <!-- <div>
+        <p>Ник</p>
+        <input @focus="ck = false" type="text" v-model="login.username">
+      </div>
+      <div>
+        <p>Пароль</p>
+        <input @focus="ck = false" type="password" v-model="login.password">
+      </div> -->
+      <div>
+        <button class="primary" @click="discordLogin" type="button">Открыть Discord</button>
+        <!-- <button class="secondary" @click="discordLogin" type="button">Дискорд</button> -->
+        <NLink
+          style="font-size: 16px; text-align: center; width: 100%;display:inline-block"
+          to="/register"
+        >Я не зарегистрирован...</NLink>
+      </div>
+    </main>
+  </form>
 </template>
 <script>
 export default {
+  auth: "guest",
   layout: "loginLayout",
   data: () => ({
     login: {

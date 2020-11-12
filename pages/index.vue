@@ -9,7 +9,7 @@ export default {
   auth: "guest",
   layout: "light",
   mounted() {
-    console.log(this.$auth);
+    // console.log(this.$auth);
   }
 };
 </script>

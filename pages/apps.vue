@@ -268,7 +268,8 @@ export default {
       this.appError = false;
       let apps = await this.$axios.get('/apps');
       this.myApps = apps.data;
-      console.log("SAVE", save)
+      console.log("SAVE", save);
+      
       if (save) return;
       this.bottomMenuStep = 0;
       this.appOpened = false;
