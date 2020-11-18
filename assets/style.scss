@@ -47,10 +47,10 @@ $font: "Rubik", Arial, sans-serif;
   width: 100%;
 }
 
-::selection {
-  background: #00000044;
+*::selection {
+  background: #00000044!important;
   .dark & {
-    background: #ffffff33;
+    background: #ffffff33!important;
   }
 }
 
@@ -341,7 +341,7 @@ label.radio {
   }
   &.checked::before {
     box-shadow: inset 0 0 0 2px $always-primary, inset 0 0 0 4px $background;
-    background: $always-primary
+    background: $always-primary;
   }
   .dark & {
     &::before {
@@ -349,6 +349,10 @@ label.radio {
     }
     &:hover::before {
       box-shadow: inset 0 0 0 2px $dark-text-subtext;
+    }
+    &.checked::before {
+      box-shadow: inset 0 0 0 2px $always-primary, inset 0 0 0 4px $dark-background;
+      background: $always-primary;
     }
   }
 }
@@ -384,6 +388,7 @@ button, a.btn {
   font-weight: $font-bold;
   cursor: pointer;
   &.min {
+    padding: 0 15px;
     width: fit-content;
     display: inline-block;
   }
@@ -436,11 +441,11 @@ button, a.btn {
   }
   .dark & {
     &.secondary {
-      box-shadow: inset 0 0 0 3px $dark-text-subtext;
-      color: $dark-text-subtext;
+      box-shadow: inset 0 0 0 3px $dark-text-light;
+      color: $dark-text-light;
       &:hover {
-        box-shadow: inset 0 0 0 3px darken($color: $dark-text-subtext, $amount: 14);
-        color: darken($color: $dark-text-subtext, $amount: 14);
+        box-shadow: inset 0 0 0 3px $dark-text-subtext;
+        color: $dark-text-subtext;
       }
     }
   }
@@ -1256,7 +1261,8 @@ button, a.btn {
 
 
 .login {
-  background: url("https://image.freepik.com/free-vector/sunset-mountains-with-pine-forest_7993-2327.jpg") 50% 50% !important;
+  // background: url("https://image.freepik.com/free-vector/sunset-mountains-with-pine-forest_7993-2327.jpg") 50% 50% !important;
+  background: url("~@/assets/login_bg.jpg") 50% 50% !important;
   background-size: cover!important;
   padding: 10px;
   min-height: 100vh;
