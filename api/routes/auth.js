@@ -6,7 +6,15 @@ const bcrypt = require("bcryptjs");
 const fetch = require("node-fetch");
 const User = require("../models/user");
 
-// +TODO логи
+
+async function isOurUser(id) {
+  let r = await fetch("http://localhost:8060/user", {
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ id }),
+    method: "post"
+  });
+  return parseInt(await r.text(), 10);
+}
 
 async function getDiscordTokens(client_id, code, redirect_uri) {
   // console.log("code ->", code);
@@ -18,7 +26,7 @@ async function getDiscordTokens(client_id, code, redirect_uri) {
     redirect_uri: redirect_uri,
     scope: "identify"
   };
-  // console.log(data)
+  console.log("discord data ->", data);
   let body = [];
   for (let i in data) {
     body.push(`${i}=${data[i]}`);
@@ -35,12 +43,13 @@ async function getDiscordTokens(client_id, code, redirect_uri) {
 }
 
 async function getDiscord(client_id, code, redirect_uri) {
-  let { access_token } = await getDiscordTokens(client_id, code, redirect_uri);
+  let { access_token, ...other } = await getDiscordTokens(client_id, code, redirect_uri);
+  console.log("OTHER", other);
   let data = await (await fetch("https://discord.com/api/v6/users/@me", {
     method: "get",
     headers: { Authorization: `Bearer ${access_token}` }
   })).json();
-  // console.log("discord returned ->", data);
+  console.log("discord returned ->", data);
   return data;
 }
 
@@ -63,21 +72,76 @@ router
     });
   })
   .use("/logout", (req, res) => {})
-  .use("/discord-reg", async (req, res) => {
+
+/* WHAT IF??? */
+
+  // .use("/discord-reg", async (req, res) => {
+  //   let { id, username } = await getDiscord(
+  //     req.body.client_id,
+  //     req.body.code,
+  //     req.body.redirect_uri
+  //   );
+  //   // console.log(id, username);
+  //   if (!id) return res.status(400).send({error: "State already was. Buy lottery ticket, if you didn't press \"Back\" button", e: "?"})
+
+  //   User.findOne({ id }, async (err, user) => {
+  //     if (err) return;
+  //     if (user && user.role != 0)
+  //       return res.status(401).send({ error: "Already registred", e: "AR" });
+
+  //     if (!(await isOurUser(id))) 
+  //       return res.status(400).send({ error: "Non SPk gamer", e: "NSG" });
+
+
+  //     if (user && user.role == 0) await users[0].delete();
+  //     let newUser = new User({
+  //       id,
+  //       username,
+  //       password: getPasswordHash("123123"),
+  //       status: null,
+  //       balance: 0,
+  //       role: 0
+  //     });
+  //     await newUser.save();
+
+
+  //     let token = jwt.sign({ id: newUser.id, _id: newUser._id }, process.env.JWT_SECRET, {
+  //       expiresIn: 604800 // 1 Week
+  //     });
+  //     logger.log("(Auth)", newUser.id, "started registration");
+  //     return res.json({ token });
+  //   });
+  // })
+  .use("/discord", async (req, res) => {
     let { id, username } = await getDiscord(
       req.body.client_id,
       req.body.code,
       req.body.redirect_uri
     );
-    // console.log(id, username);
-    if (!id) return res.status(400).send({error: "State already was. Buy lottery ticket, if you didn't press \"Back\" button"})
-
+    console.log("SADSAD", id,req.body.client_id,
+      req.body.code);
     User.findOne({ id }, async (err, user) => {
       if (err) return;
-      if (user && user.role != 0)
-        return res.status(401).send({ error: "Already registred" });
 
-      if (user && user.role == 0) await users[0].delete();
+
+      // IF USER EXISTS
+      if (user && user.role != 0) {
+        let token = jwt.sign(
+          { id: user.id, _id: user._id },
+          process.env.JWT_SECRET,
+          { expiresIn: 604800 } // 1 Week 
+        );
+
+        logger.log("(Auth)", user.id, "logged in");
+        return res.json({ token });
+      }
+
+      // ELSE REGISTER NEW USER
+      if (!(await isOurUser(id))) // (or not...)
+        return res.status(400).send({ error: "Non SPk gamer", e: "NSG" });
+
+
+      if (user && user.role == 0) await user.delete();
       let newUser = new User({
         id,
         username,
@@ -87,29 +151,14 @@ router
         role: 0
       });
       await newUser.save();
+
+
       let token = jwt.sign({ id: newUser.id, _id: newUser._id }, process.env.JWT_SECRET, {
         expiresIn: 604800 // 1 Week
       });
-      logger.log("(Auth)", newUser.id, "started registration")
+      logger.log("(Auth)", newUser.id, "started registration");
       return res.json({ token });
-    });
-  })
-  .use("/discord", async (req, res) => {
-    let { id } = await getDiscord(
-      req.body.client_id,
-      req.body.code,
-      req.body.redirect_uri
-    );
-    // console.log(id)
-    User.findOne({ id }, async (err, user) => {
-      if (err) return;
-      if (!user)
-        return res.status(404).send({ error: "User not found" });
-      let token = jwt.sign({ id: user.id, _id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: 604800 // 1 Week
-      });
-      logger.log("(Auth)", user.id, "logged in")
-      return res.json({ token });
+      
     });
   });
 

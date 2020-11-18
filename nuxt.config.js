@@ -145,7 +145,7 @@ export default {
         _scheme: "oauth2",
         authorization_endpoint: "https://discord.com/oauth2/authorize",
         userinfo_endpoint: `${process.env.API_URL}/users/@me`,
-        scope: ["identify", "guilds"],
+        scope: ["identify"/*, "guilds"*/],
         access_token_endpoint: `${process.env.API_URL}/auth/discord-reg`,
         response_type: "code",
         token_type: "Bearer",
