@@ -16,11 +16,8 @@
           <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
-        <!-- TODO подключить иконку -->
-        <div class="app-img">
-          <div class="verify"><CheckIcon size="12"/></div>
-          <img alt="App avatar" src="https://www.penpublishing.com/squaresMobileTest.jpg">
-        </div>
+        <!-- TODO: чекнуть работоспособность -->
+        <AppImg :app="app" />
       </div>
       <div class="attrs">
         <div class="attrs__one">
@@ -45,6 +42,7 @@
 // TODO подключить API
 
 import CheckIcon from "mdi-vue/Check.vue";
+import AppImg from "~/components/AppImg";
 import SuccessOverlay from "~/components/SuccessOverlay";
 import ErrorOverlay from "~/components/ErrorOverlay";
 import CloseIcon from "mdi-vue/Close.vue";
@@ -84,7 +82,7 @@ export default {
       return data;
     }
   },
-  components: { CheckIcon, SuccessOverlay, ErrorOverlay, CloseIcon }
+  components: { CheckIcon, SuccessOverlay, ErrorOverlay, CloseIcon, AppImg }
 };
 </script>
 <style>

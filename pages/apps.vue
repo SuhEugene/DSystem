@@ -24,7 +24,7 @@
         <h1>Ваши приложения</h1>
         <!-- <div v-if="createAppMenu" id="hidden-form-container">
           <form class="hidden-form">
-            
+
           </form>
         </div> -->
         <div class="wrap">
@@ -71,12 +71,12 @@
               <div style="margin-bottom:15px;" ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
               <div v-if="secretPage" style="margin-top:7px"><b>ID:</b> {{currentApp._id}}</div>
               <div v-if="secretPage" style="margin-top:7px">
-                <b>Secret:</b> 
+                <b>Secret:</b>
                 <span v-if="secretShow">{{currentApp.secret}}</span>
                 <a @click="secretShow = !secretShow" href="javascript:void(0)">{{secretShow ? "Скрыть" : "Показать"}}</a>
               </div>
               <div style="margin-top:7px">
-                <b>Ссылка:</b> 
+                <b>Ссылка:</b>
                 <span>{{`https://drom.one/${currentApp.shortname || currentApp._id}`}}</span>
                 <a target="_blank" :href="`http://${loc}/app/${currentApp.shortname || currentApp._id}`">Открыть</a>
               </div>
@@ -85,6 +85,7 @@
                 <input placeholder="appname" type="text" @blur="checkShortName" v-model="shortname">
                 <small v-if="appError == 'url'">Такой url уже существует</small>
               </div>
+              <!-- HACK кто вообще придумал аватар по ссылке? Добровольно подарить куки по ссылке - Гениально! -->
               <div class="input">
                 Ссылка на аватар
                 <input placeholder="https://example.com/image.png" @blur="checkAvatar" type="url" v-model="avatar">
@@ -269,7 +270,7 @@ export default {
       let apps = await this.$axios.get('/apps');
       this.myApps = apps.data;
       console.log("SAVE", save);
-      
+
       if (save) return;
       this.bottomMenuStep = 0;
       this.appOpened = false;

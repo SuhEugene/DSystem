@@ -70,7 +70,7 @@
             </button>
             <button
               class="min"
-              @click="setTheme(true)" 
+              @click="setTheme(true)"
               :class="{'primary': !!$store.state.dark, 'secondary':  !$store.state.dark}">
               Тьма
             </button>
@@ -122,7 +122,6 @@ export default {
       });
     },
     changeTheme() {
-      // FIXME Смена темы
       if (process.browser) {
         this.$store.commit("changeTheme");
       }

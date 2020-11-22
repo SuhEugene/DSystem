@@ -1,5 +1,4 @@
 <template>
-<!-- TODO: verfified app icons and another -->
     <div class="app-img">
         <div v-if="app.level == -1" class="app-badge app-badge--gray" tooltip="Сомнительное">!</div>
         <div v-if="app.level == 1" class="app-badge" tooltip="Подтверждённое"><CheckIcon size="16"/></div>

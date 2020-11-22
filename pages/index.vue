@@ -4,6 +4,7 @@
     <NLink to="/profile">В профиль</NLink>
   </section>
 </template>
+<!-- QUESTION А нужна ли эта страница вообще? -->
 <script>
 export default {
   auth: "guest",

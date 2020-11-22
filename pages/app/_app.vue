@@ -16,7 +16,7 @@
           <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
-        <!-- TODO подключить и настроить AppImg -->
+        <!-- TODO: чекнуть работоспособность -->
         <AppImg :app="app" />
       </div>
       <div class="sum">
@@ -109,7 +109,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     methods: {
       back () {
         console.log(window.history.length == 1, window.history.length)
-        window.history.length == 1 ? this.$router.push("/") : window.history.back() 
+        window.history.length == 1 ? this.$router.push("/") : window.history.back()
       },
       nextPage () {
         if (this.sumCheck || this.passwordCheck) return;
@@ -160,7 +160,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     },
     computed: {
       sumCheck () {
-        return ((!this.sum || this.sum <= 0) && 
+        return ((!this.sum || this.sum <= 0) &&
                 (!this.$route.params.sum || !parseInt(this.$route.params.sum) || parseInt(this.$route.params.sum) <= 0));
       },
       passwordCheck () {
@@ -191,7 +191,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
           },
         ],
         link: [{ rel: "canonical", href: `${process.env.thisUrl}${this.$route.path}` }]
-      });    
+      });
     },
   };
 </script>

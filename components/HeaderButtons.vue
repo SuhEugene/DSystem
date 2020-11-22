@@ -2,8 +2,6 @@
   <div>
     <transition :name="animBack ? 'swipe-menu-back' : 'swipe-menu'">
 
-      <!-- TODO Действие по Enter -->
-
       <!-- MAIN MENU -->
       <div v-if="!menu" :key="false" class="profile-nav">
         <div class="profile-nav__row">
@@ -16,11 +14,6 @@
           <div @click="$router.push('/apps')" tooltip="Приложения" class="profile-nav__button">
             <CubeScanIcon size="26"/>
           </div>
-          <!-- TODO
-            Запрос логов
-            Смена пароля
-            Обновление ника
-           -->
           <div tooltip="Настройки" class="profile-nav__button">
             <AccountCogOutlineIcon size="26"/>
           </div>
@@ -41,6 +34,8 @@
         </div>
       </div>
 
+      <!-- TODO: почекать работоспособность ENTER -->
+
       <!-- MONEY SENDING -->
       <template>
         <!-- Username -->
@@ -48,7 +43,9 @@
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
                        v-model="username"
-                       :items="users.map(u => u.username).filter(u => u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)" />
+                       :items="users.map(u => u.username).filter(u => u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
+                       @enterpress="!!users.find(u => u.username == username) ? next('t1') : ''"
+                       />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
@@ -63,7 +60,11 @@
         <!-- Sum -->
         <div v-if="menu == 't1'" key="t1" class="profile-nav">
           <div class="profile-nav__row">
-            <input type="number" v-model="sum" placeholder="Сумма">
+            <input type="number"
+                   v-model="sum"
+                   placeholder="Сумма"
+                   @keyup.enter="(!(sumCheck || sum <= 0 || sum > $auth.user.balance)) ? next('t2') : ''"
+                   />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back('t0')" class="profile-nav__button">
@@ -78,7 +79,11 @@
         <!-- Comment -->
         <div v-if="menu == 't2'" key="t2" class="profile-nav">
           <div class="profile-nav__row">
-            <input type="text" placeholder="Комментарий" v-model="comment">
+            <input type="text"
+                   placeholder="Комментарий"
+                   v-model="comment"
+                   @keyup.enter="(comment.length <= 100) ? next('t3') : ''"
+                   />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back('t1')" class="profile-nav__button">
@@ -118,7 +123,8 @@
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Отделение"
                        v-model="post"
-                       :items="posts.map(p => p.name).filter(p => p.toLowerCase().includes(post.toLowerCase()))" />
+                       :items="posts.map(p => p.name).filter(p => p.toLowerCase().includes(post.toLowerCase()))"
+                       @enterpress="!!posts.find(p => p.name == post) ? next('b1') : ''"/>
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
@@ -135,7 +141,8 @@
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
               v-model="username"
-              :items="users.map(u => u.username).filter(u => u.toLowerCase().includes(username.toLowerCase())/* && u != $auth.user.username*/)"
+              :items="users.map(u => u.username).filter(u => u.toLowerCase().includes(username.toLowerCase() && u != $auth.user.username))"
+              @enterpress="!!users.find(u => u.username == username && u.username != $auth.user.username) ? next('b2') : ''"
               />
           </div>
           <div class="profile-nav__row">
@@ -143,7 +150,7 @@
               <BackIcon size="26"/>
             </div>
             <div @click="next('b2')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': !users.find(u => u.username == username)}">
+                 :class="{'profile-nav__button--disabled': !users.find(u => u.username == username && u.username != $auth.user.username)}">
               Далее
             </div>
           </div>
@@ -151,7 +158,11 @@
         <!-- Sum -->
         <div v-if="menu == 'b2'" key="b2" class="profile-nav">
           <div class="profile-nav__row">
-            <input type="number" v-model="sum" placeholder="Сумма">
+            <input type="number"
+                   v-model="sum"
+                   placeholder="Сумма"
+                   @keyup.enter="!sumCheck ? next('b3') : ''"
+                   />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back('b1')" class="profile-nav__button">
@@ -184,6 +195,11 @@
         </div>
       </template>
 
+      <!-- SETTINGS -->
+      <template>
+        <Settings v-if="menu == 's0'" @back="back(false, true)" />
+      </template>
+
     </transition>
   </div>
 </template>
@@ -198,6 +214,9 @@ import AccountCashOutlineIcon from "mdi-vue/AccountCashOutline.vue";
 import AccountGroupOutlineIcon from "mdi-vue/AccountGroupOutline.vue";
 import BackIcon from "mdi-vue/ArrowLeft.vue";
 import HelpInput from "~/components/HelpInput.vue";
+
+import Settings from "~/components/HeaderButtons/Settings.vue";
+
 export default {
   props: ["moder", "banker", "posts", "users"],
   data: () => ({
@@ -218,7 +237,8 @@ export default {
     AccountCashOutlineIcon,
     AccountGroupOutlineIcon,
     BackIcon,
-    HelpInput
+    HelpInput,
+    Settings
   },
   computed: {
     sumCheck () {
@@ -226,9 +246,8 @@ export default {
     }
   },
   methods: {
-    logout() {
-      this.$auth.logout();
-    },
+    log(a) {console.log("DSADSADASD", a)},
+    logout() { this.$auth.logout(); },
     next(to) {
       this.animBack = false;
       this.menu = to;
@@ -259,4 +278,3 @@ export default {
   }
 };
 </script>
-
