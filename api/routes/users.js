@@ -6,6 +6,8 @@ const userRouter = express.Router();
 let cooldown = {};
 const getLogs = require("./getLogs");
 
+// TODO: Фризы аккаунтов
+
 userRouter
   .use((req, res, next) => {
     // console.log(req.method, req.path)
