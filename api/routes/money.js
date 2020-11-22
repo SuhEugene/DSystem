@@ -8,8 +8,6 @@ const mongoose = require("mongoose");
 const getLogs = require("./getLogs");
 const bcrypt = require("bcryptjs");
 
-// TODO логи
-
 const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
 
 let cooldown = {};

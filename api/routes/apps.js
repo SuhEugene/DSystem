@@ -24,7 +24,6 @@ const pass = () => true;
 // TODO 1
 // Read: https://github.com/brandonwoodruff92/asana/wiki/Database-Schema
 
-// +TODO логи
 
 router
   .use((req, res, next) => {
@@ -107,7 +106,7 @@ router
     await session.commitTransaction();
     session.endSession();
 
-    logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
+    logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toApp, "op:", logs.action, "sum:", logs.sum);
 
     let u1 = req.io.users.find(u => u.id == req.user.id);
 
@@ -165,7 +164,7 @@ router
 
     await session.commitTransaction();
     session.endSession();
-    logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
+    logger.log("(Transaction)", "from:", logs.fromApp, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
 
     let u1 = req.io.users.find(u => u.id == req.user.id);
 
@@ -193,7 +192,7 @@ router
         }
       } else { req.body.shortname = ''; }
     }
-    
+
 
     let fields = { name: 32, description: 300 };
     let changable = { avatar: 64, url: 64, eventUrl: 64 };
@@ -208,6 +207,7 @@ router
       if (req.app[f] == req.body[f]) continue;
       changed = true;
       let link = sanitizeUrl(req.body[f].substr(0, fields[f]));
+      if (!req.body[f]) { link = "" }
       req.app[f] = link != 'about:blank' ? link : '';
       if (link == "about:blank") { req.app.level = -1; }
     }
