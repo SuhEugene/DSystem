@@ -33,6 +33,7 @@
     </div>
     <div class="history">
       <div class="history__inner">
+        <audio ref="newOperationSound" src="~/assets/ping.mp3"></audio>
         <h1>История операций</h1>
         <div class="history__inner__data">
           <p v-if="!$store.state.logs">Операций не найдено</p>
@@ -95,6 +96,9 @@ export default {
       });
       this.socket.on("logs", logs => {
         console.log("[WS] recieved logs");
+        if (logs != this.$store.state.logs) {
+          this.$refs.newOperationSound.play();
+        }
         this.$store.commit("setLogs", logs);
       });
       this.socket.on("balance", bal => {
