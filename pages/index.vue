@@ -4,13 +4,11 @@
     <NLink to="/profile">В профиль</NLink>
   </section>
 </template>
-<!-- QUESTION А нужна ли эта страница вообще? -->
+<!-- _QUESTION А нужна ли эта страница вообще? -->
 <script>
 export default {
   auth: "guest",
   layout: "light",
-  mounted() {
-    // console.log(this.$auth);
-  }
+  mounted() { this.$router.push("/login"); }
 };
 </script>
