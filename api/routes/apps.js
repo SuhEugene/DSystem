@@ -193,9 +193,17 @@ router
       } else { req.body.shortname = ''; }
     }
 
+    if (req.body.avatar) {
+      console.log("SENDING");
+      let imageLink = await uploadImage(req.body.avatar);
+      console.log("SENDED", imageLink);
+      if (!imageLink) return res.status(400).send({ error: "img" });
+      req.app.avatar = imageLink;
+      changed = true;
+    }
 
     let fields = { name: 32, description: 300 };
-    let changable = { avatar: 64, url: 64, eventUrl: 64 };
+    let changable = { url: 64, eventUrl: 64 };
 
     for (let f in fields) {
       if (!req.body[f] || req.app[f] == req.body[f]) continue;
@@ -223,5 +231,20 @@ router
     await req.app.delete();
     res.send({ success: true });
   })
+
+async function uploadImage(image) {
+   console.log("got img", `image=${encodeURIComponent(image.split(',')[1])}`.substr(0, 50));
+   // FIXME: STUPID IMGUR FILE SENDING
+   let r = await fetch('https://api.imgur.com/3/upload', {
+     method: "POST",
+     body: `image=${encodeURIComponent(image.split(',')[1])}`,
+     headers: { "Content-Type":"application/x-www-form-urlencoded", Authorization: 'Client-ID b4061759062b8e2' }
+   });
+   let answ = await r.json();
+   console.log(answ);
+   if (!answ.success || !answ.data.link) return false;
+   console.log("link", answ.data.link);
+   return link.replace('.jpg','.jpeg');
+}
 
 module.exports = router;

@@ -36,8 +36,9 @@ global.logger = {
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '5mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(multer.array());
 
 app.use((req, res, next) => {
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);

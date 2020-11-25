@@ -88,7 +88,7 @@
               <!-- HACK кто вообще придумал аватар по ссылке? Добровольно подарить куки по ссылке - Гениально! -->
               <div class="input">
                 Ссылка на аватар
-                <input placeholder="https://example.com/image.png" @blur="checkAvatar" type="url" v-model="avatar">
+                <input type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
               </div>
               <div v-if="secretPage" class="input">
                 Ссылка на сайт
@@ -157,6 +157,7 @@ import HomeOutlineIcon from "mdi-vue/HomeOutline.vue";
 import CheckIcon from "mdi-vue/Check.vue";
 import AppImg from "~/components/AppImg.vue";
 
+const accept = ["image/png", "image/jpeg", "image/jpg"]
 
 export default {
   async asyncData({ app }) {
@@ -179,7 +180,7 @@ export default {
     currentApp: {},
     loc: null,
     appError: false,
-    outError: false
+    outError: false,
   }),
   mounted () {
     if (process.browser) this.loc = window.location.host;
@@ -254,11 +255,11 @@ export default {
         name: this.$refs.appName.innerText.trim().substr(0, 32),
         description: this.$refs.appDesc.innerText.trim().substr(0, 300),
         shortname: (this.shortname) ? this.shortname.trim().split(/ +/).join('').substr(0, 24) : '',
-        avatar: (this.avatar) ? this.avatar.trim().substr(0, 64) : '',
+        avatar: (this.avatar) ? this.avatar : '',
         url: (this.url) ? this.url.trim().substr(0, 64) : '',
         eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : ''
       }
-      this.$axios.put(`/apps/${this.currentApp._id}`, data)
+      this.$axios.$put(`/apps/${this.currentApp._id}`, data)
       .then(_r => {this.refreshApps(true)}).catch(this.errorRefresh);
     },
     deleteApp () {
@@ -301,6 +302,29 @@ export default {
         }
         this.bottomMenuStep = 5;
       }
+    },
+    newFile (e) {
+      if (!e.target.files.length) return;
+      let file = e.target.files[0];
+      this.outError = "";
+
+      if (!accept.includes(file.type)) {
+        this.outError = "Картинка не является png или jpeg";
+        e.target.files = [];
+        return;
+      }
+      if (file.size > 1024*1024*5) {
+        this.outError = "Твой файл больше 5Мб... ";
+        e.target.files = [];
+        return;
+      }
+      let files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      let image = new Image();
+      let reader = new FileReader();
+      let img = this.avatar;
+      reader.onload = (e) => { img = e.target.result; this.avatar = e.target.result; console.log(this, img); document.secretImg = e.target.result;};
+      reader.readAsDataURL(files[0]);
     }
   },
   components: { HomeOutlineIcon, CheckIcon, AppImg }
