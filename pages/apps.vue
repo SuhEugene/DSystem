@@ -59,13 +59,14 @@
               <div class="input"><button @click="createApp" class="primary" type="button">Создать</button></div>
             </template>
 
+            <div class="error" style="margin-bottom: 3px" v-if="appError"><b>
+              <span>Ошибка отправки данных.</span>
+              <span>Причина: "{{appError}}"</span>
+            </b></div>
 
             <template v-if="appOpened">
 
-              <div class="error" style="margin-bottom: 3px" v-if="appError"><b>
-                <span>Ошибка отправки данных.</span>
-                <span v-if="appError == 'Cooldown'">Причина: "Кулдаун"</span>
-              </b></div>
+
 
               <h1 ref="appName" @blur="checkName" contenteditable class="app-name" v-text="currentApp.name"></h1>
               <div style="margin-bottom:15px;" ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
@@ -192,10 +193,9 @@ export default {
       this.appOpened = this.currentApp != app || !this.appOpened;
       this.currentApp = app;
       this.shortname = this.currentApp.shortname;
-      this.avatar = this.currentApp.avatar;
+      // this.avatar = this.currentApp.avatar;
       this.url = this.currentApp.url;
       this.eventUrl = this.currentApp.eventUrl;
-      // this.avatar = this.currentApp.avatar;
       this.appError = false;
     },
     checkName () {
@@ -280,7 +280,11 @@ export default {
     },
     async errorRefresh(e) {
       this.appError = e.response.data.error;
-      console.log(e.response)
+      if (this.appError = "img")      { this.appError = 'Ошибка загрузки картинки'; }
+      if (this.appError = "imgCD")    { this.appError = 'Кулдаун смены картинки'; }
+      if (this.appError = "appCD")    { this.appError = 'Кулдаун создания приложения'; }
+      if (this.appError = "url")      { this.appError = 'Короткий URL существует'; }
+      if (this.appError = "Cooldown") { this.appError = 'Кулдаун сохранения'; }
       this.currentApp = this.apps.find(a => a._id == this.currentApp._id) || {};
     },
     async outputMoney () {
@@ -293,7 +297,7 @@ export default {
         this.bottomMenuStep = 4;
         setTimeout(() => {this.refreshApps(false)}, 1000);
       } catch (e) {
-        this.outError = "Неизвестная ошибка"
+        this.outError = "Неизвестная ошибка";
         if (e && e.response && e.response.data.e == "NEM") {
           this.outError = "Недостаточно денег на балансе";
         }
@@ -306,16 +310,16 @@ export default {
     newFile (e) {
       if (!e.target.files.length) return;
       let file = e.target.files[0];
-      this.outError = "";
+      this.appError = "";
 
       if (!accept.includes(file.type)) {
-        this.outError = "Картинка не является png или jpeg";
-        e.target.files = [];
+        this.appError = "Картинка не является png или jpeg";
+        // e.target.files = [];
         return;
       }
       if (file.size > 1024*1024*5) {
-        this.outError = "Твой файл больше 5Мб... ";
-        e.target.files = [];
+        this.appError = "Твой файл больше 5Мб... ";
+        // e.target.files = [];
         return;
       }
       let files = e.target.files || e.dataTransfer.files;

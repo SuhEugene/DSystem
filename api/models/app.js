@@ -6,6 +6,7 @@ const appModel = new Schema({
   balance: { type: Number, default: 0 },
   name:        { type: String },
   avatar:      { type: String },
+  avatarDel:   { type: String },
   shortname:   { type: String, unique: true },
   url:         { type: String },
   eventUrl:    { type: String },
@@ -13,7 +14,7 @@ const appModel = new Schema({
   owner:       { type: Schema.Types.ObjectId, ref: "users" },
   coowners:  [ { type: Schema.Types.ObjectId, ref: "users" } ],
   level: { type: Number, default: 0 },
-  /* 
+  /*
     0 - Non checked
     1 - Checked
     2 - Verified

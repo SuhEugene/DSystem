@@ -73,7 +73,7 @@
         <button type="button" @click="$router.push('/profile')" v-if="page >= 2 && $auth.loggedIn" class="primary">
           {{ $route.query.ok || "В профиль" }}
         </button>
-        <button type="button" @click="page = 0" v-if="page >= 2 && $auth.loggedIn" class="secondary">
+        <button type="button" @click="clearPage" v-if="page >= 2 && $auth.loggedIn" class="secondary">
           Ещё раз!
         </button>
         <button type="button" @click="nextPage" v-if="page < 2 && $auth.loggedIn" class="primary"
@@ -119,6 +119,12 @@ import ErrorOverlay from "~/components/ErrorOverlay";
       backPage () {
         if (this.page == 0) return window.history.back();
         this.page = 0;
+      },
+      clearPage () {
+        this.page = 0;
+        this.password = "";
+        this.sum = 0;
+        this.$auth.fetchUser();
       },
       async sendData () {
         if (this.sumCheck || this.passwordCheck) return;

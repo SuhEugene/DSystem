@@ -17,7 +17,10 @@ const sumTestZero = Joi.number().integer().min(0);
 
 const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
 
-let cooldown = {};
+let cooldown = {
+  avatar: {},
+  apps: {}
+};
 
 const pass = () => true;
 
@@ -48,6 +51,10 @@ router
   })
   .post("/", async (req, res) => {
     if (!req.body.name) return res.status(400).send({ error: "Invalid body" });
+
+    if (cooldown.apps[req.user._id] & cooldown.apps[req.user._id] > Date.now())
+      return res.status(400).send({ error: "appCD" }) // APPlication CoolDown -> appCD
+
     let apps = await App.find({ owner: req.user._id });
     if (apps.length >= 3 && apps.length >= req.user.mayHave) return res.status(400).send({ error: "Limit" });
 
@@ -192,15 +199,20 @@ router
         }
       } else { req.body.shortname = ''; }
     }
-
     if (req.body.avatar) {
-      console.log("SENDING");
-      let imageLink = await uploadImage(req.body.avatar);
-      console.log("SENDED", imageLink);
-      if (!imageLink) return res.status(400).send({ error: "img" });
-      req.app.avatar = imageLink;
+      console.log(cooldown.avatar[req.app._id], Date.now(), cooldown.avatar[req.app._id] > Date.now());
+      if (cooldown.avatar[req.app._id] && cooldown.avatar[req.app._id] > Date.now())
+        return res.status(400).send({ error: "imgCD" }); // IMaGe CoolDown -> imgCD
+
+      if (req.app.avatarDel) await removeImage(req.app.avatarDel);
+      let imgData = await uploadImage(req.body.avatar);
+      if (!imgData) return res.status(400).send({ error: "img" });
+      req.app.avatar = imgData.link;
+      req.app.avatarDel = imgData.delete;
       changed = true;
+      cooldown.avatar[req.app._id] = Date.now() + 30 * 60 * 1000; // 30min cooldown
     }
+
 
     let fields = { name: 32, description: 300 };
     let changable = { url: 64, eventUrl: 64 };
@@ -233,18 +245,23 @@ router
   })
 
 async function uploadImage(image) {
-   console.log("got img", `image=${encodeURIComponent(image.split(',')[1])}`.substr(0, 50));
    // FIXME: STUPID IMGUR FILE SENDING
    let r = await fetch('https://api.imgur.com/3/upload', {
      method: "POST",
-     body: `image=${encodeURIComponent(image.split(',')[1])}`,
-     headers: { "Content-Type":"application/x-www-form-urlencoded", Authorization: 'Client-ID b4061759062b8e2' }
+     body: JSON.stringify({ image: image.split(',')[1], type: "base64" }),
+     headers: { "Content-Type":"application/json", Authorization: 'Client-ID b4061759062b8e2' }
    });
    let answ = await r.json();
-   console.log(answ);
    if (!answ.success || !answ.data.link) return false;
-   console.log("link", answ.data.link);
-   return link.replace('.jpg','.jpeg');
+   logger.log("(Imgur)", "Got link:", answ.data.link, "and hash:", answ.data.deletehash);
+   return {link: answ.data.link.replace('.jpg','.jpeg'), delete: answ.data.deletehash};
+}
+
+async function removeImage(hash) {
+   // FIXME: STUPID IMGUR FILE SENDING
+   let r = await fetch(`https://api.imgur.com/3/image/${hash}`, { method: "DELETE" });
+     logger.log("(Imgur)", "Deleted avatar by hash:", hash);
+   return await r.json();
 }
 
 module.exports = router;
