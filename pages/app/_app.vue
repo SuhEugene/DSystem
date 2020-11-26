@@ -138,9 +138,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         (this.$route.query.text) ? data.text = this.$route.query.text : '';
         (this.$route.query.uid)  ? data.uid  = this.$route.query.uid  : '';
         try {
-          let r = await this.$axios.post( `/apps/${this.$route.params.app}/send`, data);
-
-          console.log(r.data)
+          let r = await this.$axios.post( `/apps/${this.$route.params.app}/send`, data, { withCredentials: true });
 
           this.loading = false;
 

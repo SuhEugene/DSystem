@@ -71,47 +71,10 @@ router
       return res.json({ token });
     });
   })
-  .use("/logout", (req, res) => {})
+  .use("/logout", (req, res) => {
+    res.clearCookie("auth").clearCookie("refresh").send();
+  })
 
-/* WHAT IF??? */
-
-  // .use("/discord-reg", async (req, res) => {
-  //   let { id, username } = await getDiscord(
-  //     req.body.client_id,
-  //     req.body.code,
-  //     req.body.redirect_uri
-  //   );
-  //   // console.log(id, username);
-  //   if (!id) return res.status(400).send({error: "State already was. Buy lottery ticket, if you didn't press \"Back\" button", e: "?"})
-
-  //   User.findOne({ id }, async (err, user) => {
-  //     if (err) return;
-  //     if (user && user.role != 0)
-  //       return res.status(401).send({ error: "Already registred", e: "AR" });
-
-  //     if (!(await isOurUser(id))) 
-  //       return res.status(400).send({ error: "Non SPk gamer", e: "NSG" });
-
-
-  //     if (user && user.role == 0) await users[0].delete();
-  //     let newUser = new User({
-  //       id,
-  //       username,
-  //       password: getPasswordHash("123123"),
-  //       status: null,
-  //       balance: 0,
-  //       role: 0
-  //     });
-  //     await newUser.save();
-
-
-  //     let token = jwt.sign({ id: newUser.id, _id: newUser._id }, process.env.JWT_SECRET, {
-  //       expiresIn: 604800 // 1 Week
-  //     });
-  //     logger.log("(Auth)", newUser.id, "started registration");
-  //     return res.json({ token });
-  //   });
-  // })
   .use("/discord", async (req, res) => {
     let { id, username } = await getDiscord(
       req.body.client_id,
@@ -129,12 +92,30 @@ router
         let token = jwt.sign(
           { id: user.id, _id: user._id },
           process.env.JWT_SECRET,
-          { expiresIn: 604800 } // 1 Week 
+          { expiresIn: 86400 } // 1 Day (24h)
+        );
+
+        let refresh = jwt.sign(
+          { id: user.id, _id: user._id },
+          process.env.JWT_REFRESH_SECRET,
+          { expiresIn: 2419200 } // 4 Weeks
         );
 
         logger.log("(Auth)", user.id, "logged in");
-        return res.json({ token });
+        //  primary auth token
+        res.cookie("auth", token,
+            { expires: new Date(Date.now() + 86400000),
+              httpOnly: true, sameSite: true })
+          // secondary token to refresh primary (default)
+          .cookie("refresh", refresh,
+            { expires: new Date(Date.now() + 2419200000),
+              httpOnly: true, sameSite: true })
+
+          .send({ token: "We don't like hackers" });
+        return;
       }
+
+      if (!id) return res.status(400).send({ error: "Invalid code", e: "IC" });
 
       // ELSE REGISTER NEW USER
       if (!(await isOurUser(id))) // (or not...)
@@ -153,12 +134,31 @@ router
       await newUser.save();
 
 
-      let token = jwt.sign({ id: newUser.id, _id: newUser._id }, process.env.JWT_SECRET, {
-        expiresIn: 604800 // 1 Week
-      });
+      let token = jwt.sign(
+        { id: newUser.id, _id: newUser._id },
+        process.env.JWT_SECRET,
+        { expiresIn: 86400 } // 1 Day (24h)
+      );
+      let refresh = jwt.sign(
+        { id: newUser.id, _id: newUser._id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: 2419200 } // 4 Weeks
+      );
       logger.log("(Auth)", newUser.id, "started registration");
-      return res.json({ token });
-      
+      // return res.json({ token });
+
+      //  primary auth token
+      res.cookie("auth", token,
+          { expires: new Date(Date.now() + 86400000),
+            httpOnly: true, sameSite: true })
+        // secondary token to refresh primary (default)
+        .cookie("refresh", refresh,
+          { expires: new Date(Date.now() + 2419200000),
+            httpOnly: true, sameSite: true })
+
+        .send({ token: "We don't like hackers" });
+      return;
+
     });
   });
 

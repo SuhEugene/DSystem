@@ -5,6 +5,7 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
@@ -36,16 +37,34 @@ global.logger = {
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
 
-app.use(bodyParser.json({ limit: '5mb', extended: true }));
+app.use(bodyParser.json({ limit: '6mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use((req, res, next) => {
+  req.cookies = {};
+  if (!req.headers.cookie) return next();
+  for (let pair of req.headers.cookie.split(";")) {
+    let [name, value] = pair.trim().split("=");
+    req.cookies[name] = value;
+  }
+  return next();
+})
 // app.use(multer.array());
 
 app.use((req, res, next) => {
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
-  res.append("Access-Control-Allow-Headers", "*");
-  res.append("Access-Control-Allow-Methods", "*");
+  res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+  res.append("Access-Control-Allow-Credentials", "true");
+
   if (req.method == "OPTIONS") return res.status(200).send();
   next();
+});
+
+app.use("/test", (req, res) => {
+  console.log(req.cookie);
+  res.cookie("test", "suck", {expires: new Date(Date.now() + 604800), httpOnly: true, sameSite: true});
+  res.send();
 })
 
 app.get("/user/:id", (req, res) => {
@@ -87,21 +106,48 @@ app.use("/auth", authRouter);
 // app.use("/oauth2", oauth2Router);
 
 app.use(function(req, res, next) {
-  var token = req.headers["authorization"];
-  if (!token) return res.status(403).send("--- Пшёл вон ---");
+  let token = req.cookies && req.cookies.auth;
+  if (!token) return res.status(403).send({ error: "Unauthorized" });
 
   token = token.replace("Bearer ", "");
   try {
     return jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
-      if (err) return res.status(401).json({ error: "Invalid token" });
+      if (err) return refreshToken(req, res, next);
       req.user = user;
       req.io = io;
       next();
     });
   } catch (e) {
-    return res.status(401).send({ error: "Invalid token" })
+    return refreshToken(req, res, next);
   }
 });
+
+function refreshToken(req, res, next) {
+  try {
+    jwt.verify(token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
+      if (err) return res.status(401).json({ error: "Invalid token" });
+      let token = jwt.sign(
+        user,
+        process.env.JWT_SECRET,
+        { expiresIn: 86400 } // 1 Day (24h)
+      );
+      let refresh = jwt.sign(
+        user,
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: 2419200 } // 4 Weeks
+      );
+      res.cookie("auth", token,
+          { expires: new Date(Date.now() + 86400000),
+            httpOnly: true, sameSite: true })
+        .cookie("refresh", refresh,
+          { expires: new Date(Date.now() + 2419200000),
+            httpOnly: true, sameSite: true })
+        .send({ error: "retry" })
+    })
+  } catch (e) {
+    return res.status(401).send({ error: "Invalid token" })
+  }
+}
 
 const userRouter = require("./routes/users");
 const appRouter = require("./routes/apps");
@@ -183,19 +229,18 @@ const getUser = (id) => new Promise((send, reject) => {
 });
 
 
+app.post("/ws", (req, res) => {
+  if (!req.body.cid) return res.send();
+  io.users = io.users.filter(u => u.id != req.user.id);
+  io.users.push({id: req.user.id, io: req.body.cid});
+  io.to(req.body.cid).emit("hello");
+  return res.send();
+})
+
+
 io.on("connection", client => {
-  console.log("connected", client.id)
-  client.on("hello", token => {
-    token = token.replace("Bearer ", "");
-    try {
-      var user = jwt.verify(token, process.env.JWT_SECRET);
-    } catch(err) {
-      return client.emit("error1", err);
-    }
-    io.users = io.users.filter(u => u.id != user.id);
-    io.users.push({id: user.id, io: client.id});
-    client.emit("hello");
-  });
+  console.log("connected", client.id);
+  client.emit("you are", client.id);
 });
 
 http.listen(8081, ()=>{console.log("Started at *:8081"); console.log(Date.now())});

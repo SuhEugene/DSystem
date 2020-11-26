@@ -67,8 +67,8 @@ export default {
     socket: null
   }),
   async asyncData({app}) {
-    const posts = await app.$axios.get('/posts');
-    const users = await app.$axios.get('/users');
+    const posts = await app.$axios.get('/posts', { withCredentials: true });
+    const users = await app.$axios.get('/users', { withCredentials: true });
     return { posts: posts.data, users: users.data };
   },
   methods: {
@@ -77,10 +77,10 @@ export default {
     },
     sendStatus () {
       if (this.$auth.user.status == this.status) return;
-      this.$axios.patch("/users/@me/status", {status: this.status})
+      this.$axios.patch("/users/@me/status", {status: this.status}, { withCredentials: true })
       .then(r => {this.status = r.data.status; this.$auth.setUser(r.data)})
       .catch(() => {this.status = this.$auth.user.status});
-    },
+    }    
   },
   mounted () {
     setTimeout(()=>{this.$auth.fetchUser()}, 500);
@@ -88,7 +88,7 @@ export default {
     this.banker = this.$auth.user.role > 1;
     this.$store.commit("setLogs", this.$auth.user.logs);
     this.socket = this.$nuxtSocket({persist: true});
-    this.socket.on("connect", () => {
+    this.socket.on("connect", client => {
       console.log("[WS] connected");
       this.socket.on("hello", err => {
         this.$nuxt.$loading.finish();
@@ -105,12 +105,11 @@ export default {
         console.log("[WS] recieved balance");
         this.$store.commit("setBal", bal);
       });
-      this.socket.emit("hello",
-        localStorage.getItem("auth._token.discord") ||
-        localStorage.getItem("auth._token.discord-reg") ||
-        localStorage.getItem("auth._token.local"))
+      this.socket.on("you are", name => {
+        this.$axios.post("/ws", { cid: name }, { withCredentials: true });
+      })
       this.$nuxt.$loading.start();
-    })
+    });
   }
 };
 </script>

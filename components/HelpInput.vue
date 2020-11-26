@@ -19,7 +19,7 @@ export default {
   }),
   methods: {
     toggleA() {
-      setTimeout(()=>{this.a=false},130)
+      setTimeout(()=>{this.a=false},300)
     }
   }
 }

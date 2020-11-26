@@ -142,7 +142,7 @@ export default {
       link: [
         { rel: "canonical", href: `${process.env.thisUrl}${this.$route.path}` }
       ]
-    });    
+    });
   },
   validate({ params }) {
     return /^[a-zA-Z0-9_]{3,40}$/.test(params.id) && (params.sum == null || parseInt(params.sum, 10))
@@ -158,7 +158,7 @@ export default {
       this.$axios.post(`/money/pass/send/${this.user.id}`, {
         password: this.password,
         sum: this.sum
-      }).then(() => {this.step=3;}, (e) => {this.step=2;this.error=e.response.data.error})
+      }, { withCredentials: true }).then(() => {this.step=3;}, (e) => {this.step=2;this.error=e.response.data.error})
     }
   }
 };

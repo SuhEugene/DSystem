@@ -468,7 +468,7 @@ button, a.btn {
   &__help {
     // pointer-events: none;
     opacity: 0;
-    transition: opacity .13s;
+    transition: opacity .3s;
     position: absolute;
     top: 100%;
     left: 0;
@@ -1047,7 +1047,8 @@ button, a.btn {
     @include bcontainer-in;
     &__data {
       padding: 5px 10px;
-      max-height: 400px;
+      height: 100%;
+      max-height: 500px;
       overflow-x: hidden;
       overflow-y: auto;
       &::-webkit-scrollbar {

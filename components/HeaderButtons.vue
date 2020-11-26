@@ -246,8 +246,12 @@ export default {
     }
   },
   methods: {
-    log(a) {console.log("DSADSADASD", a)},
-    logout() { this.$auth.logout(); },
+    async logout () {
+      try {
+        await this.$axios.get("/logout", { withCredentials: true });
+        this.$router.push("/login");
+      } catch (e) {this.$router.push("/login");}
+    },
     next(to) {
       this.animBack = false;
       this.menu = to;
@@ -267,13 +271,13 @@ export default {
       this.$axios.post(`/money/${this.users.find(u => u.username == this.username).id}/add`, {
         sum: this.sum,
         post: this.posts.find(p => p.name == this.post).id
-      }).then(r => { this.next(false); this.clear() });
+      }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
     },
     sendMoney() {
       this.$axios.post(`/money/send/${this.users.find(u => u.username == this.username).id}`, {
         sum: this.sum,
         comment: this.comment
-      }).then(r => { this.next(false); this.clear() });
+      }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
     }
   }
 };

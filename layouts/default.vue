@@ -56,7 +56,7 @@ export default {
   },
   mounted() {
     // this.$axios.defaults.baseURL = process.env.axiosBase;
-    if (this.$auth.user && this.$auth.user.role == 0) return this.$router.push("/registration");
+    if (this.$auth && this.$auth.user && this.$auth.user.role == 0) return this.$router.push("/registration");
     if (process.browser) {
       this.$store.commit("setTheme", localStorage.getItem("dark") === "true");
       this.readyState = false;

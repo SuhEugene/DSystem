@@ -106,7 +106,7 @@ export default {
     checkUsername() {
       this.loading = true;
       this.error = "";
-      this.$axios.get(`/mine/${this.username}`).then(r => {
+      this.$axios.get(`/mine/${this.username}`, { withCredentials: true }).then(r => {
         this.loading = false;
         if (r.data.code === "player.was") {
           this.error = "Пользователь с данным никнеймом уже зарегистрирован";
@@ -135,7 +135,7 @@ export default {
         username: this.username,
         password: this.password,
         sex: this.sex
-      }).then(async r => {
+      }, { withCredentials: true }).then(async r => {
         await this.$auth.fetchUser();
         this.$router.push("/profile");
       }, e => {this.step = 7})

@@ -93,75 +93,96 @@ export default {
   modules: [
     // Doc: https://http.nuxtjs.org
     "@nuxtjs/axios",
-    "@nuxtjs/auth",
+    // "@nuxtjs/auth",
     "nuxt-socket-io"
   ],
   router: {
-    middleware: ["auth"]
+    // middleware: [/*"auth",*/ "authTest"]
   },
   io: {
     sockets: [{
       url: process.env.API_URL
     }]
   },
-  auth: {
-    strategies: {
-      local: {
-        endpoints: {
-          login: {
-            url: `${process.env.API_URL}/auth/login`,
-            method: "post",
-            propertyName: "token"
-          },
-          logout: {
-            url: `${process.env.API_URL}/auth/logout`,
-            method: "post"
-          },
-          user: {
-            url: `${process.env.API_URL}/users/@me`,
-            method: "get",
-            propertyName: "user"
-          }
-        }
-        // tokenRequired: true,
-        // tokenType: 'bearer',
-        // globalToken: true,
-        // autoFetchUser: true
-      },
-      discord: {
-        _scheme: "oauth2",
-        authorization_endpoint: "https://discord.com/oauth2/authorize",
-        userinfo_endpoint: `${process.env.API_URL}/users/@me`,
-        scope: ["identify"],
-        access_token_endpoint: `${process.env.API_URL}/auth/discord`,
-        response_type: "code",
-        token_type: "Bearer",
-        redirect_uri: `${process.env.SELF_URL}/profile`,
-        client_id: "701439769133187092",
-        token_key: "token",
-        prompt: "none"
-      },
-      "discord-reg": {
-        _scheme: "oauth2",
-        authorization_endpoint: "https://discord.com/oauth2/authorize",
-        userinfo_endpoint: `${process.env.API_URL}/users/@me`,
-        scope: ["identify"/*, "guilds"*/],
-        access_token_endpoint: `${process.env.API_URL}/auth/discord-reg`,
-        response_type: "code",
-        token_type: "Bearer",
-        redirect_uri: `${process.env.SELF_URL}/registration`,
-        client_id: "701439769133187092",
-        token_key: "token",
-        prompt: "none"
-      }
-    },
-    redirect: {
-      login: "/login",
-      logout: "/",
-      callback: "/login",
-      home: "/profile"
-    }
-  },
+  // auth: {
+  //   localStorage: false,
+  //   cookie: {
+  //     domain: process.env.SELF_URL || "http://localhost:8080",
+  //     secure: true
+  //   },
+  //   strategies: {
+  //     // cookie: {
+  //     //   cookie: {
+  //     //     // (optional) If set we check this cookie exsistence for loggedIn check
+  //     //     name: 'XSRF-TOKEN',
+  //     //   }
+  //     // },
+  //     local: {
+  //       endpoints: {
+  //         login: {
+  //           url: `${process.env.API_URL}/auth/login`,
+  //           method: "post",
+  //           propertyName: "token"
+  //         },
+  //         logout: {
+  //           url: `${process.env.API_URL}/auth/logout`,
+  //           method: "post"
+  //         },
+  //         user: {
+  //           url: `${process.env.API_URL}/users/@me`,
+  //           method: "get",
+  //           propertyName: "user"
+  //         }
+  //       }
+  //       // tokenRequired: true,
+  //       // tokenType: 'bearer',
+  //       // globalToken: true,
+  //       // autoFetchUser: true
+  //     },
+  //     discord: {
+  //       _scheme: "oauth2",
+  //       authorization_endpoint: "https://discord.com/oauth2/authorize",
+  //       userinfo_endpoint: `${process.env.API_URL}/users/@me`,
+  //       scope: ["identify"],
+  //       access_token_endpoint: `${process.env.API_URL}/test`,
+  //       response_type: "code",
+  //       token_type: "Bearer",
+  //       redirect_uri: `${process.env.SELF_URL}/profile`,
+  //       client_id: "701439769133187092",
+  //       token_key: null,
+  //       prompt: "none"
+  //     },
+  //     // "discord-reg": {
+  //     //   _scheme: "oauth2",
+  //     //   authorization_endpoint: "https://discord.com/oauth2/authorize",
+  //     //   userinfo_endpoint: `${process.env.API_URL}/users/@me`,
+  //     //   scope: ["identify"/*, "guilds"*/],
+  //     //   access_token_endpoint: `${process.env.API_URL}/auth/discord-reg`,
+  //     //   response_type: "code",
+  //     //   token_type: "Bearer",
+  //     //   redirect_uri: `${process.env.SELF_URL}/registration`,
+  //     //   client_id: "701439769133187092",
+  //     //   token_key: "token",
+  //     //   prompt: "none"
+  //     // }
+  //   },
+  //   redirect: {
+  //     login: "/login",
+  //     logout: "/",
+  //     callback: "/login",
+  //     home: "/profile"
+  //   },
+  //   // endpoints: {
+  //   //   // (optional) If set, we send a get request to this endpoint before login
+  //   //   xsrf: {
+  //   //     url: ''
+  //   //   }
+  //   // }
+  //   // plugins: [ /*{ src: '~/plugins/axios', ssr: true }*/ { src:'~/plugins/auth.js', ssr:true} ]
+  // },
+
+  plugins: [ '~/plugins/auth.js' ],
+
 
   /*
    ** Build configuration

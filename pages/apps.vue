@@ -162,7 +162,7 @@ const accept = ["image/png", "image/jpeg", "image/jpg"]
 
 export default {
   async asyncData({ app }) {
-    const apps = await app.$axios.get('/apps');
+    const apps = await app.$axios.get('/apps', { withCredentials: true });
     return { myApps: apps.data };
   },
   data: () => ({
@@ -245,7 +245,7 @@ export default {
     createApp () {
       this.$axios.post("/apps", {
         name: this.appName
-      }).then(this.refreshApps).catch(this.errorRefresh);
+      }, { withCredentials: true }).then(this.refreshApps).catch(this.errorRefresh);
       this.appName = "";
     },
     sendAllOfUs () {
@@ -259,16 +259,16 @@ export default {
         url: (this.url) ? this.url.trim().substr(0, 64) : '',
         eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : ''
       }
-      this.$axios.$put(`/apps/${this.currentApp._id}`, data)
+      this.$axios.$put(`/apps/${this.currentApp._id}`, data, { withCredentials: true })
       .then(_r => {this.refreshApps(true)}).catch(this.errorRefresh);
     },
     deleteApp () {
-      this.$axios.delete(`/apps/${this.currentApp._id}`)
+      this.$axios.delete(`/apps/${this.currentApp._id}`, {}, { withCredentials: true })
       .then(() => {this.refreshApps(false);this.currentApp={};}).catch(this.errorRefresh);
     },
     async refreshApps (save=false) {
       this.appError = false;
-      let apps = await this.$axios.get('/apps');
+      let apps = await this.$axios.get('/apps', { withCredentials: true });
       this.myApps = apps.data;
       console.log("SAVE", save);
 
@@ -291,7 +291,7 @@ export default {
       if (parseInt(this.outSum) < 0) return;
       this.outError = false;
       try {
-        let r = await this.$axios.post(`/apps/${this.currentApp._id}/take`, { sum: this.outSum || 0 });
+        let r = await this.$axios.post(`/apps/${this.currentApp._id}/take`, { sum: this.outSum || 0 }, { withCredentials: true });
         this.outSum = null;
         if (!r) { this.outError = "Неизвестная ошибка"; this.bottomMenuStep = 5; return;}
         this.bottomMenuStep = 4;
