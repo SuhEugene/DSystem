@@ -38,12 +38,7 @@ router
     // if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
     // if (!cooldown[req.user.id][req.path]) cooldown[req.user.id][req.path] = {};
     // cooldown[req.user.id][req.path][req.method] = Date.now();
-    User.findOne({ id: req.user.id }, async (err, user) => {
-      if (err) return;
-      if (!user) return res.status(404).send({ error: "User not found" });
-      req.user = user;
-      next();
-    });
+    next();
   })
   .get("/", async (req, res) => {
     let apps = await App.find({'owner': req.user._id}).populate('owner', 'balance _id id role status username mayHave sex');
@@ -56,7 +51,8 @@ router
       return res.status(400).send({ error: "appCD" }) // APPlication CoolDown -> appCD
 
     let apps = await App.find({ owner: req.user._id });
-    if (apps.length >= 3 && apps.length >= req.user.mayHave) return res.status(400).send({ error: "Limit" });
+    console.log(apps.length, req.user.mayHave)
+    if ((apps.length >= 3 && !req.user.mayHave) || apps.length >= req.user.mayHave) return res.status(400).send({ error: "Limit" });
 
     let app = new App();
     app._id = new mongoose.Types.ObjectId();
@@ -245,7 +241,6 @@ router
   })
 
 async function uploadImage(image) {
-   // FIXME: STUPID IMGUR FILE SENDING
    let r = await fetch('https://api.imgur.com/3/upload', {
      method: "POST",
      body: JSON.stringify({ image: image.split(',')[1], type: "base64" }),
@@ -258,7 +253,6 @@ async function uploadImage(image) {
 }
 
 async function removeImage(hash) {
-   // FIXME: STUPID IMGUR FILE SENDING
    let r = await fetch(`https://api.imgur.com/3/image/${hash}`, { method: "DELETE" });
      logger.log("(Imgur)", "Deleted avatar by hash:", hash);
    return await r.json();

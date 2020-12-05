@@ -5,8 +5,8 @@
         <div v-if="app.level == 2" class="app-badge" tooltip="Партнёр"><ShipWheelIcon size="16"/></div>
         <div v-if="app.level == 3" class="app-badge" tooltip="Официальное"><SailBoatIcon size="16"/></div>
         <div class="app-image">
-            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" :style="`background-image: url('${app.level >= 0 ? app.avatar : ''}')`">
-            <!-- <img src="img_orange_flowers.jpg" alt="Flowers" style="width:auto;"> -->
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                 :style="app.avatar ? `background-image: url('${app.level >= 0 ? app.avatar: ''}')` : ''">
             <div>
               <CubeOutlineIcon v-if="app.level >=0" size="38" />
               <EmoticonDevilOutlineIcon v-else size="38" />

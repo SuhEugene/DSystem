@@ -6,14 +6,16 @@ const bcrypt = require("bcryptjs");
 const fetch = require("node-fetch");
 const User = require("../models/user");
 
+// TODO: 'login' field refresh endpoint
+// TODO: 'login' field refresh endpoint frontend
 
 async function isOurUser(id) {
   let r = await fetch("http://localhost:8060/user", {
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ id: String(id) }),
     method: "post"
   });
-  return parseInt(await r.text(), 10);
+  return (await r.json()).gamer;
 }
 
 async function getDiscordTokens(client_id, code, redirect_uri) {
@@ -81,7 +83,7 @@ router
       req.body.code,
       req.body.redirect_uri
     );
-    console.log("SADSAD", id,req.body.client_id,
+    console.log("SADSAD", id, req.body.client_id,
       req.body.code);
     User.findOne({ id }, async (err, user) => {
       if (err) return;
@@ -90,13 +92,13 @@ router
       // IF USER EXISTS
       if (user && user.role != 0) {
         let token = jwt.sign(
-          { id: user.id, _id: user._id },
+          { id: user.id, _id: user._id, random: user.random },
           process.env.JWT_SECRET,
           { expiresIn: 86400 } // 1 Day (24h)
         );
 
         let refresh = jwt.sign(
-          { id: user.id, _id: user._id },
+          { id: user.id, _id: user._id, random: user.random },
           process.env.JWT_REFRESH_SECRET,
           { expiresIn: 2419200 } // 4 Weeks
         );
@@ -129,18 +131,19 @@ router
         password: getPasswordHash("123123"),
         status: null,
         balance: 0,
-        role: 0
+        role: 0,
+        random: randStr()
       });
       await newUser.save();
 
 
       let token = jwt.sign(
-        { id: newUser.id, _id: newUser._id },
+        { id: newUser.id, _id: newUser._id, random: newUser.random },
         process.env.JWT_SECRET,
         { expiresIn: 86400 } // 1 Day (24h)
       );
       let refresh = jwt.sign(
-        { id: newUser.id, _id: newUser._id },
+        { id: newUser.id, _id: newUser._id, random: newUser.random },
         process.env.JWT_REFRESH_SECRET,
         { expiresIn: 2419200 } // 4 Weeks
       );
@@ -162,4 +165,11 @@ router
     });
   });
 
+const alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-_+=$#";
+const rand = () => alphabet[Math.floor(Math.random()*alphabet.length)];
+const randStr = () => {
+  let text = "";
+  for (let i = 0; i < 10; i++) { text += rand() }
+  return text;
+}
 module.exports = router;

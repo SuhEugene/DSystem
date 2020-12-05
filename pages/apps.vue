@@ -1,5 +1,4 @@
 <template>
-    <!-- TODO Замена иконок на компонент -->
 
   <section id="apps-page">
     <header>
@@ -86,8 +85,8 @@
                 <input placeholder="appname" type="text" @blur="checkShortName" v-model="shortname">
                 <small v-if="appError == 'url'">Такой url уже существует</small>
               </div>
-              <!-- HACK кто вообще придумал аватар по ссылке? Добровольно подарить куки по ссылке - Гениально! -->
               <div class="input">
+                <!-- TODO: design -->
                 Ссылка на аватар
                 <input type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
               </div>
@@ -263,7 +262,7 @@ export default {
       .then(_r => {this.refreshApps(true)}).catch(this.errorRefresh);
     },
     deleteApp () {
-      this.$axios.delete(`/apps/${this.currentApp._id}`, {}, { withCredentials: true })
+      this.$axios.delete(`/apps/${this.currentApp._id}`, { withCredentials: true })
       .then(() => {this.refreshApps(false);this.currentApp={};}).catch(this.errorRefresh);
     },
     async refreshApps (save=false) {
@@ -280,12 +279,13 @@ export default {
     },
     async errorRefresh(e) {
       this.appError = e.response.data.error;
-      if (this.appError = "img")      { this.appError = 'Ошибка загрузки картинки'; }
-      if (this.appError = "imgCD")    { this.appError = 'Кулдаун смены картинки'; }
-      if (this.appError = "appCD")    { this.appError = 'Кулдаун создания приложения'; }
-      if (this.appError = "url")      { this.appError = 'Короткий URL существует'; }
-      if (this.appError = "Cooldown") { this.appError = 'Кулдаун сохранения'; }
-      this.currentApp = this.apps.find(a => a._id == this.currentApp._id) || {};
+      if (this.appError == "img")      { this.appError = 'Ошибка загрузки картинки'; }
+      if (this.appError == "imgCD")    { this.appError = 'Кулдаун смены картинки'; }
+      if (this.appError == "appCD")    { this.appError = 'Кулдаун создания приложения'; }
+      if (this.appError == "url")      { this.appError = 'Короткий URL существует'; }
+      if (this.appError == "Cooldown") { this.appError = 'Кулдаун сохранения'; }
+      if (this.appError == "Limit")    { this.appError = 'Лимит приложений'; }
+      this.currentApp = this.myApps.find(a => a._id == this.currentApp._id) || {};
     },
     async outputMoney () {
       if (parseInt(this.outSum) < 0) return;

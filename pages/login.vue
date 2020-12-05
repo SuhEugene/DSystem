@@ -20,6 +20,7 @@
         >Я не зарегистрирован...</NLink>
       </div>
     </main>
+    <!-- XXX where nonspkgamer error? -->
     <div v-if="error" :class="$style.bottom_error" v-html="error"></div>
   </form>
 </template>
@@ -87,7 +88,7 @@ export default {
         return false;
       }
       if (e.message == "Network Error"){
-        text = "Сервер не отвечает - возможно он упал или перезагружается. Попробуйте перезагрузить страницу через несколько секунд.<br>"+
+        text = "Сервер не отвечает - возможно он упал или перезагружается.<br>Попробуйте перезагрузить страницу через несколько секунд.<br>"+
           "Проверить состояние сервера вы можете "+
           "<a class=\"white\" href=\"https://discord.gg/xFfNay3\" target=\"_blank\">в нашем дискорде</a>";
       }

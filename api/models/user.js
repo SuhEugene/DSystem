@@ -7,6 +7,7 @@ const userModel = new Schema({
   username: { type: String },
   password: { type: String },
   status:   { type: String },
+  random:   { type: String },
   sex:      { type: Number },
   balance:  { type: Number },
   role:     { type: Number },

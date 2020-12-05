@@ -14,7 +14,7 @@
                      v-model="status"
                      placeholder="Укажите статус"
                      type="text" id="sendStatus"
-                     name="sendStatus">
+                     name="sendStatus" autocomplete="off">
            </label>
           </div>
           <div class="profile-header__balance">
@@ -36,7 +36,7 @@
         <audio ref="newOperationSound" src="~/assets/ping.mp3"></audio>
         <h1>История операций</h1>
         <div class="history__inner__data">
-          <p v-if="!$store.state.logs">Операций не найдено</p>
+          <p v-if="!$store.state.logs || !$store.state.logs.length">Операций не найдено</p>
           <HistoryEl v-for="log in $store.state.logs" :key="log._id" :log="log"/>
         </div>
       </div>
@@ -78,9 +78,9 @@ export default {
     sendStatus () {
       if (this.$auth.user.status == this.status) return;
       this.$axios.patch("/users/@me/status", {status: this.status}, { withCredentials: true })
-      .then(r => {this.status = r.data.status; this.$auth.setUser(r.data)})
+      .then(r => {this.status = r.data.status; this.$auth.user = r.data})
       .catch(() => {this.status = this.$auth.user.status});
-    }    
+    }
   },
   mounted () {
     setTimeout(()=>{this.$auth.fetchUser()}, 500);
@@ -90,26 +90,26 @@ export default {
     this.socket = this.$nuxtSocket({persist: true});
     this.socket.on("connect", client => {
       console.log("[WS] connected");
-      this.socket.on("hello", err => {
-        this.$nuxt.$loading.finish();
-        console.log("[WS] logged in");
-      });
-      this.socket.on("logs", logs => {
-        console.log("[WS] recieved logs");
-        if (logs != this.$store.state.logs) {
-          this.$refs.newOperationSound.play();
-        }
-        this.$store.commit("setLogs", logs);
-      });
-      this.socket.on("balance", bal => {
-        console.log("[WS] recieved balance");
-        this.$store.commit("setBal", bal);
-      });
-      this.socket.on("you are", name => {
-        this.$axios.post("/ws", { cid: name }, { withCredentials: true });
-      })
       this.$nuxt.$loading.start();
     });
+    this.socket.on("hello", err => {
+      this.$nuxt.$loading.finish();
+      console.log("[WS] logged in");
+    });
+    this.socket.on("logs", logs => {
+      console.log("[WS] recieved logs");
+      if (logs != this.$store.state.logs) {
+        this.$refs.newOperationSound.play();
+      }
+      this.$store.commit("setLogs", logs);
+    });
+    this.socket.on("balance", bal => {
+      console.log("[WS] recieved balance");
+      this.$store.commit("setBal", bal);
+    });
+    this.socket.on("you are", name => {
+      this.$axios.post("/ws", { cid: name }, { withCredentials: true });
+    })
   }
 };
 </script>

@@ -3,10 +3,18 @@ const client = new Discord.Client();
 const app = require("express")();
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
-require("dotenv").config()
+require("dotenv").config();
 
-client.on("ready", () => {
+
+const mainRole = process.env.MAIN_ROLE;
+const mainGuild = process.env.MAIN_GUILD;
+
+
+client.on("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
+	const gld = await client.guilds.fetch(mainGuild);
+	gld.members.fetch("404236405116764162").then(console.log).catch(console.log)
+	// gld.members.fetch().then((...a) => {console.log("done", a)}).catch((...a) => {console.log("done error", a)});
 });
 
 // client.on("message", async message => {
@@ -23,8 +31,6 @@ client.on("ready", () => {
 //   } catch (e) { message.reply("error"); }
 // })
 
-const mainRole = process.env.MAIN_ROLE;
-const mainGuild = process.env.MAIN_GUILD;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,11 +47,11 @@ app.post("/user", async (req, res) => {
   console.log("req", req.body.id)
   if (!req.body.id) return res.status(400).send("FCK");
   try {
-    let mbr = await (await client.guilds.fetch(mainGuild)).members.fetch(req.body.id);
-    console.log(String(mbr.roles.cache.has(mainRole) ? 1 : 0));
-    // return res.send(String(mbr.roles.cache.has(mainRole) ? 1 : 0));
-    return res.send("1");
-  } catch (e) { return res.status(500).send(e); }
+		const gld = await client.guilds.fetch(mainGuild);
+		const mbr = await gld.members.fetch(req.body.id);
+		if (!mbr) return res.send({ gamer: false });
+    return res.send({ gamer: mbr.roles.cache.has(mainRole) });
+  } catch (e) { return res.status(500).send({ gamer: false, error: true }); }
 });
 
 client.login(process.env.TOKEN);

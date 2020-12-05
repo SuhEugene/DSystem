@@ -6,7 +6,6 @@ const userRouter = express.Router();
 let cooldown = {};
 const getLogs = require("./getLogs");
 
-// TODO: Фризы аккаунтов
 
 userRouter
   .use((req, res, next) => {
@@ -15,13 +14,7 @@ userRouter
         // return res.status(400).send({ error: "Cooldown" });
       // if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
       // cooldown[req.user.id][req.path] = Date.now();
-      User.findOne({ id: req.user.id }, async (err, user) => {
-      if (err) return;
-      if (!user)
-        return res.status(404).send({ error: "User not found" });
-      req.user = user;
-      next();
-    });
+  next();
   })
   .get("/", (req, res) => {
     User.find({role: {$ne: 0}},(err, users) => {

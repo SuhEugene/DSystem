@@ -16,7 +16,6 @@
           <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
-        <!-- TODO: чекнуть работоспособность -->
         <AppImg :app="app" />
       </div>
       <div class="sum">

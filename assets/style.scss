@@ -35,6 +35,9 @@ $font-bold: 500;
 $font: "Rubik", Arial, sans-serif;
 // $font: "Inter", Arial, sans-serif;
 
+
+// FIXME selection reg page
+
 @mixin bcontainer {
   display: flex;
   flex-direction: column;
@@ -319,8 +322,10 @@ input[type=radio] {
   opacity: 0;
   width: 1px;
   height: 1px;
+  cursor: pointer;
 }
 label.radio {
+  cursor: pointer;
   display: flex;
   justify-content: flex-start;
   align-items: center;

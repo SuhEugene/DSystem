@@ -16,6 +16,7 @@ require("dotenv").config();
 
 io.users = [];
 
+
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
   useUnifiedTopology: true,
   useNewUrlParser: true
@@ -105,6 +106,7 @@ app.use("/auth", authRouter);
 // const oauth2Router = require("./service_oauth2");
 // app.use("/oauth2", oauth2Router);
 
+// TODO: фризы аккаунтов
 app.use(function(req, res, next) {
   let token = req.cookies && req.cookies.auth;
   if (!token) return res.status(403).send({ error: "Unauthorized" });
@@ -113,7 +115,11 @@ app.use(function(req, res, next) {
   try {
     return jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
       if (err) return refreshToken(req, res, next);
-      req.user = user;
+      try {
+        req.user = await getUser(user._id, user.login);
+      } catch (e) {
+        return res.status(400).send({ error: "Non SPk gamer", e: "NSG" })
+      }
       req.io = io;
       next();
     });
@@ -194,14 +200,17 @@ app.post("/reg", (req, res) => {
         if (error) return res.status(500).send({ error });
         if (!user) return res.status(400).send({ error: "Magic!" });
         console.log(r.data.player);
-        User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}] })
-        user.username = r.data.player.username;
-        user.uuid = r.data.player.raw_id;
-        user.password = await getPasswordHash(req.body.password);
-        user.sex = parseInt(req.body.sex, 10);
-        user.role = 2;
-        await user.save();
-        res.status(200).send();
+        User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}], role: { $ne:0 } }, async (err, usr) => {
+          if (err) return res.status(500).send({ err });
+          if (usr) return res.status(400).send({ error: "have" });
+          user.username = r.data.player.username;
+          user.uuid = r.data.player.raw_id;
+          user.password = await getPasswordHash(req.body.password);
+          user.sex = parseInt(req.body.sex, 10);
+          user.role = 2;
+          await user.save();
+          res.status(200).send();
+        })
       });
     });
 });
@@ -220,8 +229,8 @@ app.get("/mine/:username", (req, res) => {
     });
 });
 
-const getUser = (id) => new Promise((send, reject) => {
-  User.findOne({ id }, (err, user) => {
+const getUser = (_id, login) => new Promise((send, reject) => {
+  User.findOne({ _id, login }, (err, user) => {
     if (err) return reject(err);
     if (!user) return reject("User not found");
     return send(user);
