@@ -120,6 +120,7 @@ router
       if (!id) return res.status(400).send({ error: "Invalid code", e: "IC" });
 
       // ELSE REGISTER NEW USER
+      console.log("hello");
       if (!(await isOurUser(id))) // (or not...)
         return res.status(400).send({ error: "Non SPk gamer", e: "NSG" });
 

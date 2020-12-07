@@ -4,10 +4,10 @@
       <div class="profile-header__overlay"></div>
       <div class="profile-header__holder">
         <div class="profile-header__holder__spacer profile-header__holder__spacer--0"></div>
-        <UserAvatar :user="this.$auth.user" />
+        <UserAvatar :user="$auth.user" />
         <div class="profile-header__holder--nick-bal">
           <div class="profile-header__nickname">
-            <div class="profile-header__nickname--name">{{$auth.user.username}}</div>
+            <div class="profile-header__nickname--name">{{$auth.user && $auth.user.username}}</div>
             <label>
               <input class="profile-header__nickname--status"
                      @blur="sendStatus"
@@ -19,7 +19,7 @@
           </div>
           <div class="profile-header__balance">
             <div class="profile-header__balance--title">Баланс</div>
-            <div class="profile-header__balance--value">{{$auth.user.balance}} АР</div>
+            <div class="profile-header__balance--value">{{$auth.user && $auth.user.balance}} АР</div>
           </div>
         </div>
         <div class="profile-header__holder__spacer profile-header__holder__spacer--1"></div>
@@ -67,9 +67,14 @@ export default {
     socket: null
   }),
   async asyncData({app}) {
-    const posts = await app.$axios.get('/posts', { withCredentials: true });
-    const users = await app.$axios.get('/users', { withCredentials: true });
-    return { posts: posts.data, users: users.data };
+    try {
+      const posts = await app.$axios.get('/posts', { withCredentials: true });
+      const users = await app.$axios.get('/users', { withCredentials: true });
+      return { posts: posts.data, users: users.data };
+    } catch (e) {
+      console.error(e);
+      return { posts: [], users: [] };
+    }
   },
   methods: {
     themeChange() {

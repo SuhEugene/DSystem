@@ -21,7 +21,7 @@
       </div>
     </main>
     <!-- XXX where nonspkgamer error? -->
-    <div v-if="error" :class="$style.bottom_error" v-html="error"></div>
+    <!-- <div v-if="error" class="bottom_error" v-html="error"></div> -->
   </form>
 </template>
 <script>
@@ -97,7 +97,16 @@ export default {
   }
 };
 </script>
-<style module>
+<style lang="scss">
+  .non_relative {
+    position: static!important;
+  }
+  a.white {
+    color: white;
+    transition: 0.13s opacity;
+    opacity: 1;
+    &:hover { opacity: 0.7; color: white;}
+  }
   .bottom_error  {
     bottom: 0;
     left: 0;
@@ -111,16 +120,5 @@ export default {
     font-size: 16px;
     position: absolute;
     box-shadow: 0 2px 2px 0 rgba(0,0,0,.18);
-  }
-</style>
-<style lang="scss">
-  .non_relative {
-    position: static!important;
-  }
-  a.white {
-    color: white;
-    transition: 0.13s opacity;
-    opacity: 1;
-    &:hover { opacity: 0.7; color: white;}
   }
 </style>

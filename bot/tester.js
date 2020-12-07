@@ -13,7 +13,7 @@ const mainGuild = process.env.MAIN_GUILD;
 client.on("ready", async () => {
 	console.log(`Logged in as ${client.user.tag}!`);
 	const gld = await client.guilds.fetch(mainGuild);
-	gld.members.fetch("404236405116764162").then(console.log).catch(console.log)
+	// gld.members.fetch("404236405116764162").then(console.log).catch(console.log)
 	// gld.members.fetch().then((...a) => {console.log("done", a)}).catch((...a) => {console.log("done error", a)});
 });
 

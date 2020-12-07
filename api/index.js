@@ -62,12 +62,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/test", (req, res) => {
-  console.log(req.cookie);
-  res.cookie("test", "suck", {expires: new Date(Date.now() + 604800), httpOnly: true, sameSite: true});
-  res.send();
-})
-
 app.get("/user/:id", (req, res) => {
   if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
   User.findOne({
@@ -108,7 +102,7 @@ app.use("/auth", authRouter);
 
 // TODO: фризы аккаунтов
 app.use(function(req, res, next) {
-  let token = req.cookies && req.cookies.auth;
+  let token = req.cookies && (req.cookies.auth || req.cookies.refresh);
   if (!token) return res.status(403).send({ error: "Unauthorized" });
 
   token = token.replace("Bearer ", "");
@@ -118,8 +112,9 @@ app.use(function(req, res, next) {
       try {
         req.user = await getUser(user._id, user.login);
       } catch (e) {
-        return res.status(400).send({ error: "Non SPk gamer", e: "NSG" })
+        return res.status(400).send({ error: "Non registred", e: "NRG" })
       }
+      if (req.user.freezed) return res.status(418).send({ error: "Freezed", e: "F" })
       req.io = io;
       next();
     });

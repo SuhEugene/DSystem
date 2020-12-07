@@ -1,5 +1,8 @@
 
 
+// FIXME: profile -> login -> profile -> apps
+// FIXME: no register
+
 
 class Auth {
   constructor ({store, $axios, query, app}, auth) {
@@ -22,16 +25,22 @@ class Auth {
 
   async fetchUser(retry=false) {
     try {
+      console.log("fetch req");
       let r = await this.$axios.get(this.$auth.discord.userinfo_endpoint, { withCredentials: true });
       this.user = r.data;
+      console.log(r.data);
       this.loggedIn = true;
       this.error = false;
       return true;
     } catch (e) {
+      console.log(e.request)
       console.warn(e.response ? e.response.data : e);
       this.user = false;
       this.loggedIn = false;
       this.error = e.response ? e.response.data : e;
+      if (this.error.error == "Freezed" || this.error.e == "F") {
+        this.user = { freezed: true };
+      }
       if (!retry && e.response && e.response.data.error == "retry")
         await this.fetchUser(true);
       return false;
@@ -96,6 +105,9 @@ function randString() {
 }
 
 
+const free = ['/app', '/user', '/'];
+const superFree = ['/app', '/user'];
+
 
 export default async function (ctx, inject) {
 
@@ -136,35 +148,29 @@ export default async function (ctx, inject) {
   if (process.browser) {
     console.log(ctx.query.code, ctx.query.state, localStorage.getItem("state"))
     if (ctx.query.code && ctx.query.state && ctx.query.state == localStorage.getItem("state")) {
+      console.log("LOGGING IN");
       await $auth.logIn(ctx.query.code);
-      console.log("LOGGING IN")
+      console.log("LOGGED IN");
     }
+    localStorage.removeItem("state");
+    console.log("FETHING USER");
+    await $auth.fetchUser();
+    console.log("FETCHED USER");
+    console.log($auth.loggedIn, $auth.user);
+
+
+    if (free.includes(ctx.route.path)) return;
+    for (let n of superFree) {
+      if (ctx.route.path.startsWith(n)) return;
+    }
+
+    // for (let o in ctx.app) console.log(o);
+
+    if (!$auth.loggedIn && !["/login", "/register"].includes(ctx.route.path))
+      return ctx.app.router.push("/login");
+
+    if ($auth.loggedIn && ["/login", "/register"].includes(ctx.route.path))
+      return ctx.app.router.push("/profile");
+
   }
-  process.browser && localStorage.removeItem("state");
-  await $auth.fetchUser();
-
-  if (!$auth.loggedIn && !["/login", "/register"].includes(ctx.route.path)) {
-    ctx.redirect("/login");
-  }
-  if ($auth.loggedIn && ["/login", "/register"].includes(ctx.route.path)) {
-    ctx.redirect("/profile");
-  }
-  // inject("test", () => console.log("hello"))
-
-
-  // process.browser && inject("authm", $auth);
-  // console.log("uesr", await $auth.fetchUser());
-
-
-  // if ( {
-  //   console.log("HELLO")
-  // } else {
-  //   console.log("goodbye");
-  // }
-
-  // $axios.withCredentials = true;
-  // $axios.defaults.withCredentials = true;
-  // $axios.defaults.headers.common.withCredentials = true;
-  // next();
-  // console.log($axios.defaults);
 }
