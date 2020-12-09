@@ -92,13 +92,13 @@ router
       // IF USER EXISTS
       if (user && user.role != 0) {
         let token = jwt.sign(
-          { id: user.id, _id: user._id, random: user.random },
+          { id: user.id, _id: user._id, login: user.login },
           process.env.JWT_SECRET,
           { expiresIn: 86400 } // 1 Day (24h)
         );
 
         let refresh = jwt.sign(
-          { id: user.id, _id: user._id, random: user.random },
+          { id: user.id, _id: user._id, login: user.login },
           process.env.JWT_REFRESH_SECRET,
           { expiresIn: 2419200 } // 4 Weeks
         );
@@ -133,18 +133,18 @@ router
         status: null,
         balance: 0,
         role: 0,
-        random: randStr()
+        login: randStr()
       });
       await newUser.save();
 
 
       let token = jwt.sign(
-        { id: newUser.id, _id: newUser._id, random: newUser.random },
+        { id: newUser.id, _id: newUser._id, login: newUser.login },
         process.env.JWT_SECRET,
         { expiresIn: 86400 } // 1 Day (24h)
       );
       let refresh = jwt.sign(
-        { id: newUser.id, _id: newUser._id, random: newUser.random },
+        { id: newUser.id, _id: newUser._id, login: newUser.login },
         process.env.JWT_REFRESH_SECRET,
         { expiresIn: 2419200 } // 4 Weeks
       );
