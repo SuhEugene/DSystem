@@ -37,6 +37,8 @@ global.logger = {
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
 
+
+
 app.use(bodyParser.json({ limit: '6mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -52,11 +54,11 @@ app.use((req, res, next) => {
 // app.use(multer.array());
 
 app.use((req, res, next) => {
+  console.log(req.method, req.path);
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
   res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
   res.append("Access-Control-Allow-Credentials", "true");
-
   if (req.method == "OPTIONS") return res.status(200).send();
   next();
 });
@@ -64,6 +66,10 @@ app.use((req, res, next) => {
 app.use("/test", (req, res) => {
   console.log(req.cookie);
   res.cookie("test", "suck", {expires: new Date(Date.now() + 604800), httpOnly: true, sameSite: true});
+console.log("process.env.CLEAR_MAIN", process.env.CLEAR_MAIN)
+  res.cookie("hahaha", "token",
+      { expires: new Date(Date.now() + 86400000),
+        httpOnly: true, sameSite: true, domain: process.env.CLEAR_MAIN })
   res.send();
 })
 
@@ -102,6 +108,7 @@ app.get("/apps/:id", async (req, res) => {
 const authRouter = require("./routes/auth");
 app.use("/auth", authRouter);
 
+app.get("/api/users/@me", (req, res) => {res.status(417).send("Fufufuf")})
 // const oauth2Router = require("./service_oauth2");
 // app.use("/oauth2", oauth2Router);
 
@@ -158,7 +165,7 @@ app.use("/money", moneyRouter);
 
 app.get("/posts", (req, res) => {
   Post.find((err, posts) => {
-    if (err) return;
+    if (err) return res.json([]);
     User.findOne({ id: req.user.id }, (err, user) => {
       if (err) return console.error(err);
       if (user.role > 2) return res.json(posts);

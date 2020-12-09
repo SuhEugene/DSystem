@@ -66,10 +66,21 @@ export default {
     status: "",
     socket: null
   }),
-  async asyncData({app}) {
-    const posts = await app.$axios.get('/posts', { withCredentials: true });
-    const users = await app.$axios.get('/users', { withCredentials: true });
+  async asyncData({ app }) {
+    // let posts = [];
+    // let users = []
+    // try {
+    const posts = await app.$api.get('/posts', { withCredentials: true })/* || []*/;
+    // } catch (e) {
+    //   posts = [];
+    // }
+    // try {
+    const users = await app.$api.get('/users', { withCredentials: true })/* || []*/;
+    // } catch (e) {
+    //   users = [];
+    // }
     return { posts: posts.data, users: users.data };
+
   },
   methods: {
     themeChange() {
@@ -80,7 +91,7 @@ export default {
       this.$axios.patch("/users/@me/status", {status: this.status}, { withCredentials: true })
       .then(r => {this.status = r.data.status; this.$auth.setUser(r.data)})
       .catch(() => {this.status = this.$auth.user.status});
-    }    
+    }
   },
   mounted () {
     setTimeout(()=>{this.$auth.fetchUser()}, 500);

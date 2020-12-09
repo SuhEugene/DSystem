@@ -161,8 +161,11 @@ import AppImg from "~/components/AppImg.vue";
 const accept = ["image/png", "image/jpeg", "image/jpg"]
 
 export default {
-  async asyncData({ app }) {
-    const apps = await app.$axios.get('/apps', { withCredentials: true });
+  async asyncData({ $api, $axios, app }) {
+    // console.log("helo")
+    // console.log(app.$api.post)
+    // console.log($api, $axios)
+    const apps = await app.$api.get('/apps', { withCredentials: true });
     return { myApps: apps.data };
   },
   data: () => ({

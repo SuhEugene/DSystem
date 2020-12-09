@@ -6,7 +6,7 @@
       <a href="javascript:void(0)" onclick="window.location.reload()">Refresh page</a>
       <br>
       <br>
-      <span class="grey">guest@dromon:~$</span>
+      <span class="grey">{{this.$auth.user ? this.$auth.user.username.toLowerCase() : 'guest'}}@dromon:~$</span>
       <b>{{(cursor) ? "_" : ""}}</b>
     </span>
   </div>
@@ -16,7 +16,7 @@ export default {
   props: ['error'],
   data: () => ({
     strings: [
-      "<span class='grey'>guest@dromon:~$</span> npm run app",
+      "<span class='grey'>{2}@dromon:~$</span> npm run app",
       "",
       "> dromon@2.0 app /home",
       "> nuxt start",
@@ -47,7 +47,7 @@ export default {
       "",
       'Message: {1}',
       "",
-      "<span class='grey'>guest@dromon:~$</span> bash gotohomepage.sh",
+      "<span class='grey'>{2}@dromon:~$</span> bash gotohomepage.sh",
       ""
     ],
     insert: 0,
@@ -63,11 +63,13 @@ export default {
     this.nex();
     setInterval(() => {
       this.cursor = !this.cursor;
-    }, 1000);
+    }, 700);
     this.strings[27] = this.strings[27].replace("{0}", this.error.statusCode)
                                        .replace("{0}", this.error.statusCode)
                                        .replace("{0}", this.error.statusCode);
     this.strings[29] = this.strings[29].replace("{1}", this.error.message);
+    this.strings[0] = this.strings[0].replace("{2}", this.$auth.user ? this.$auth.user.username.toLowerCase() : 'guest');
+    this.strings[31] = this.strings[31].replace("{2}", this.$auth.user ? this.$auth.user.username.toLowerCase() : 'guest');
   }
 };
 </script>

@@ -92,7 +92,7 @@ router
         let token = jwt.sign(
           { id: user.id, _id: user._id },
           process.env.JWT_SECRET,
-          { expiresIn: 86400 } // 1 Day (24h)
+          { expiresIn: 21600 } // 6h
         );
 
         let refresh = jwt.sign(
@@ -102,9 +102,10 @@ router
         );
 
         logger.log("(Auth)", user.id, "logged in");
+        logger.log("(AUTH)", process.env.CLEAR_MAIN);
         //  primary auth token
         res.cookie("auth", token,
-            { expires: new Date(Date.now() + 86400000),
+            { expires: new Date(Date.now() + 21600000),
               httpOnly: true, sameSite: true })
           // secondary token to refresh primary (default)
           .cookie("refresh", refresh,
@@ -137,7 +138,7 @@ router
       let token = jwt.sign(
         { id: newUser.id, _id: newUser._id },
         process.env.JWT_SECRET,
-        { expiresIn: 86400 } // 1 Day (24h)
+        { expiresIn: 21600 } // 6h
       );
       let refresh = jwt.sign(
         { id: newUser.id, _id: newUser._id },
@@ -149,7 +150,7 @@ router
 
       //  primary auth token
       res.cookie("auth", token,
-          { expires: new Date(Date.now() + 86400000),
+          { expires: new Date(Date.now() + 21600000),
             httpOnly: true, sameSite: true })
         // secondary token to refresh primary (default)
         .cookie("refresh", refresh,

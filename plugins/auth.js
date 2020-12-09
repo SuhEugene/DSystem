@@ -1,11 +1,10 @@
-
-
+import axios from 'axios'
 
 class Auth {
-  constructor ({store, $axios, query, app}, auth) {
+  constructor ({store, query, app}, auth, $api) {
       this.$store = store;
       this.$auth = auth;
-      this.$axios = $axios;
+      this.$api = $api;
       this.query = query;
       this.app = app;
   }
@@ -22,18 +21,30 @@ class Auth {
 
   async fetchUser(retry=false) {
     try {
-      let r = await this.$axios.get(this.$auth.discord.userinfo_endpoint, { withCredentials: true });
+      debug("\n/*/ NEW FETCH USER");
+      let r = await this.$api.get(this.$auth.discord.userinfo_endpoint, { withCredentials: true });
+      debug("/*/ req was");
       this.user = r.data;
+      debug("/*/ user set");
       this.loggedIn = true;
+      debug("/*/ logged in");
       this.error = false;
+      debug("/*/ no error\nEND\n");
       return true;
     } catch (e) {
       console.warn(e.response ? e.response.data : e);
+      debug("/*/ fuck error");
       this.user = false;
+      debug("/*/ user false");
       this.loggedIn = false;
+      debug("/*/ not logged in");
       this.error = e.response ? e.response.data : e;
-      if (!retry && e.response && e.response.data.error == "retry")
+      debug("/*/ error");
+      if (!retry && e.response && e.response.data.error == "retry"){
+        debug("/*/ refetch");
         await this.fetchUser(true);
+      }
+      debug("/*/ false\nEND\n");
       return false;
     }
   }
@@ -41,7 +52,7 @@ class Auth {
   async logIn (code) {
     try {
       let { redirect_uri, client_id } = this.$auth.discord;
-      let r = await this.$axios.post(this.$auth.discord.access_token_endpoint, {
+      let r = await this.$api.post(this.$auth.discord.access_token_endpoint, {
         code,
         redirect_uri,
         client_id
@@ -95,15 +106,16 @@ function randString() {
   return text;
 }
 
-
+const debug = (...args) => console.log(...args);
 
 export default async function (ctx, inject) {
 
-  // if (ctx.route.path == "/logout") {
-  //   ctx.res.clearCookie("auth");
-  //   ctx.res.clearCookie("refresh");
-  // }
+  let cookie;
+  console.log("I'm on server?", `${process.server ? 'Yes' : 'No'}`);
 
+  const api = axios.create({ baseURL: process.env.axiosBase });
+  if (process.server) { api.defaults.headers.common['cookie'] = ctx.req.headers.cookie; }
+  debug("/ test");
   if (ctx.route.path == "/") return ctx.redirect("/login");
 
   const authData = {
@@ -130,9 +142,11 @@ export default async function (ctx, inject) {
   // for (let i in ctx) {
   //   console.log(i)
   // }
-  let $auth = new Auth(ctx, authData);
+  debug("Auth injection")
+  let $auth = new Auth(ctx, authData, api);
   inject("auth", $auth);
 
+  debug("Log in")
   if (process.browser) {
     console.log(ctx.query.code, ctx.query.state, localStorage.getItem("state"))
     if (ctx.query.code && ctx.query.state && ctx.query.state == localStorage.getItem("state")) {
@@ -140,13 +154,19 @@ export default async function (ctx, inject) {
       console.log("LOGGING IN")
     }
   }
+  debug("State removing")
   process.browser && localStorage.removeItem("state");
+  debug("User Fetch")
   await $auth.fetchUser();
 
+  debug("Not logged in check")
   if (!$auth.loggedIn && !["/login", "/register"].includes(ctx.route.path)) {
+    debug("Not logged in !!!!")
     ctx.redirect("/login");
   }
+  debug("Logged in check")
   if ($auth.loggedIn && ["/login", "/register"].includes(ctx.route.path)) {
+    debug("Logged in !!!!")
     ctx.redirect("/profile");
   }
   // inject("test", () => console.log("hello"))

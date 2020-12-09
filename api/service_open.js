@@ -73,7 +73,7 @@ app.use((req, res, next) => {
       return res.status(403).send({ error: "Forbidden", message: "'data' scope required" });
 
     const user = await User.findOne({ _id: req.data.user_id });
-    
+
     let respData = {};
     for (let field of userData.free) respData[field] = user[field];
 
@@ -94,7 +94,7 @@ app.use((req, res, next) => {
 
     res.send({ status: user.status });
   })
-  
+
 app.listen(8083, () => console.log("> Open API service started on *:8083"))
 
 module.exports = router;
