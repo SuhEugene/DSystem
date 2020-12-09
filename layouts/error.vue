@@ -6,7 +6,7 @@
       <a href="javascript:void(0)" onclick="window.location.reload()">Refresh page</a>
       <br>
       <br>
-      <span class="grey">{{this.$auth.user ? this.$auth.user.username.toLowerCase() : 'guest'}}@dromon:~$</span>
+      <span class="grey">{{(this.$auth.user && this.$auth.user.username) ? this.$auth.user.username.toLowerCase() : 'guest'}}@dromon:~$</span>
       <b>{{(cursor) ? "_" : ""}}</b>
     </span>
   </div>
@@ -68,8 +68,8 @@ export default {
                                        .replace("{0}", this.error.statusCode)
                                        .replace("{0}", this.error.statusCode);
     this.strings[29] = this.strings[29].replace("{1}", this.error.message);
-    this.strings[0] = this.strings[0].replace("{2}", this.$auth.user ? this.$auth.user.username.toLowerCase() : 'guest');
-    this.strings[31] = this.strings[31].replace("{2}", this.$auth.user ? this.$auth.user.username.toLowerCase() : 'guest');
+    this.strings[0] = this.strings[0].replace("{2}", (this.$auth.user && this.$auth.user.username) ? this.$auth.user.username.toLowerCase() : 'guest');
+    this.strings[31] = this.strings[31].replace("{2}", (this.$auth.user && this.$auth.user.username) ? this.$auth.user.username.toLowerCase() : 'guest');
   }
 };
 </script>

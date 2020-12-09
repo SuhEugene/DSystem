@@ -108,15 +108,18 @@ function randString() {
 
 const debug = (...args) => console.log(...args);
 
+const free = ["/user", "/app"];
+
 export default async function (ctx, inject) {
 
   let cookie;
   console.log("I'm on server?", `${process.server ? 'Yes' : 'No'}`);
 
   const api = axios.create({ baseURL: process.env.axiosBase });
-  if (process.server) { api.defaults.headers.common['cookie'] = ctx.req.headers.cookie; }
+  if (process.server && ctx.req.headers.cookie) { api.defaults.headers.common['cookie'] = ctx.req.headers.cookie; }
   debug("/ test");
   if (ctx.route.path == "/") return ctx.redirect("/login");
+
 
   const authData = {
     discord: {
@@ -139,14 +142,12 @@ export default async function (ctx, inject) {
       home: "/profile"
     }
   };
-  // for (let i in ctx) {
-  //   console.log(i)
-  // }
-  debug("Auth injection")
+
+  debug("Auth injection");
   let $auth = new Auth(ctx, authData, api);
   inject("auth", $auth);
 
-  debug("Log in")
+  debug("Log in");
   if (process.browser) {
     console.log(ctx.query.code, ctx.query.state, localStorage.getItem("state"))
     if (ctx.query.code && ctx.query.state && ctx.query.state == localStorage.getItem("state")) {
@@ -159,6 +160,10 @@ export default async function (ctx, inject) {
   debug("User Fetch")
   await $auth.fetchUser();
 
+  for (let path of free) {
+    if (ctx.route.path.startsWith(path))
+      return;
+  }
   debug("Not logged in check")
   if (!$auth.loggedIn && !["/login", "/register"].includes(ctx.route.path)) {
     debug("Not logged in !!!!")
@@ -170,7 +175,6 @@ export default async function (ctx, inject) {
     ctx.redirect("/profile");
   }
   // inject("test", () => console.log("hello"))
-
 
   // process.browser && inject("authm", $auth);
   // console.log("uesr", await $auth.fetchUser());

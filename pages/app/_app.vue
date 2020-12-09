@@ -11,14 +11,14 @@
       <div class="title">
         Перевод приложению {{app.name}}
       </div>
-      <div class="icons">
+      <div class="icons" v-if="$auth.loggedIn">
         <div class="app-img app-img--big">
-          <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
+          <img alt="User avatar" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
         <AppImg :app="app" />
       </div>
-      <div class="sum">
+      <div v-if="$auth.loggedIn || $route.params.sum" class="sum">
         <div class="sum__title">Сумма</div>
         <div class="sum__num" v-if="$route.params.sum || page > 0">{{$route.params.sum || sum}} АР</div>
         <label>
@@ -78,7 +78,7 @@
         <button type="button" @click="nextPage" v-if="page < 2 && $auth.loggedIn" class="primary"
           :class="{'disabled': sumCheck || passwordCheck}">{{(page == 0) ? "Продолжить" : "Оплатить"}}
         </button>
-        <button type="button" @click="backPage" v-if="page < 2" class="secondary">{{(page == 0) ? "Отмена" : "Назад"}}</button>
+        <button type="button" @click="backPage" v-if="page < 2 && $auth.loggedIn" class="secondary">{{(page == 0) ? "Отмена" : "Назад"}}</button>
       </div>
     </template>
   </form>
@@ -100,8 +100,12 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     }),
     async asyncData({ app, params }) {
       try {
-        return {app: (await app.$api.get(`/apps/${params.app}`)).data};
+        console.log(`/apps/${params.app.split("?")[0].split("#")[0]}`);
+        console.log((await app.$api.get(`/apps/${params.app.split("?")[0].split("#")[0]}`)).data);
+        return {app: (await app.$api.get(`/apps/${params.app.split("?")[0].split("#")[0]}`)).data};
       } catch (err) {
+        console.warn("SUKA ERR", err);
+        console.warn(err.response.data);
         return {app: false};
       }
     },
@@ -175,7 +179,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     head () {
       const title = !this.app.name ? 'Ошибка - приложение не найдено' : ((this.$route.params.sum) ?
         `${this.app.name} - запрос ${this.$route.params.sum} АР` :
-        `${this.app.name}`);
+        `${this.app.name} - перевод приложению`);
       const description = !this.app.name ? 'Приложение не существует или идентификатор указан неправильно' : ((this.$route.params.sum) ?
         `Страница отправки суммы ${this.$route.params.sum} АР приложению ${this.app.name}` :
         this.app.status);
@@ -184,14 +188,11 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         meta: [
           { name: "title", content: title },
           { property: "og:title", content: title },
-          { hid: "description", name: "description", content: description },
-          { property: "og:description", content: description },
+          { hid: "description", name: "description", content: description || "Описание отсутствует" },
+          { property: "og:description", content: description || "Описание отсутствует" },
           { property: "og:url", content: `${process.env.thisUrl}${this.$route.path}` },
           { property: "og:site_name", content: "Dromon System" },
-          {
-            property: "og:image",
-            content: this.app.name ? `https://minotar.net/armor/bust/${this.app.name}/300.png` : ''
-          },
+          { property: "og:image", content: this.app.avatar || '' },
         ],
         link: [{ rel: "canonical", href: `${process.env.thisUrl}${this.$route.path}` }]
       });

@@ -28,30 +28,7 @@ export default {
     return ({
       htmlAttrs: {
         lang: 'ru'
-      },
-      meta: [
-        {
-          hid: "description",
-          name: "description",
-          content: "Оплати всё и везде"
-        },
-        {
-          property: "og:title",
-          content: "Dromon"
-        },
-        {
-          name: "title",
-          content: "Dromon"
-        },
-        {
-          property: "og:url",
-          content: process.env.thisUrl+"/"
-        },
-        {
-          property: "og:description",
-          content: "Оплати всё и везде"
-        }
-      ]
+      }
     })
   },
   components: { DromonLogo }

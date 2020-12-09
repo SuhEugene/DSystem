@@ -249,11 +249,7 @@ export default {
     // XXX: transform logout to $auth
     async logout () {
       try {
-<<<<<<< HEAD
-        await this.$axios.get("/auth/logout", { withCredentials: true });
-=======
         await this.$api.get("/auth/logout", { withCredentials: true });
->>>>>>> undo
         this.$router.push("/login");
       } catch (e) {this.$router.push("/login");}
     },

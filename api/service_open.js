@@ -101,7 +101,6 @@ async function isOurUser(id) {
   //   if (!cooldown[req.user.id][req.path]) cooldown[req.user.id][req.path] = {};
   //   cooldown[req.user.id][req.path][req.method] = Date.now();
   // })
-<<<<<<< HEAD
   // .get("/user", async (req, res) => {
   //   if (!req.data.scope.includes("data"))
   //     return res.status(403).send({ error: "Forbidden", message: "'data' scope required" });
@@ -128,36 +127,6 @@ async function isOurUser(id) {
   //
   //   res.send({ status: user.status });
   // })
-
-=======
-  .get("/user", async (req, res) => {
-    if (!req.data.scope.includes("data"))
-      return res.status(403).send({ error: "Forbidden", message: "'data' scope required" });
-
-    const user = await User.findOne({ _id: req.data.user_id });
-
-    let respData = {};
-    for (let field of userData.free) respData[field] = user[field];
-
-    for (let field of userData.scope) {
-      if (!req.data.scope.includes(field)) continue;
-      respData[field] = user[field];
-    }
-
-    res.send(respData);
-  })
-  .post("/user/status", async (req, res) => {
-    if (!req.data.scope.includes("set-status"))
-      return res.status(403).send({ error: "Forbidden", message: "'set-status' scope required" });
-
-    let user = await User.findOne({ _id: req.data.user_id });
-    user.status = req.body.status.toString().substr(0, 32) || null;
-    await user.save();
-
-    res.send({ status: user.status });
-  })
-
->>>>>>> undo
 app.listen(8083, () => console.log("> Open API service started on *:8083"))
 
 module.exports = router;
