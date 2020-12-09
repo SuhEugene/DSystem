@@ -93,7 +93,7 @@ export default {
   }),
   async asyncData({ app, params }) {
     try {
-      return {user: (await app.$axios.get(`/user/${params.id}`)).data};
+      return {user: (await app.$api.get(`/user/${params.id}`)).data};
     } catch (err) {
       return {user: false};
     }

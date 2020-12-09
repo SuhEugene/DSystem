@@ -33,7 +33,7 @@ export default {
         {
           hid: "description",
           name: "description",
-          content: "Оплати всё и везде"
+          content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis cupiditate tempora labore molestias, dolorum, illo modi suscipit! Ipsam asperiores veniam officia consequatur eum tempora, iure, necessitatibus laboriosam commodi ducimus nobis."
         },
         {
           property: "og:title",
@@ -49,7 +49,8 @@ export default {
         },
         {
           property: "og:description",
-          content: "Оплати всё и везде"
+          content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis cupiditate tempora labore molestias, dolorum, illo modi suscipit! Ipsam asperiores veniam officia consequatur eum tempora, iure, necessitatibus laboriosam commodi ducimus nobis."
+          // content: "Оплати всё и везде"
         }
       ]
     })

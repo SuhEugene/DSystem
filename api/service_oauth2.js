@@ -122,7 +122,7 @@ app.use((req, res, next) => {
         { user_id: user.user_id, scope: user.scope },
         process.env.ACCESS_SECRET,
         { expiresIn: 604800 } // 1 Week
-      ); 
+      );
       const refresh_token = jwt.sign(
         { user_id: user.user_id, scope: user.scope },
         process.env.REFRESH_SECRET,
