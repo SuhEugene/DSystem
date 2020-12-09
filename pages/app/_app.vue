@@ -100,7 +100,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     }),
     async asyncData({ app, params }) {
       try {
-        return {app: (await app.$axios.get(`/apps/${params.app}`)).data};
+        return {app: (await app.$api.get(`/apps/${params.app}`)).data};
       } catch (err) {
         return {app: false};
       }

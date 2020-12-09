@@ -1,0 +1,1 @@
+rsync -vzhr -e 'ssh -i ~/.ssh/sups' /home/suheugene/projects/dsystem/ suheugene@134.209.234.162:/home/suheugene/bld/dsst --exclude ".nuxt" --exclude "node_modules" --exclude ".git" --exclude "*.sh" --exclude "api"

@@ -249,7 +249,11 @@ export default {
     // XXX: transform logout to $auth
     async logout () {
       try {
+<<<<<<< HEAD
         await this.$axios.get("/auth/logout", { withCredentials: true });
+=======
+        await this.$api.get("/auth/logout", { withCredentials: true });
+>>>>>>> undo
         this.$router.push("/login");
       } catch (e) {this.$router.push("/login");}
     },
@@ -269,13 +273,13 @@ export default {
       this.comment = "";
     },
     bankerAddMoney() {
-      this.$axios.post(`/money/${this.users.find(u => u.username == this.username).id}/add`, {
+      this.$api.post(`/money/${this.users.find(u => u.username == this.username).id}/add`, {
         sum: this.sum,
         post: this.posts.find(p => p.name == this.post).id
       }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
     },
     sendMoney() {
-      this.$axios.post(`/money/send/${this.users.find(u => u.username == this.username).id}`, {
+      this.$api.post(`/money/send/${this.users.find(u => u.username == this.username).id}`, {
         sum: this.sum,
         comment: this.comment
       }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
