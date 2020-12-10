@@ -19,6 +19,20 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
   useNewUrlParser: true
 });
 
+// TODO OAUTH BIG TODO
+// **GET `oauth.di-api.net.ru/user`**
+// Получение игрока
+// Принимает `{}`
+// Возвращает `{ uuid, username, id, _id }`
+// Дополнительные поля по scope: `status`, `balance`, `role` (имя scope соответствует имени поля)
+//
+// **POST `oauth.di-api.net.ru/user/status`** __scope `set-status`__
+// Установка статуса игроку
+// Принимает `{ status }`
+// Возвращает 200/400/403
+//
+// По факту Oauth нужен только для входа а в остальном бесполезен, ибо в сервисе и фич маловато, которые можно было бы разрешить менять
+
 
 // TODO logs
 

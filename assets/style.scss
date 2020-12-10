@@ -1238,6 +1238,25 @@ button, a.btn {
         margin-top: 4px;
       }
     }
+    .app-description, .app-name {
+      padding: 5px 8px;
+      box-shadow: 0 0 0 1px hsla(0,0%,100%,.15);
+      border-radius: 3px;
+      box-shadow: 0 0 0 1px $card-stroke;
+      border:none;
+      border-radius: $card-border-radius;
+      font-family: $font;
+      color: $text-simple;
+      transition: box-shadow .13s;
+      &:hover { box-shadow: 0 0 0 1px $text-light; }
+      &:focus { box-shadow: 0 0 0 2px $always-primary; }
+      .dark & {
+        box-shadow: 0 0 0 1px $dark-card-stroke;
+        color: $dark-text-simple;
+        &:hover { box-shadow: 0 0 0 1px $dark-text-light; }
+        &:focus { box-shadow: 0 0 0 2px $always-primary; }
+      }
+    }
     .dark & {
       background: $dark-card-background;
       box-shadow: $dark-card-shadow;
@@ -1264,6 +1283,7 @@ button, a.btn {
     }
   }
 }
+
 
 
 .login {
@@ -1384,6 +1404,12 @@ button, a.btn {
     flex-direction: row;
     flex-wrap: wrap;
     &__one {
+      &--red {
+        padding: 10px 15px;
+        background: #ff000022;
+        border-radius: 3px;
+        border: 1px solid #ff000044;
+      }
       min-width: 50%;
       &__title {
         font-size: 14px;

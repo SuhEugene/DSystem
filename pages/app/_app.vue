@@ -61,7 +61,7 @@
           </div>
         </div>
         <div class="attrs" v-if="page == 3" key="3">
-          <div class="attrs__one">
+          <div class="attrs__one attrs__one--red">
             <div class="attrs__one__title">Ошибка оплаты</div>
             <div class="attrs__one__text">{{error}}</div>
           </div>
@@ -69,10 +69,10 @@
       <!-- </transition-group> -->
       <div class="buttons">
         <NLink v-if="!$auth.loggedIn" class="btn primary" to="/login">Вход</NLink>
-        <button type="button" @click="$router.push('/profile')" v-if="page >= 2 && $auth.loggedIn" class="primary">
-          {{ $route.query.ok || "В профиль" }}
+        <button type="button" @click="home" v-if="page >= 2 && $auth.loggedIn" class="primary">
+          {{ ($route.query.redirect_uri) ? $route.query.ok || "Вернуться на сайт" : "В профиль" }}
         </button>
-        <button type="button" @click="clearPage" v-if="page >= 2 && $auth.loggedIn" class="secondary">
+        <button type="button" @click="clearPage" v-if="page >= 2 && $auth.loggedIn && $route.query.again == '1'" class="secondary">
           Ещё раз!
         </button>
         <button type="button" @click="nextPage" v-if="page < 2 && $auth.loggedIn" class="primary"
@@ -96,7 +96,8 @@ import ErrorOverlay from "~/components/ErrorOverlay";
       loading: false,
       sum: 0,
       app: {},
-      error: null
+      error: null,
+      redirectValid: false
     }),
     async asyncData({ app, params }) {
       try {
@@ -129,6 +130,10 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         this.sum = 0;
         this.$auth.fetchUser();
       },
+      home () {
+        if (!this.$route.query.redirect_uri) return this.$router.push('/profile');
+        if (process.browser) { window.location = this.$route.query.redirect_uri; }
+      },
       async sendData () {
         if (this.sumCheck || this.passwordCheck) return;
         this.loading = true;
@@ -140,26 +145,18 @@ import ErrorOverlay from "~/components/ErrorOverlay";
 
         (this.$route.query.text) ? data.text = this.$route.query.text : '';
         (this.$route.query.uid)  ? data.uid  = this.$route.query.uid  : '';
+        (this.$route.query.redirect_uri)  ? data.redirectURI  = this.$route.query.redirect_uri  : '';
         try {
           let r = await this.$axios.post( `/apps/${this.$route.params.app}/send`, data, { withCredentials: true });
 
           this.loading = false;
 
-          if (r.data.error == "Invalid password") {
-            this.error = "Неверный пароль";
-            this.page = 3;
-            return;
-          }
-          if (r.data.error) {
-            this.error = "Произошла ошибка";
-            this.page = 3;
-            return;
-          }
           this.page = 2;
         } catch (e) {
           this.error = "Неизвестная ошибка";
           if (e.response && e.response.data.e == "NEM" || e.response.data.error == "Not enough money") { this.error = "Недостаточно АР на балансе" }
           if (e.response && (e.response.data.e == "IP" || e.response.data.error == "Invalid password")) { this.error = "Неверный пароль" }
+          if (e.response && (e.response.data.e == "IRU" || e.response.data.error == "Invalid redirect uri")) { this.error = "Неверный redirect uri" }
           this.page = 3;
           return;
         }
@@ -180,9 +177,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
       const title = !this.app.name ? 'Ошибка - приложение не найдено' : ((this.$route.params.sum) ?
         `${this.app.name} - запрос ${this.$route.params.sum} АР` :
         `${this.app.name} - перевод приложению`);
-      const description = !this.app.name ? 'Приложение не существует или идентификатор указан неправильно' : ((this.$route.params.sum) ?
-        `Страница отправки суммы ${this.$route.params.sum} АР приложению ${this.app.name}` :
-        this.app.status);
+      const description = !this.app.name ? 'Приложение не существует или идентификатор указан неправильно' : this.app.description;
       return ({
         title,
         meta: [

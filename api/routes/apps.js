@@ -9,6 +9,7 @@ const User = require("../models/user");
 const App = require("../models/app");
 const Logs = require("../models/logs");
 const Joi = require('joi');
+const md5 = require('js-md5');
 const sanitizeUrl = require("@braintree/sanitize-url").sanitizeUrl;
 let getLogs = require("./getLogs");
 
@@ -84,6 +85,8 @@ router
     let { value: sum, error } = sumTest.validate(req.body.sum);
     if (!!error) return res.status(400).send({ error: "Invalid body", e: "IB", joie: error });
 
+    if (req.body.redirectURI != req.app.redirectURI) return res.status(400).send({ error: "Invalid redirect uri", e: "IRU" });
+
     if (req.user.balance - 1 < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
 
     const session = await mongoose.startSession();
@@ -132,7 +135,7 @@ router
           _id: req.user._id
         }
       }),
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${md5(String(req.app.secret))}` },
       method: "POST"
     }).then(pass).catch(pass);
   })
@@ -143,7 +146,7 @@ router
   .post("/:id/take", async (req, res) => {
     let { value: sum, error } = sumTestZero.validate(req.body.sum);
     if (!!error) return res.status(400).send({ error: "Invalid body", e: "IB", joie: error });
-
+    if (sum == 0 && req.app.balance == 0) return res.status(400).send({ error: "Not enough money", e: "NEM" });
     if (sum == 0) sum = req.app.balance;
 
     if (req.app.balance < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
@@ -211,7 +214,7 @@ router
 
 
     let fields = { name: 32, description: 300 };
-    let changable = { url: 64, eventUrl: 64 };
+    let changable = { url: 64, eventUrl: 64, redirectURI: 64 };
 
     for (let f in fields) {
       if (!req.body[f] || req.app[f] == req.body[f]) continue;

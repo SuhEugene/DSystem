@@ -19,10 +19,13 @@ userRouter
   .get("/", (req, res) => {
     User.find({role: {$ne: 0}},(err, users) => {
       if (err) return;
+      if (req.user.role > 2) return res.json(users.map(u => ({
+        id: u.id, username: u.username,
+        balance: u.balance
+      })));
       if (req.user.role > 1) return res.json(users.map(u => ({
         id: u.id,
-        username: u.username,
-        balance: u.balance
+        username: u.username
       })));
       return res.json(users.map(u => ({ id: u.id, username: u.username })));
     });

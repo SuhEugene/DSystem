@@ -68,7 +68,7 @@
 
 
               <h1 ref="appName" @blur="checkName" contenteditable class="app-name" v-text="currentApp.name"></h1>
-              <div style="margin-bottom:15px;" ref="appDesc" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
+              <div style="margin-bottom:15px;" ref="appDesc" class="app-description" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
               <div v-if="secretPage" style="margin-top:7px"><b>ID:</b> {{currentApp._id}}</div>
               <div v-if="secretPage" style="margin-top:7px">
                 <b>Secret:</b>
@@ -93,6 +93,10 @@
               <div v-if="secretPage" class="input">
                 Ссылка на сайт
                 <input placeholder="https://example.com/" @blur="checkUrl" type="url" v-model="url">
+              </div>
+              <div v-if="secretPage" class="input">
+                Redirect URI
+                <input placeholder="https://example.com/success" @blur="checkRedirectURI" type="url" v-model="redirectURI">
               </div>
               <div v-if="secretPage" class="input">
                 URL события
@@ -178,6 +182,7 @@ export default {
     avatar: '',
     url: '',
     eventUrl: '',
+    redirectURI: '',
     myApps: [],
     secretShow: false,
     currentApp: {},
@@ -197,6 +202,7 @@ export default {
       this.shortname = this.currentApp.shortname;
       // this.avatar = this.currentApp.avatar;
       this.url = this.currentApp.url;
+      this.redirectURI = this.currentApp.redirectURI;
       this.eventUrl = this.currentApp.eventUrl;
       this.appError = false;
     },
@@ -237,6 +243,13 @@ export default {
       }
       this.url = this.url.trim().substr(0, 64);
     },
+    checkRedirectURI () {
+      if (!this.redirectURI) {
+        this.redirectURI = "";
+        return;
+      }
+      this.redirectURI = this.redirectURI.trim().substr(0, 64);
+    },
     checkEventUrl () {
       if (!this.eventUrl) {
         this.eventUrl = "";
@@ -250,6 +263,7 @@ export default {
       }, { withCredentials: true }).then(this.refreshApps).catch(this.errorRefresh);
       this.appName = "";
     },
+    // BUG: avatar twice
     sendAllOfUs () {
       this.$refs.appName.innerText = this.$refs.appName.innerText.replace("\n", "");
       this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.replace("\n", "");
@@ -259,10 +273,11 @@ export default {
         shortname: (this.shortname) ? this.shortname.trim().split(/ +/).join('').substr(0, 24) : '',
         avatar: (this.avatar) ? this.avatar : '',
         url: (this.url) ? this.url.trim().substr(0, 64) : '',
+        redirectURI: (this.redirectURI) ? this.redirectURI.trim().substr(0, 64) : '',
         eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : ''
       }
       this.$axios.$put(`/apps/${this.currentApp._id}`, data, { withCredentials: true })
-      .then(_r => {this.refreshApps(true)}).catch(this.errorRefresh);
+      .then(_r => {this.refreshApps(true); this.avatar = "";}).catch(this.errorRefresh);
     },
     deleteApp () {
       this.$axios.delete(`/apps/${this.currentApp._id}`, { withCredentials: true })

@@ -4,6 +4,7 @@ require("dotenv").config();
 const prodVersion = true;
 
 export default {
+  telemetry: false,
   loading: {
     color: "#346db3",
     height: "4px"

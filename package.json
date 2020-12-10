@@ -25,6 +25,7 @@
     "express": "4.17.1",
     "fs": "0.0.1-security",
     "joi": "^17.2.1",
+    "js-md5": "^0.7.3",
     "jsonwebtoken": "8.5.1",
     "mdi-vue": "1.6.3",
     "mongoose": "5.9.25",

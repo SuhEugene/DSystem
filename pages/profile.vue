@@ -22,6 +22,7 @@
             <div class="profile-header__balance--value">{{$auth.user && $auth.user.balance}} АР</div>
           </div>
         </div>
+        <!-- FIX setbal -->
         <div class="profile-header__holder__spacer profile-header__holder__spacer--1"></div>
         <HeaderButtons
           class="profile-header__buttons"

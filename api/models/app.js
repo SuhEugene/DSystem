@@ -10,6 +10,7 @@ const appModel = new Schema({
   shortname:   { type: String, unique: true },
   url:         { type: String },
   eventUrl:    { type: String },
+  redirectURI: { type: String },
   description: { type: String, default: "Описание" },
   owner:       { type: Schema.Types.ObjectId, ref: "users" },
   coowners:  [ { type: Schema.Types.ObjectId, ref: "users" } ],

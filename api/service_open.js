@@ -15,12 +15,27 @@ require("dotenv").config();
 
 let cooldown = {};
 
-// const tokenExchange = Joi.object({
-//   client_id: Joi.string().hex().length(20).required(),
-//   client_secret: Joi.number().integer().required()
-// });
-
-// const validator = { tokenExchange, getCode };
+// DA BIG TODO VERY BIG TODO
+// ~~**POST `open.di-api.net.ru/app/send`**~~
+// Перевод **приложение** -> **юзер**
+// Комиссия не взымается
+// Принимает `{ sum, id/uuid, comment }`
+// Возвращает 200/400/403
+//
+// ~~**GET `open.di-api.net.ru/app/logs/from`**~~
+// Выдаёт последние num или 5 переводов **приложение** -> **юзер**
+// Принимает `{ num }` ( 1 <= num <= 30)
+// Возвращает 200`{ logs: [{ appFrom, userTo, sum, comment, time }] }` / 400 / 403
+//
+// ~~**GET `open.di-api.net.ru/app/logs/to`**~~
+// Выдаёт последние num или 5 переводов **юзер** -> **приложение**
+// Принимает `{ num }` ( 1 <= num <= 30)
+// Возвращает 200`{ logs: [{ appTo, userFrom, sum, comment, time }] }` / 400 / 403
+//
+// **GET `open.di-api.net.ru/isSPkUser/<:id>`**
+// Получение bool играет ли user с данным discord id на СПк
+// Принимает `{}`
+// Возвращает 200`{ gamer: true/false }` / 400`{ gamer: "error" }`
 
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
