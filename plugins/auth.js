@@ -1,12 +1,13 @@
 import axios from 'axios'
 
 class Auth {
-  constructor ({store, query, app}, auth, $api) {
+  constructor ({store, query, app, redirect}, auth, $api) {
       this.$store = store;
       this.$auth = auth;
       this.$api = $api;
       this.query = query;
       this.app = app;
+      this.redirect = redirect;
   }
 
   get user() { return this.$store.state.$auth.user; }
@@ -18,6 +19,16 @@ class Auth {
   set user (user) { this.$store.commit("setUser", user);/* console.log("user set", user)*/ }
   set error (err) { this.$store.commit("setAuthError", err); }
   set bigError (err) { this.$store.commit("setAuthBigError", err); }
+
+  async logout() {
+    try {
+      await this.$api.get("/auth/logout", { withCredentials: true });
+      this.loggedIn = false;
+      this.user = false;
+      if (process.server) this.redirect("/login")
+      if (process.browser) this.app.router.push("/login");
+    } catch (e) {}
+  }
 
   async fetchUser(retry=false) {
     try {
@@ -39,6 +50,8 @@ class Auth {
       this.loggedIn = false;
       debug("/*/ not logged in");
       this.error = e.response ? e.response.data : e;
+      // На случай отключения сервера
+      if (e.response && e.response.status == 502) this.error = { message: "Network Error" };
       debug("/*/ error");
       if (!retry && e.response && e.response.data.error == "retry"){
         debug("/*/ refetch");
@@ -62,8 +75,8 @@ class Auth {
       }
       return true;
     } catch (e) {
-      console.warn(e.response ? e.response.data : e);
       this.bigError = e.response ? e.response.data : e;
+      if (e.response && e.response.status == 502) this.bigError = { message: "Network Error" };
       return false;
     }
   }

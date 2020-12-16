@@ -5,9 +5,11 @@
       <!-- MAIN MENU -->
       <div v-if="!menu" :key="false" class="profile-nav">
         <div class="profile-nav__row">
+          <!-- TODO фриз/анфриз модерами по нику -->
           <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
             <AccountGroupOutlineIcon size="26"/>
           </div>
+          <!-- TODO ВЫЗОВ БАНКИРА -->
           <div tooltip="Вызвать банкира" class="profile-nav__button">
             <AccountTieVoiceOutlineIcon size="26"/>
           </div>
@@ -246,12 +248,8 @@ export default {
     }
   },
   methods: {
-    // XXX: transform logout to $auth
-    async logout () {
-      try {
-        await this.$api.get("/auth/logout", { withCredentials: true });
-        this.$router.push("/login");
-      } catch (e) {this.$router.push("/login");}
+    logout () {
+      this.$auth.logout();
     },
     next(to) {
       this.animBack = false;

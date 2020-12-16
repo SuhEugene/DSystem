@@ -14,21 +14,18 @@
           <p style="margin-bottom: 10px;">Выбери самую комфортную на твой взгляд тему</p>
           <div class="if">
             <button
-              class="min"
-              @click="setTheme(false)"
+              class="min" @click="setTheme(false)"
               :class="{'primary':  !$store.state.dark, 'secondary': !!$store.state.dark}">
               Светлая
             </button>
             <button
-              class="min"
-              @click="setTheme(true)"
+              class="min" @click="setTheme(true)"
               :class="{'primary': !!$store.state.dark, 'secondary':  !$store.state.dark}">
               Тёмная
             </button>
           </div>
           <!-- <button @click="changeTheme" class="secondary">Сменить</button> -->
           <button @click="step++" style="margin-top: 50px;" class="primary">Далее</button>
-          <button @click="step--" style="margin-top: 8px" class="secondary">Назад</button>
         </div>
       </div>
 

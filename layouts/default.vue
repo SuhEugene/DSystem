@@ -33,7 +33,7 @@ export default {
         {
           hid: "description",
           name: "description",
-          content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis cupiditate tempora labore molestias, dolorum, illo modi suscipit! Ipsam asperiores veniam officia consequatur eum tempora, iure, necessitatibus laboriosam commodi ducimus nobis."
+          content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
         },
         {
           property: "og:title",
@@ -49,7 +49,7 @@ export default {
         },
         {
           property: "og:description",
-          content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Omnis cupiditate tempora labore molestias, dolorum, illo modi suscipit! Ipsam asperiores veniam officia consequatur eum tempora, iure, necessitatibus laboriosam commodi ducimus nobis."
+          content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
           // content: "Оплати всё и везде"
         }
       ]

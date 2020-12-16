@@ -25,11 +25,35 @@ export default {
   },
   head () {
     if (this.$route.path.startsWith("/user")) return;
+    if (this.$route.path.startsWith("/app")) return;
     return ({
       htmlAttrs: {
         lang: 'ru'
-      }
-    })
+      },
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
+        },
+        {
+          property: "og:title",
+          content: "Dromon"
+        },
+        {
+          name: "title",
+          content: "Dromon"
+        },
+        {
+          property: "og:url",
+          content: process.env.thisUrl+"/"
+        },
+        {
+          property: "og:description",
+          content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
+        }
+      ]
+    });
   },
   components: { DromonLogo }
 };

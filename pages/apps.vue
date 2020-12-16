@@ -168,8 +168,12 @@ export default {
     // console.log("helo")
     // console.log(app.$api.post)
     // console.log($api, $axios)
-    const apps = await app.$api.get('/apps', { withCredentials: true });
-    return { myApps: apps.data };
+    try {
+      const apps = await app.$api.get('/apps', { withCredentials: true });
+      return { myApps: apps.data };
+    } catch (e) {
+      return { myApps: [] };
+    }
   },
   data: () => ({
     appOpened: false,
@@ -191,6 +195,7 @@ export default {
     outError: false,
   }),
   mounted () {
+    if (!this.$auth.loggedIn) this.$router.push('/login');
     if (process.browser) this.loc = window.location.host;
   },
   methods: {

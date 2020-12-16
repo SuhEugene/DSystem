@@ -12,11 +12,11 @@
     <!-- <div class="history-el__space history-el__space--2"></div> -->
     <div class="history-el__user history-el__user--1">
       <div class="history-el__user--title">От</div>
-      <div class="history-el__user--value">{{from}}</div>
+      <div class="history-el__user--value">{{from || "УДАЛЁН"}}</div>
     </div>
     <div class="history-el__user history-el__user--2">
       <div class="history-el__user--title">Кому</div>
-      <div class="history-el__user--value">{{to}}</div>
+      <div class="history-el__user--value">{{to || "УДАЛЁН"}}</div>
     </div>
     <!-- <div class="history-el__space history-el__space--3"></div> -->
     <div class="history-el__comm">

@@ -88,6 +88,7 @@ export default {
     }
   },
   mounted () {
+    if (!this.$auth.loggedIn) this.$router.push('/login');
     setTimeout(()=>{this.$auth.fetchUser()}, 500);
     this.status = this.$auth.user.status;
     this.banker = this.$auth.user.role > 1;
