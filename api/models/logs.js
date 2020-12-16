@@ -2,10 +2,10 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const logsModel = new Schema({
-  fromUser:  { type: Schema.Types.ObjectId, ref: "users" },
-  toUser:    { type: Schema.Types.ObjectId, ref: "users" },
-  fromApp:   { type: Schema.Types.ObjectId, ref: "apps" },
-  toApp:     { type: Schema.Types.ObjectId, ref: "apps" },
+  fromUser:  { type: Schema.Types.ObjectId, ref: "users", index: true },
+  toUser:    { type: Schema.Types.ObjectId, ref: "users", index: true },
+  fromApp:   { type: Schema.Types.ObjectId, ref: "apps", index: true },
+  toApp:     { type: Schema.Types.ObjectId, ref: "apps", index: true },
   sum:       { type: Number },
   action:    { type: String },
   more:      { type: String },

@@ -7,13 +7,13 @@ const appModel = new Schema({
   name:        { type: String },
   avatar:      { type: String },
   avatarDel:   { type: String },
-  shortname:   { type: String, unique: true },
+  shortname:   { type: String, unique: true, index: true },
   url:         { type: String },
   eventUrl:    { type: String },
   redirectURI: { type: String },
   description: { type: String, default: "Описание" },
-  owner:       { type: Schema.Types.ObjectId, ref: "users" },
-  coowners:  [ { type: Schema.Types.ObjectId, ref: "users" } ],
+  owner:       { type: Schema.Types.ObjectId, ref: "users", index: true },
+  coowners:  [ { type: Schema.Types.ObjectId, ref: "users", index: true } ],
   level: { type: Number, default: 0 },
   /*
     0 - Non checked

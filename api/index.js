@@ -53,6 +53,7 @@ app.use((req, res, next) => {
 // app.use(multer.array());
 
 app.use((req, res, next) => {
+  
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
   res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
