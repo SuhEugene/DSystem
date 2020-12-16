@@ -14,14 +14,26 @@
       <div>
         <button class="primary" @click="discordLogin" type="button">Открыть Discord</button>
         <!-- <button class="secondary" @click="discordLogin" type="button">Дискорд</button> -->
-        <NLink
-          style="font-size: 16px; text-align: center; width: 100%;display:inline-block"
+        <NLink style="font-size: 16px; text-align: center; width: 100%;display:inline-block;margin-bottom:0;"
           to="/register"
         >Я не зарегистрирован...</NLink>
       </div>
+      <client-only>
+        <div v-if="(!!$auth.bigError || !!$auth.error) && ($auth.bigError || $auth.error).error != 'Unauthorized'"
+             class="bottom_error" v-html='error'></div>
+      </client-only>
+
+           <!-- <div v-if="($auth.bigError || $auth.error).message == 'Network Error'" class="bottom_error">
+             Сервер не отвечает - возможно он упал или перезагружается.<br>
+             Попробуйте перезагрузить страницу через несколько секунд.<br>
+             Проверить состояние сервера вы можете
+             <a class=\"white\" href=\"https://discord.gg/xFfNay3\" target=\"_blank\">в нашем дискорде</a>
+           </div>
+           <client-only>
+             <div v-if="($auth.bigError || $auth.error).error == 'Non SPk gamer'"
+                  class="bottom_error">Вы не являетесь игроком СПк или не авторизованы в дискорде СПк</div>
+           </client-only> -->
     </main>
-    <!-- XXX where nonspkgamer error? -->
-    <!-- <div v-if="error" class="bottom_error" v-html="error"></div> -->
   </form>
 </template>
 <script>
@@ -72,8 +84,9 @@ export default {
   },
   computed: {
     error () {
-      let e = this.$auth.bigError || this.$auth.error;
+      let e = this.$auth ? this.$auth.bigError || this.$auth.error || "NONE" : 'NONE';
       if (!e) return false;
+      console.error("!!!!", e);
       let text = "Неизвестная ошибка";
       if (e.error == "Invalid token") {
         text = "Ваш токен устарел<br>Необходимо авторизоваться через дискорд ещё раз";

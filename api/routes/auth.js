@@ -108,11 +108,11 @@ router
         //  primary auth token
         res.cookie("auth", token,
             { expires: new Date(Date.now() + 21600000),
-              httpOnly: true, sameSite: true })
+              httpOnly: true, sameSite: true, secure: true })
           // secondary token to refresh primary (default)
           .cookie("refresh", refresh,
             { expires: new Date(Date.now() + 2419200000),
-              httpOnly: true, sameSite: true })
+              httpOnly: true, sameSite: true, secure: true })
 
           .send({ token: "We don't like hackers" });
         return;
@@ -155,11 +155,11 @@ router
       //  primary auth token
       res.cookie("auth", token,
           { expires: new Date(Date.now() + 21600000),
-            httpOnly: true, sameSite: true })
+            httpOnly: true, sameSite: true, secure: true })
         // secondary token to refresh primary (default)
         .cookie("refresh", refresh,
           { expires: new Date(Date.now() + 2419200000),
-            httpOnly: true, sameSite: true })
+            httpOnly: true, sameSite: true, secure: true })
 
         .send({ token: "We don't like hackers" });
       return;
