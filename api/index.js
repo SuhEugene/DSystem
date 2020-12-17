@@ -53,7 +53,7 @@ app.use((req, res, next) => {
 // app.use(multer.array());
 
 app.use((req, res, next) => {
-  
+
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
   res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
@@ -76,6 +76,7 @@ app.get("/user/:id", (req, res) => {
     if (err) return;
     if (!user) return res.status(404).send({ error: "User not found" });
     res.json({
+      _id: user._id,
       id: user.id,
       role: user.role,
       status: user.status,
