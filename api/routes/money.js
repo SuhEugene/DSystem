@@ -3,12 +3,15 @@ const express = require("express");
 const User = require("../models/user");
 const Logs = require("../models/logs");
 const Post = require("../models/post");
+const Joi = require('joi');
 const moneyRouter = express.Router();
 const mongoose = require("mongoose");
 const getLogs = require("./getLogs");
 const bcrypt = require("bcryptjs");
 
 const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
+
+const hex = Joi.string().hex().length(24);
 
 let cooldown = {};
 function getPost(id) {
@@ -123,7 +126,8 @@ moneyRouter
       u2 && req.io.to(u2.io).emit("balance", user.balance);
     });
   }).post("/pass/send/:id", (req, res) => {
-    if (isNaN(req.params.id) || req.params.id == req.user.id) return res.status(400).json({ error: "Invalid id" });
+    const { error } = hex.validate(req.params.id);
+    if (error) return res.status(400).json({ error: "Invalid id" });
     if (isNaN(req.body.sum) ||
         !parseInt(req.body.sum, 10) ||
         parseInt(req.body.sum, 10) > 64*36*27 ||
@@ -133,9 +137,10 @@ moneyRouter
       return res.status(400).json({ error: "Invalid body" });
     if (!verifyPassword(req.body.password, req.user.password))
       return res.status(403).json({ error: "Invalid password" });
-    User.findOne({ id: req.params.id }, async (err, user) => {
+      console.log("find user", req.params.id, "by _id");
+    User.findOne({ _id: req.params.id }, async (err, user) => {
       if (err) return;
-
+      if (user.id == req.user.id) return res.status(400).json({ error: "Invalid id" });
       if (!user) return res.status(404).json({ error: "User not found" });
       if (req.user.balance - parseInt(req.body.sum, 10) < 0)
         return res.status(400).json({ error: "Not enough money" });
