@@ -9,16 +9,18 @@
     </header>
     <main>
       <h1 style="margin-top: 30px;">Все приложения</h1>
-      <!-- <div class="app" style="margin-bottom: 50px;">
-        <div class="app__image">
-          <div class="app-badge"><CheckIcon size="12"/></div>
-          <img alt="app icon" src="https://www.penpublishing.com/squaresMobileTest.jpg">
-        </div>
-        <div class="app__data">
-          <div class="app__title">Hello world</div>
-          <div class="app__info">Короткое описание приложения</div>
-        </div>
-      </div> -->
+      <div class="apps-container">
+        <a v-for="app in apps" :key="app._id"
+           target="_blank" rel="noreferrer"
+           class="app app--many"
+           :href="app.url">
+          <AppImg :app="app" />
+          <div class="app__data">
+            <div class="app__title">{{ app.name }}</div>
+            <div class="app__info">{{ app.description }}</div>
+          </div>
+        </a>
+      </div>
       <div id="my-apps">
         <h1>Ваши приложения</h1>
         <!-- <div v-if="createAppMenu" id="hidden-form-container">
@@ -168,14 +170,21 @@ export default {
     // console.log("helo")
     // console.log(app.$api.post)
     // console.log($api, $axios)
+    let allApps = [];
+    let myApps = [];
     try {
-      const apps = await app.$api.get('/apps', { withCredentials: true });
-      return { myApps: apps.data };
-    } catch (e) {
-      return { myApps: [] };
-    }
+      allApps = (await app.$api.get('/apps/all/public', { withCredentials: true })).data || [];
+    } catch (e) {}
+    try {
+      myApps = (await app.$api.get('/apps', { withCredentials: true })).data || [];
+    } catch (e) {}
+    return { myApps: myApps, apps: allApps };
+
   },
   data: () => ({
+    myApps: [],
+    apps: [],
+    currentApp: {},
     appOpened: false,
     createAppMenu: false,
     secretPage: false,
@@ -187,9 +196,7 @@ export default {
     url: '',
     eventUrl: '',
     redirectURI: '',
-    myApps: [],
     secretShow: false,
-    currentApp: {},
     loc: null,
     appError: false,
     outError: false,

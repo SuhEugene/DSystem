@@ -45,6 +45,19 @@ router
     let apps = await App.find({'owner': req.user._id}).populate('owner', 'balance _id id role status username mayHave sex');
     res.json(apps);
   })
+  .get("/all/public", async (req, res) => {
+    console.log("ALL APPS");
+    let apps = await App.find({'public': true}, [], { sort: { level: -1 }});
+    return res.json(apps.map(v => ({
+      name: v.name,
+      description: v.description,
+      url: v.url,
+      _id: v._id,
+      avatar: v.avatar,
+      level: v.level,
+      public: v.public
+    })));
+  })
   .post("/", async (req, res) => {
     if (!req.body.name) return res.status(400).send({ error: "Invalid body" });
 
