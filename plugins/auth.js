@@ -167,9 +167,11 @@ export default async function (ctx, inject) {
       await $auth.logIn(ctx.query.code);
       console.log("LOGGING IN")
     }
+    if (ctx.query.state) {
+      debug("State removing")
+      localStorage.removeItem("state");
+    }
   }
-  debug("State removing")
-  process.browser && localStorage.removeItem("state");
   debug("User Fetch")
   await $auth.fetchUser();
 

@@ -33,8 +33,8 @@
               </div>
               <div class="last" v-if="!$auth.loggedIn">Войдите, чтобы получить возможность перевести {{sum || "какую-либо сумму"}} АР</div>
               <div class="last" v-if="$auth.loggedIn && ($auth.user.balance <= 0 || (parseInt($route.params.sum, 10) && $auth.user.balance < $route.params.sum))">
-              На вашем счету недостаточно АР, чтобы перевести {{sum || "какую-либо сумму"}} АР
-            </div>
+                На вашем счету недостаточно средств, чтобы перевести {{sum || "какую-либо сумму"}} АР
+              </div>
 
               <div v-if="!$route.params.sum && $auth.loggedIn && $auth.user.balance > 0">
                 <div class="attrs__one__title">Сумма</div>

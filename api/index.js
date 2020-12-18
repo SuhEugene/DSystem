@@ -64,6 +64,7 @@ app.use((req, res, next) => {
 });
 
 app.get("/user/:id", (req, res) => {
+  console.log(req.method, req.path, req.params.id);
   if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
   User.findOne({
     $or: [
@@ -73,7 +74,7 @@ app.get("/user/:id", (req, res) => {
       ]
     },
   async (err, user) => {
-    if (err) return;
+    if (err) return res.status(500).send();
     if (!user) return res.status(404).send({ error: "User not found" });
     res.json({
       _id: user._id,
@@ -110,7 +111,7 @@ app.use(function(req, res, next) {
   token = token.replace("Bearer ", "");
   try {
     return jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
-      if (err) return refreshToken(req, res, next);
+      if (err) return refreshToken(req, res, next, token);
       try {
         req.user = await getUser(user._id, user.login);
       } catch (e) {
@@ -121,30 +122,31 @@ app.use(function(req, res, next) {
       next();
     });
   } catch (e) {
-    return refreshToken(req, res, next);
+    return refreshToken(req, res, next, token);
   }
 });
 
-function refreshToken(req, res, next) {
+function refreshToken(req, res, next, old_token) {
   try {
-    jwt.verify(token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
+    jwt.verify(old_token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
+      console.log("Invalid refresh", old_token);
       if (err) return res.status(401).json({ error: "Invalid token" });
-      let token = jwt.sign(
-        user,
+      let new_token = jwt.sign(
+        { id: user.id, _id: user._id, login: user.login },
         process.env.JWT_SECRET,
-        { expiresIn: 86400 } // 1 Day (24h)
+        { expiresIn: 21600 } // 6h
       );
       let refresh = jwt.sign(
-        user,
+        { id: user.id, _id: user._id, login: user.login },
         process.env.JWT_REFRESH_SECRET,
         { expiresIn: 2419200 } // 4 Weeks
       );
-      res.cookie("auth", token,
-          { expires: new Date(Date.now() + 86400000),
-            httpOnly: true, sameSite: true })
+      res.cookie("auth", new_token,
+          { expires: new Date(Date.now() + 21600000),
+            httpOnly: true, sameSite: true, secure: true })
         .cookie("refresh", refresh,
           { expires: new Date(Date.now() + 2419200000),
-            httpOnly: true, sameSite: true })
+            httpOnly: true, sameSite: true, secure: true })
         .send({ error: "retry" })
     })
   } catch (e) {
