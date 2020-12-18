@@ -40,7 +40,12 @@ class Auth {
       this.loggedIn = true;
       debug("/*/ logged in");
       this.error = false;
-      debug("/*/ no error\nEND\n");
+      debug("/*/ no error");
+      if (!retry && r.data.error == "retry"){
+        debug("/*/ refetch");
+        await this.fetchUser(true);
+      }
+      debug("/*/ END");
       return true;
     } catch (e) {
       console.warn(e.response ? e.response.data : e);

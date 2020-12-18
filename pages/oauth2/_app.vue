@@ -28,11 +28,11 @@
           </div>
           <div :class="$style.scope">
             <div :class="[$style.scope_icon, $style.red_scope]"><CloseIcon size="22"></CloseIcon></div>
-            <div>Испечь вам торт</div>
+            <div>{{ text }}</div>
           </div>
         </div>
       </div>
-      <button type="button" class="primary">Вход</button>
+      <button type="button" class="primary">Авторизовать</button>
       <button type="button" class="secondary">Отмена</button>
     </template>
   </form>
@@ -49,6 +49,39 @@ import CloseIcon from "mdi-vue/Close.vue";
 
 const req = ["scope", "redirect_uri", "response_type"];
 const scopes_list = ["data", "status", "set-status", "balance", "role"];
+const texts = [
+  "Уплыть на вашей лодке",
+  "Торговать с вашими жителями",
+  "Использовать вашу ферму опыта",
+  "Напомнить, что торт - это ложь",
+  "Посмотреть эндермену в глаза",
+  "Заагрить на вас крипера",
+  "Захватить этот мир",
+  "Даровать бессмертие",
+  "Зачаровать деревянный меч на остроту 5 при помощи стола зачарований",
+  "Продать вам Авенита",
+  "Обнулить СПк2",
+  "Восхищаться дизайном сайта Джексона",
+  "Смотреть хентай онлайн без регистрации и смс",
+  "Дать всем понять, что Twitch катится не в ту сторону",
+  "Убить Эндер Дракона без вашего участия",
+  "Стать вашим ♂️dungeon master♂️",
+  "Стать вашим ♂️slave♂️",
+  "Удалить эту бесполезную строчку",
+  "Узнать, что ваше настощее имя - Валя",
+  "Уничтожить вселенную",
+  "Включить фантомов",
+  "[Чикен, придумай что-то умное для этой строчки]",
+  "Lorem ipsum dolor sit amet, consectetur",
+  "Тест тест тест тест тест тест",
+  "Купить прон в HD качестве за ваш счёт",
+  "Съесть ваш ужин, пока вы отошли",
+  "Удалить папку .minecraft",
+  "Покакать",
+  "Боготворить Юджина",
+  "Поиграть в Киберпанк вместо вас",
+  "Написать песню лучше, чем Аристокрафт"
+];
 export default {
   name: "OAuth2",
   layout: "loginLayout",
@@ -63,15 +96,16 @@ export default {
     page: 0,
     scopeNames: {
       "data": "Идентифицировать вас",
-      "status": "Узнать статус",
-      "set-status": "Поменять статус",
-      "balance": "Узнать баланс",
-      "role": "Определить банковскую роль"
-    }
+      "status": "Узнать ваш статус",
+      "set-status": "Поменять ваш статус",
+      "balance": "Узнать ваш баланс",
+      "role": "Определить вашу банковскую роль"
+    },
+    text: "Ммм..."
   }),
   mounted () {
     let opt = ["prompt", "state"];
-
+    this.text = texts[Math.floor(Math.random()*texts.length)];
   },
   computed: {
     scopes () {
@@ -108,7 +142,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 3px solid #346db3;
+  border: 2px solid #346db3;
   border-radius: 50%;
   margin-bottom: 0!important;
 }
