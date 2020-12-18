@@ -80,3 +80,6 @@ typings/
 # IDE
 .idea
 .run
+
+# Service worker
+sw.*

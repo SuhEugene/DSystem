@@ -1,5 +1,8 @@
 <template>
   <div class="container login" :class="{dark: $store.state.dark}">
+    <client-only>
+      <div id="nonetwork" v-if="$nuxt.isOffline"><b>Интернет соединение потеряно</b></div>
+    </client-only>
     <transition name="page">
       <div v-if="readyState" class="main-loading-page" :class="rand">
         <DromonLogo />

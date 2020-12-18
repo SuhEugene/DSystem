@@ -1,6 +1,11 @@
 <template>
   <div class="container" :class="{dark: $store.state.dark}">
-    <div id="nonetwork" v-if="$nuxt.isOffline">Интернет соединение потеряно</div>
+    <client-only>
+      <div id="nonetwork" v-if="$nuxt.isOffline">
+        <div style="margin-bottom:2px"><b>Интернет соединение потеряно</b></div>
+        <div style="opacity:0.75">Данные могут быть неактуальны</div>
+      </div>
+    </client-only>
     <transition name="page">
       <div v-if="readyState" class="main-loading-page" :class="rand">
         <DromonLogo />

@@ -9,6 +9,16 @@ export default {
     color: "#346db3",
     height: "4px"
   },
+  static: {
+    prefix: false
+  },
+  dir: {
+    static: "static"
+  },
+  cli: {
+    bannerColor: 'blueBright',
+    badgeMessages: ['Made with love']
+  },
   // loading: "~/components/LoadingBar.vue",
   env: {
     axiosBase: prodVersion ? process.env.API_URL : 'http://localhost:8080/api',
@@ -29,8 +39,10 @@ export default {
    ** Rendering mode
    ** Doc: https://nuxtjs.org/api/configuration-mode
    */
-  mode: "universal",
+  // mode: "universal",
   // mode: "spa",
+  // ssr: true,
+  target: "server",
 
   loadingIndicator: {
     name: 'three-bounce',
@@ -124,6 +136,34 @@ export default {
     '~/plugins/api.js',
     '~/plugins/auth.js'
   ],
+  buildModules: [
+    '@nuxtjs/pwa',
+  ],
+  pwa: {
+    meta: {
+      name: "Dromon",
+      author: "SuhEugene",
+      description: "Приложение для быстрой оплаты АРами чего угодно, где угодно и когда угодно",
+      theme_color: "#346db3",
+      lang: "ru",
+    },
+    manifest: {
+      name: 'Dromon - оплати здесь и сейчас',
+      short_name: "Dromon",
+      description: "С помощью этого приложения вы можете оплатить АРами что угодно, где угодно и когда угодно",
+      lang: 'ru',
+      useWebmanifestExtension: false,
+      background_color: "#346db3",
+      theme_color: "#346db3"
+    },
+    workbox: {
+      workboxURL: "https://cdn.jsdelivr.net/npm/workbox-cdn/workbox/workbox-sw.js",
+      autoRegister: true,
+      offline: false,
+      offlinePage: "/offline",
+      offlineAssets: ["login_bg.jpg"]
+    }
+  },
 
 
   /*
