@@ -60,7 +60,7 @@ class Auth {
       debug("/*/ error");
       if (!retry && e.response && e.response.data.error == "retry"){
         debug("/*/ refetch");
-        await this.fetchUser(true);
+        return await this.fetchUser(true);
       }
       debug("/*/ false\nEND\n");
       return false;
@@ -115,7 +115,7 @@ class Auth {
   }
 }
 
-const alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890_+@!-"
+const alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890_-"
 function randString() {
   let text = "";
   for (let i = 0; i < 15; i++) {

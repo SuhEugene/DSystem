@@ -83,3 +83,6 @@ typings/
 
 # Service worker
 sw.*
+
+# Tern project :3
+.tern-project

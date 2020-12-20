@@ -5,8 +5,8 @@
       <p>Приложение не найдено</p>
       <a href="javascript:void(0)" class="primary btn" @click="back">Назад</a>
     </div>
-    <SuccessOverlay v-if="page == 2" />
-    <ErrorOverlay   v-if="page == 3" />
+    <SuccessOverlay v-if="page === 1" />
+    <ErrorOverlay   v-if="page === 2" />
     <template v-if="app !== false">
       <div class="title">
         Авторизация в приложении {{app.name}}
@@ -19,21 +19,36 @@
         <!-- TODO: чекнуть работоспособность -->
         <AppImg :app="app" />
       </div>
-      <div class="attrs">
-        <div class="attrs__one">
-          <div style="margin-bottom: 10px;" class="attrs__one__title bold">Это позволит приложению</div>
-          <div :class="$style.scope" v-for="scope in scopes" :key="scope">
-            <div :class="$style.scope_icon"><CheckIcon size="22"></CheckIcon></div>
-            <div>{{scopeNames[scope]}}</div>
-          </div>
-          <div :class="$style.scope">
-            <div :class="[$style.scope_icon, $style.red_scope]"><CloseIcon size="22"></CloseIcon></div>
-            <div>{{ text }}</div>
+      <template v-if="page === 0">
+        <div class="attrs">
+          <div class="attrs__one">
+            <div style="margin-bottom: 10px;" class="attrs__one__title bold">Это позволит приложению</div>
+            <div class="scope" v-for="scope in scopes" :key="scope">
+              <div class="scope_icon"><CheckIcon size="22"></CheckIcon></div>
+              <div>{{scopeNames[scope]}}</div>
+            </div>
+            <div class="scope">
+              <div class="scope_icon red_scope"><CloseIcon size="22"></CloseIcon></div>
+              <div>{{ text }}</div>
+            </div>
           </div>
         </div>
-      </div>
-      <button type="button" class="primary">Авторизовать</button>
-      <button type="button" class="secondary">Отмена</button>
+        <button type="button" @click="authorize" class="primary">Авторизовать</button>
+        <button type="button" class="secondary">Отмена</button>
+      </template>
+      <template v-if="page === 1">
+        <h2>Успех!</h2>
+        <p style="text-align: center">Сейчас вы будете перенаправлены...</p>
+      </template>
+      <template v-if="page === 2">
+        <div class="attrs">
+          <div class="attrs__one attrs__one--red">
+            <div class="attrs__one__title">Ошибка авторизации</div>
+            <div class="attrs__one__text">{{error}}</div>
+          </div>
+        </div>
+        <button class="secondary" @click="page = 0">Ещё раз!</button>
+      </template>
     </template>
   </form>
 </template>
@@ -48,7 +63,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
 import CloseIcon from "mdi-vue/Close.vue";
 
 const req = ["scope", "redirect_uri", "response_type"];
-const scopes_list = ["data", "status", "set-status", "balance", "role"];
+// const scopes_list = ["data", "status", "set-status", "balance", "role"];
 const texts = [
   "Уплыть на вашей лодке",
   "Торговать с вашими жителями",
@@ -101,10 +116,11 @@ export default {
       "balance": "Узнать ваш баланс",
       "role": "Определить вашу банковскую роль"
     },
-    text: "Ммм..."
+    text: "Ммм...",
+    error: ""
   }),
   mounted () {
-    let opt = ["prompt", "state"];
+    // let opt = ["prompt", "state"];
     this.text = texts[Math.floor(Math.random()*texts.length)];
   },
   computed: {
@@ -116,6 +132,36 @@ export default {
       return data;
     }
   },
+  methods: {
+    back () {
+      console.log(window.history.length === 1, window.history.length)
+      window.history.length === 1 ? this.$router.push("/") : window.history.back()
+    },
+    async authorize () {
+      try {
+        let {data: {code}} = await this.$api.post("/oauth2/code", {
+          client_id: this.$route.query.client_id || this.app._id,
+          response_type: this.$route.query.response_type || "code",
+          redirect_uri: this.$route.query.redirect_uri,
+          scope: this.$route.query.scope.split(/ +/)
+        }, {withCredentials: true});
+        this.page = 1;
+        if (process.browser) {
+          window.location = `${this.$route.query.redirect_uri}?code=${code}`+
+                            `&response_type=${this.$route.query.response_type || "code"}`+
+                            `&scope=${this.$route.query.scope.split(/ +/).join(' ')}`;
+        }
+      } catch (e) {
+        this.error = "Неизвестная ошибка";
+        if (e.response && (e.response.data.e === "IRU" || e.response.data.error === "Invalid redirect uri")) { this.error = "Неверный redirect uri" }
+        if (e.response && e.response.data.details && e.response.data.details[0]) {
+          this.error = `ERR: ${e.response.data.details[0].message}`;
+        }
+        this.page = 2;
+        return;
+      }
+    }
+  },
   components: { CheckIcon, SuccessOverlay, ErrorOverlay, CloseIcon, AppImg }
 };
 </script>
@@ -124,7 +170,7 @@ export default {
   .attrs {margin-bottom: 0 !important;}
   button {margin-top: 12px!important;}
 </style>
-<style module>
+<style scoped>
 .scope {
   display: flex;
   justify-content: flex-start;

@@ -12,10 +12,14 @@ const mongoose = require("mongoose");
 const User = require("./models/user");
 const Post = require("./models/post");
 const App = require("./models/app");
+const userRouter = require("./routes/users");
+const appRouter = require("./routes/apps");
+const moneyRouter = require("./routes/money");
+const authRouter = require("./routes/auth");
+const Joi = require("joi");
 require("dotenv").config();
 
 io.users = [];
-
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
   useUnifiedTopology: true,
@@ -37,6 +41,33 @@ global.logger = {
 
 
 const getPasswordHash = password => bcrypt.hashSync(password, 12);
+function refreshToken(req, res, next, old_token) {
+  try {
+    jwt.verify(old_token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
+      // console.log("Invalid refresh", old_token);
+      if (err) return res.status(401).json({ error: "Invalid token" });
+      let new_token = jwt.sign(
+        { id: user.id, _id: user._id, login: user.login },
+        process.env.JWT_SECRET,
+        { expiresIn: 21600 } // 6h
+      );
+      let refresh = jwt.sign(
+        { id: user.id, _id: user._id, login: user.login },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: 2419200 } // 4 Weeks
+      );
+      res.cookie("auth", new_token,
+        { expires: new Date(Date.now() + 21600000),
+          httpOnly: true, sameSite: true, secure: true })
+        .cookie("refresh", refresh,
+          { expires: new Date(Date.now() + 2419200000),
+            httpOnly: true, sameSite: true, secure: true })
+        .send({ error: "retry" })
+    })
+  } catch (e) {
+    return res.status(401).send({ error: "Invalid token" })
+  }
+}
 
 app.use(bodyParser.json({ limit: '6mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -59,7 +90,7 @@ app.use((req, res, next) => {
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
   res.append("Access-Control-Allow-Credentials", "true");
 
-  if (req.method == "OPTIONS") return res.status(200).send();
+  if (req.method === "OPTIONS") return res.status(200).send();
   next();
 });
 
@@ -89,7 +120,7 @@ app.get("/user/:id", (req, res) => {
 app.get("/apps/:id", async (req, res) => {
   if (!req.params.id) return res.status(400).send();
   let app = await App.findOne({shortname: String(req.params.id).toLowerCase()});
-  if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
+  if (!app && parseInt(req.params.id, 16) && req.params.id.length === 24) {
     app = await App.findOne({ _id: req.params.id });
   }
   if (!app) return res.status(404).send({ error: "App not found" });
@@ -97,13 +128,15 @@ app.get("/apps/:id", async (req, res) => {
   res.status(200).send(app);
 });
 
-const authRouter = require("./routes/auth");
+
 app.use("/auth", authRouter);
 
 // const oauth2Router = require("./service_oauth2");
 // app.use("/oauth2", oauth2Router);
 
-// TODO: фризы аккаунтов
+///////////////////////////////////
+//           MAIN AUTH           //
+///////////////////////////////////
 app.use(function(req, res, next) {
   let token = req.cookies && (req.cookies.auth || req.cookies.refresh);
   if (!token) return res.status(403).send({ error: "Unauthorized" });
@@ -126,65 +159,62 @@ app.use(function(req, res, next) {
   }
 });
 
-function refreshToken(req, res, next, old_token) {
-  try {
-    jwt.verify(old_token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
-      console.log("Invalid refresh", old_token);
-      if (err) return res.status(401).json({ error: "Invalid token" });
-      let new_token = jwt.sign(
-        { id: user.id, _id: user._id, login: user.login },
-        process.env.JWT_SECRET,
-        { expiresIn: 21600 } // 6h
-      );
-      let refresh = jwt.sign(
-        { id: user.id, _id: user._id, login: user.login },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: 2419200 } // 4 Weeks
-      );
-      res.cookie("auth", new_token,
-          { expires: new Date(Date.now() + 21600000),
-            httpOnly: true, sameSite: true, secure: true })
-        .cookie("refresh", refresh,
-          { expires: new Date(Date.now() + 2419200000),
-            httpOnly: true, sameSite: true, secure: true })
-        .send({ error: "retry" })
-    })
-  } catch (e) {
-    return res.status(401).send({ error: "Invalid token" })
-  }
-}
-
-const userRouter = require("./routes/users");
-const appRouter = require("./routes/apps");
-const moneyRouter = require("./routes/money");
 app.use("/users", userRouter);
 app.use("/apps", appRouter);
 app.use("/money", moneyRouter);
 
+const getCode = Joi.object({
+  client_id: Joi.string().hex().length(24).required(),
+  response_type: Joi.string().allow('token', 'code').required(),
+  redirect_uri: Joi.string().max(64).required(),
+  scope: Joi.array().items(Joi.string().max(20)).required(),
+});
+app.post("/oauth2/code", async (req, res) => {
+  const { error } = getCode.validate(req.body);
+  if (error) return res.status(400).send(error);
+
+  try {
+    console.log("I WANT TO SEND", req.body)
+    console.log("I AM SENDING", JSON.stringify(req.body));
+    const f = await fetch(`${process.env.OAUTH_URL}/code`, {
+      method: "POST",
+      body: JSON.stringify(req.body),
+      headers: {
+        "Authorization": `Bearer ${req.cookies.auth}`,
+        "Content-Type": "application/json"
+      }
+    });
+    const r = await f.json();
+    console.log("F STATUS IS", f.status);
+    return res.status(f.status).send(r);
+  } catch (e) {
+    return res.status(417).send({ error: (e.response) ? (e.response.data || e.response.message) : (e.status || 500) });
+  }
+})
+
 app.get("/posts", (req, res) => {
-  Post.find((err, posts) => {
-    if (err) return;
+    Post.find((err, posts) => {
+      if (err) return;
+      User.findOne({ id: req.user.id }, (err, user) => {
+        if (err) return console.error(err);
+        if (user.role > 2) return res.json(posts);
+        return res.json(posts.filter(p => p.id !== 0).map(p => ({ name: p.name, id: p.id })))
+      });
+    });
+  })
+  .post("/posts", (req, res) => {
     User.findOne({ id: req.user.id }, (err, user) => {
-      if (err) return console.error(err);
-      if (user.role > 2) return res.json(posts);
-      return res.json(posts.filter(p => p.id != 0).map(p => ({ name: p.name, id: p.id })))
+      if (err) return console.log(err);
+      if (user.role < 3) return res.status(403).json({ error: "Access denied" });
+      if (isNaN(req.body.id) || !req.body.name) return console.log(req.body.id, req.body.name);
+      let post = new Post();
+      post.id = req.body.id;
+      post.name = req.body.name;
+      post.balance = 0;
+      post.save();
+      return res.json(post);
     });
   });
-});
-
-app.post("/posts", (req, res) => {
-  User.findOne({ id: req.user.id }, (err, user) => {
-    if (err) return console.log(err);
-    if (user.role < 3) return res.status(403).json({ error: "Access denied" });
-    if (isNaN(req.body.id) || !req.body.name) return console.log(req.body.id, req.body.name);
-    let post = new Post();
-    post.id = req.body.id;
-    post.name = req.body.name;
-    post.balance = 0;
-    post.save();
-    return res.json(post);
-  });
-});
 
 app.post("/reg", (req, res) => {
   if (!req.body.username || !req.body.username.length    ||
@@ -194,7 +224,7 @@ app.post("/reg", (req, res) => {
   fetch(`https://playerdb.co/api/player/minecraft/${req.body.username}`)
     .then(r => r.json())
     .then(r => {
-      if (r.code != "player.found") return res.status(400).send(r);
+      if (r.code !== "player.found") return res.status(400).send(r);
       User.findOne({ id: req.user.id }, async (error, user) => {
         if (error) return res.status(500).send({ error });
         if (!user) return res.status(400).send({ error: "Magic!" });
@@ -219,7 +249,7 @@ app.get("/mine/:username", (req, res) => {
   fetch(`https://playerdb.co/api/player/minecraft/${req.params.username}`)
     .then(r => r.json())
     .then(r => {
-      if (r.code != "player.found") return res.status(200).send(r);
+      if (r.code !== "player.found") return res.status(200).send(r);
       User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}], role: {$ne: 0} }, (err, user) => {
         if (err) return res.status(500).send({ error: err });
         if (user) return res.status(200).send({ code: "player.was" });
@@ -239,7 +269,7 @@ const getUser = (_id, login) => new Promise((send, reject) => {
 
 app.post("/ws", (req, res) => {
   if (!req.body.cid) return res.send();
-  io.users = io.users.filter(u => u.id != req.user.id);
+  io.users = io.users.filter(u => u.id !== req.user.id);
   io.users.push({id: req.user.id, io: req.body.cid});
   io.to(req.body.cid).emit("hello");
   return res.send();

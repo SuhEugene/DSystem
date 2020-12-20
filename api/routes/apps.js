@@ -98,7 +98,7 @@ router
     let { value: sum, error } = sumTest.validate(req.body.sum);
     if (!!error) return res.status(400).send({ error: "Invalid body", e: "IB", joie: error });
 
-    if (req.body.redirectURI != req.app.redirectURI) return res.status(400).send({ error: "Invalid redirect uri", e: "IRU" });
+    if (req.body.redirectURI && req.body.redirectURI !== req.app.redirectURI) return res.status(400).send({ error: "Invalid redirect uri", e: "IRU" });
 
     if (req.user.balance - 1 < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
 

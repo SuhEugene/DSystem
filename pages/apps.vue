@@ -90,9 +90,9 @@
               <div class="input">
                 <!-- TODO: design -->
                 Аватар
-                <label class="btn min" :class="this.avatar ? 'primary' : 'secondary'" style="display: flex; margin-top: 5px;">
-                  {{ this.avatar ? "Загрузить" : "Файл прикреплён" }}
-                  <input type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
+                <label class="btn min" :class="!this.avatar ? 'primary' : 'secondary'" style="display: flex; margin-top: 5px;">
+                  {{ !this.avatar ? "Загрузить" : "Файл прикреплён" }}
+                  <input style="display: none" type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
                 </label>
               </div>
               <div v-if="secretPage" class="input">

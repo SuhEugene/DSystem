@@ -776,22 +776,24 @@ button, a.btn, .btn {
 .profile-header {
   @include bcontainer;
   color: $always-white;
-  // background: url("https://images.pexels.com/photos/370799/pexels-photo-370799.jpeg") center center;
-  // background: url("https://i.ytimg.com/vi/7GKZqLmL4PI/maxresdefault.jpg") center center;
-  // background: url("http://i1.ytimg.com/vi/xgh4NBSYYKA/maxresdefault.jpg") center center;
-  // background: url("http://4.bp.blogspot.com/-NRO6IfXOyWI/UFzlQf4VPeI/AAAAAAAAAGY/7GcmlF8m2tI/s1600/Abstract-purple-wallpaper.jpg") center center;
-  // background: url("http://i.ytimg.com/vi/9u6pcYWq1fY/maxresdefault.jpg") center center;
-  // background: url("http://2.bp.blogspot.com/-RiCzlsLuNnM/T3PLGnXCV3I/AAAAAAAAANM/RRyLU5ePjkY/s1600/image.png") center center;
-  // background: url("https://i.ytimg.com/vi/dg-s-7QLoB0/maxresdefault.jpg") center center;
-  // background: url("https://media.discordapp.net/attachments/734134835190300740/757229871993978880/iK3n4Xhd6GE.png") center center;
-  // background: url("https://cdn-asset-mel-1.airsquare.com/cyclewerks/managed/image/product/DA04ABC3-8D99-11E5-9CFF4902151E9189-zoom.jpg") center center;
-  // background: url("http://4.bp.blogspot.com/-5vhEElaEwt8/VAKIkxBnS8I/AAAAAAAAAOY/3a63DLiUp0o/s1600/Minecraft+wallpapers+7minecraft.com+053.jpg") center 20%;
-  // background: url("https://i.ytimg.com/vi/-U1PjstoBVs/maxresdefault.jpg") center 70%;
-  // background: url("https://i.ytimg.com/vi/Wqi0_OsgbAE/maxresdefault.jpg") center 20%;
-  // background: url("https://i.ytimg.com/vi/wVWJHoPG5fE/maxresdefault.jpg") center 30%;
-  // background: linear-gradient(20deg, #144d93, #548dd3);
-  // background: linear-gradient(20deg, #ff00d4, #00f3ff);
-  // background: white;
+  /*
+  background: url("https://images.pexels.com/photos/370799/pexels-photo-370799.jpeg") center center;
+  background: url("https://i.ytimg.com/vi/7GKZqLmL4PI/maxresdefault.jpg") center center;
+  background: url("http://i1.ytimg.com/vi/xgh4NBSYYKA/maxresdefault.jpg") center center;
+  background: url("http://4.bp.blogspot.com/-NRO6IfXOyWI/UFzlQf4VPeI/AAAAAAAAAGY/7GcmlF8m2tI/s1600/Abstract-purple-wallpaper.jpg") center center;
+  background: url("http://i.ytimg.com/vi/9u6pcYWq1fY/maxresdefault.jpg") center center;
+  background: url("http://2.bp.blogspot.com/-RiCzlsLuNnM/T3PLGnXCV3I/AAAAAAAAANM/RRyLU5ePjkY/s1600/image.png") center center;
+  background: url("https://i.ytimg.com/vi/dg-s-7QLoB0/maxresdefault.jpg") center center;
+  background: url("https://media.discordapp.net/attachments/734134835190300740/757229871993978880/iK3n4Xhd6GE.png") center center;
+  background: url("https://cdn-asset-mel-1.airsquare.com/cyclewerks/managed/image/product/DA04ABC3-8D99-11E5-9CFF4902151E9189-zoom.jpg") center center;
+  background: url("http://4.bp.blogspot.com/-5vhEElaEwt8/VAKIkxBnS8I/AAAAAAAAAOY/3a63DLiUp0o/s1600/Minecraft+wallpapers+7minecraft.com+053.jpg") center 20%;
+  background: url("https://i.ytimg.com/vi/-U1PjstoBVs/maxresdefault.jpg") center 70%;
+  background: url("https://i.ytimg.com/vi/Wqi0_OsgbAE/maxresdefault.jpg") center 20%;
+  background: url("https://i.ytimg.com/vi/wVWJHoPG5fE/maxresdefault.jpg") center 30%;
+  background: linear-gradient(20deg, #144d93, #548dd3);
+  background: linear-gradient(20deg, #ff00d4, #00f3ff);
+  background: white;
+  */
   background: url("~@/assets/profile_bg.webp") center center;
   background-size: cover;
   position: relative;
@@ -1126,7 +1128,6 @@ button, a.btn, .btn {
 }
 
 
-
 #apps-page {
   @include bcontainer;
   header {
@@ -1237,7 +1238,7 @@ button, a.btn, .btn {
         position: absolute;
         height: 18px;
         width: 18px;
-        background: #346db3;
+        background: $always-primary;
         right: -6px;
         bottom: -6px;
         border-radius: 50%;
@@ -1270,8 +1271,6 @@ button, a.btn, .btn {
     }
     .app-description, .app-name {
       padding: 5px 8px;
-      box-shadow: 0 0 0 1px hsla(0,0%,100%,.15);
-      border-radius: 3px;
       box-shadow: 0 0 0 1px $card-stroke;
       border:none;
       border-radius: $card-border-radius;
@@ -1315,10 +1314,9 @@ button, a.btn, .btn {
 }
 
 
-
 .login {
   // background: url("https://image.freepik.com/free-vector/sunset-mountains-with-pine-forest_7993-2327.jpg") 50% 50% !important;
-  background: url("~@/assets/login_bg.jpg") 50% 50% !important;
+  background: url("/login_bg.jpg") 50% 50% !important;
   background-size: cover!important;
   padding: 10px;
   min-height: 100vh;
@@ -1671,6 +1669,7 @@ button, a.btn, .btn {
   top: 0;
   left: 0;
 }
+
 .swipe-menu-enter-active,
 .swipe-menu-back-enter-active,
 .swipe-menu-leave-active,
@@ -1678,20 +1677,24 @@ button, a.btn, .btn {
   transition: transform .3s ease-out, opacity .2s;
 }
 
+
 .swipe-menu-enter {
   transform: translateX(70px);
   opacity: 0;
 }
+
 .swipe-menu-leave-active,
 .swipe-menu-leave-to {
   transform: translateX(-70px);
   opacity: 0;
 }
 
+
 .swipe-menu-back-enter {
   transform: translateX(-70px);
   opacity: 0;
 }
+
 .swipe-menu-back-leave-active,
 .swipe-menu-back-leave-to {
   transform: translateX(70px);

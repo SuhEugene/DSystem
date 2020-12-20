@@ -5,8 +5,8 @@
       <p>Приложение не найдено</p>
       <a href="javascript:void(0)" class="primary btn" @click="back">Назад</a>
     </div>
-    <SuccessOverlay v-if="page == 2" />
-    <ErrorOverlay   v-if="page == 3" />
+    <SuccessOverlay v-if="page === 2" />
+    <ErrorOverlay   v-if="page === 3" />
     <template v-if="app !== false">
       <div class="title">
         Перевод приложению {{app.name}}
@@ -22,11 +22,11 @@
         <div class="sum__title">Сумма</div>
         <div class="sum__num" v-if="$route.params.sum || page > 0">{{$route.params.sum || sum}} АР</div>
         <label>
-          <input type="number" v-if="!$route.params.sum && page == 0" v-model="sum">
+          <input type="number" v-if="!$route.params.sum && page === 0" v-model="sum">
         </label>
       </div>
       <!-- <transition-group name="swipe" style="position: relative"> -->
-        <div class="attrs" v-if="page == 0" key="0">
+        <div class="attrs" v-if="page === 0" :key="0">
           <div class="attrs__one">
             <div class="attrs__one__title">Приложение</div>
             <div class="attrs__one__text">{{app.name}}</div>
@@ -36,7 +36,7 @@
             <div class="attrs__one__text">{{$route.query.text || "Пожертвование"}}</div>
           </div>
         </div>
-        <div class="attrs" v-if="page == 1" key="1">
+        <div class="attrs" v-if="page === 1" :key="1">
           <div class="attrs__one">
             <div class="attrs__one__title">Ваш баланс</div>
             <div class="attrs__one__text">{{$auth.user.balance}} АР</div>
@@ -54,13 +54,13 @@
             <input type="password" @keypress.enter="nextPage" v-model="password">
           </div>
         </div>
-        <div class="attrs" v-if="page == 2" key="2">
+        <div class="attrs" v-if="page === 2" :key="2">
           <div class="attrs__one">
             <div class="attrs__one__title">Статус</div>
             <div class="attrs__one__text">Успешно оплачено</div>
           </div>
         </div>
-        <div class="attrs" v-if="page == 3" key="3">
+        <div class="attrs" v-if="page === 3" :key="3">
           <div class="attrs__one attrs__one--red">
             <div class="attrs__one__title">Ошибка оплаты</div>
             <div class="attrs__one__text">{{error}}</div>
@@ -72,7 +72,7 @@
         <button type="button" @click="home" v-if="page >= 2 && $auth.loggedIn" class="primary">
           {{ ($route.query.redirect_uri) ? $route.query.ok || "Вернуться на сайт" : "В профиль" }}
         </button>
-        <button type="button" @click="clearPage" v-if="page >= 2 && $auth.loggedIn && $route.query.again == '1'" class="secondary">
+        <button type="button" @click="clearPage" v-if="page >= 2 && $auth.loggedIn && ($route.query.again == '1' || page == 3)" class="secondary">
           Ещё раз!
         </button>
         <button type="button" @click="nextPage" v-if="page < 2 && $auth.loggedIn" class="primary"
@@ -112,16 +112,16 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     },
     methods: {
       back () {
-        console.log(window.history.length == 1, window.history.length)
-        window.history.length == 1 ? this.$router.push("/") : window.history.back()
+        console.log(window.history.length === 1, window.history.length)
+        window.history.length === 1 ? this.$router.push("/") : window.history.back()
       },
       nextPage () {
         if (this.sumCheck || this.passwordCheck) return;
-        if (this.page == 0) {this.page = 1; return;}
+        if (this.page === 0) {this.page = 1; return;}
         this.sendData();
       },
       backPage () {
-        if (this.page == 0) return window.history.back();
+        if (this.page === 0) return window.history.back();
         this.page = 0;
       },
       clearPage () {
@@ -154,9 +154,9 @@ import ErrorOverlay from "~/components/ErrorOverlay";
           this.page = 2;
         } catch (e) {
           this.error = "Неизвестная ошибка";
-          if (e.response && e.response.data.e == "NEM" || e.response.data.error == "Not enough money") { this.error = "Недостаточно АР на балансе" }
-          if (e.response && (e.response.data.e == "IP" || e.response.data.error == "Invalid password")) { this.error = "Неверный пароль" }
-          if (e.response && (e.response.data.e == "IRU" || e.response.data.error == "Invalid redirect uri")) { this.error = "Неверный redirect uri" }
+          if (e.response && (e.response.data.e === "NEM" || e.response.data.error === "Not enough money")){ this.error = "Недостаточно АР на балансе" }
+          if (e.response && (e.response.data.e === "IP" || e.response.data.error === "Invalid password")) { this.error = "Неверный пароль" }
+          if (e.response && (e.response.data.e === "IRU" || e.response.data.error === "Invalid redirect uri")) { this.error = "Неверный redirect uri" }
           this.page = 3;
           return;
         }
@@ -168,7 +168,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
                 (!this.$route.params.sum || !parseInt(this.$route.params.sum) || parseInt(this.$route.params.sum) <= 0));
       },
       passwordCheck () {
-        return (this.page == 1 && this.password.length < 6);
+        return (this.page === 1 && this.password.length < 6);
       }
     },
     components: { SuccessOverlay, ErrorOverlay, AppImg },
