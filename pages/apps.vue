@@ -89,8 +89,11 @@
               </div>
               <div class="input">
                 <!-- TODO: design -->
-                Ссылка на аватар
-                <input type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
+                Аватар
+                <label class="btn min" :class="this.avatar ? 'primary' : 'secondary'" style="display: flex; margin-top: 5px;">
+                  {{ this.avatar ? "Загрузить" : "Файл прикреплён" }}
+                  <input type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
+                </label>
               </div>
               <div v-if="secretPage" class="input">
                 Ссылка на сайт

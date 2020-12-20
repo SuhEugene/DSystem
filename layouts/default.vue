@@ -35,22 +35,15 @@ export default {
         lang: 'ru'
       },
       meta: [
-        {
-          hid: "description",
-          name: "description",
-          content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
-        },
-        {
-          property: "og:title",
-          content: "Dromon"
-        },
-        {
-          name: "title",
-          content: "Dromon"
-        },
+        { property: "og:title", content: "Dromon System" },
+        { name: "title", content: "Dromon" },
         {
           property: "og:url",
           content: process.env.thisUrl+"/"
+        },
+        {
+          hid: "description", name: "description",
+          content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
         },
         {
           property: "og:description",
