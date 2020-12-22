@@ -77,6 +77,7 @@ export default {
         rel: "preconnect",
         href: prodVersion ? process.env.API_URL : 'http://localhost:8080/api'
       },
+      // TODO: Большая круглая икнока на сайте, маленькая квадратная в приложении
       {
         rel: "icon",
         href: "/favicon.ico"

@@ -62,31 +62,54 @@ userRouter
       logs: await getLogs(req)
     });
   })
-  .get("/:id", (req, res) => {
+  .use("/:id", (req, res, next) => {
     if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
-    User.findOne({
-      $or: [
-          { id: req.params.id },
-          { username: req.params.id },
-          { uuid: req.params.id }
-        ]
-      },
-    async (err, user) => {
-      if (err) return;
-      if (!user) return res.status(404).send({ error: "User not found" });
-      let data = {
-        id: user.id,
-        _id: user._id,
-        uuid: user.uuid,
-        role: user.role,
-        status: user.status,
-        username: user.username
-      };
-      if (req.user.role > 2) {
-        data.balance = user.balance;
-      }
-      res.json(data);
-    });
+    try {
+      User.findOne({
+        $or: [
+            { id: req.params.id },
+            { username: req.params.id },
+            { uuid: req.params.id }
+          ]
+        },
+      async (err, user) => {
+        if (err) return;
+        if (!user) return res.status(404).send({ error: "User not found" });
+        req.subUser = user;
+        next();
+      });
+    } catch (e) {
+      res.status(400).send({ error: "Invalid id" })
+    }
+  })
+  .get("/:id", (req, res) => {
+    let data = {
+      id:       req.subUser.id,
+      _id:      req.subUser._id,
+      uuid:     req.subUser.uuid,
+      role:     req.subUser.role,
+      status:   req.subUser.status,
+      username: req.subUser.username
+    };
+    if (req.user.role > 2) data.balance = user.balance;
+
+    res.json(data);
+  })
+  .post("/:id/freeze", async (req, res) => {
+
+    if (req.user.role < 3) return res.send(403);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    req.subUser.freezed = !req.subUser.freezed;
+    await req.subUser.save();
+
+    await session.commitTransaction();
+    session.endSession();
+
+    logger.log("(Frozen)", req.user.id, "frozen", req.subUser.id );
+
   });
 
 module.exports = userRouter;

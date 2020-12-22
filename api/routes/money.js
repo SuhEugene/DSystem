@@ -48,8 +48,9 @@ moneyRouter
 
     User.findOne({ id: req.params.id }, async (err, user) => {
       if (err) return;
+      let sum = parseInt(req.body.sum, 10)
       if (!user) return res.status(404).json({ error: "User not found" });
-      if (user.balance + parseInt(req.body.sum, 10) < 0)
+      if (!sum || user.balance + sum < 0)
         return res.status(400).json({ error: "Not enough money" });
       let post = await getPost(req.body.post);
       if (!post) return res.status(404).json({ error: "Post not found" });
@@ -61,7 +62,7 @@ moneyRouter
       logs.sum = parseInt(req.body.sum, 10);
       logs.action = "banker-void";
       logs.more = (parseInt(req.body.sum, 10) > 0) ? "Пополнение" : "Снятие";
-      user.balance += parseInt(req.body.sum, 10);
+      user.balance += sum;
 
       await logs.save();
       await post.save();
