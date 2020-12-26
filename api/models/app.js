@@ -2,7 +2,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const appModel = new Schema({
-  secret:  { type: Number },
   balance: { type: Number, default: 0 },
   name:        { type: String },
   avatar:      { type: String },
@@ -10,6 +9,7 @@ const appModel = new Schema({
   shortname:   { type: String, unique: true, index: true },
   url:         { type: String },
   eventUrl:    { type: String },
+  secret:      { type: String },
   redirectURI: { type: String },
   description: { type: String, default: "Описание" },
   owner:       { type: Schema.Types.ObjectId, ref: "users", index: true },

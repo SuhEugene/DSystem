@@ -5,38 +5,69 @@
       <!-- MAIN MENU -->
       <div v-if="!menu" :key="false" class="profile-nav">
         <div class="profile-nav__row">
+          <!-- TODO ВЫЗОВ БАНКИРА -->
+          <div tooltip="Вызвать банкира" class="profile-nav__button">
+            <AccountTieVoiceOutlineIcon size="26"/>
+          </div><div tooltip="Перевод" @click="next('t0')" class="profile-nav__button">
+            <ArrowRightBoldOutlineIcon size="26"/>
+          </div>
+          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
+            <CubeScanIcon size="26"/>
+          </div>
+        </div>
+        <div class="profile-nav__row">
           <!-- TODO фриз/анфриз модерами по нику -->
           <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
             <AccountGroupOutlineIcon size="26"/>
           </div>
-          <!-- TODO ВЫЗОВ БАНКИРА -->
-          <div tooltip="Вызвать банкира" class="profile-nav__button">
-            <AccountTieVoiceOutlineIcon size="26"/>
-          </div>
-          <div @click="$router.push('/apps')" tooltip="Приложения" class="profile-nav__button">
-            <CubeScanIcon size="26"/>
-          </div>
-          <div tooltip="Настройки" class="profile-nav__button">
-            <AccountCogOutlineIcon size="26"/>
-          </div>
-        </div>
-        <div class="profile-nav__row">
           <div tooltip="Банкир панель" @click="next('b0')" v-if="banker" class="profile-nav__button">
             <AccountCashOutlineIcon size="26"/>
-          </div>
-          <div tooltip="Перевод" @click="next('t0')" class="profile-nav__button">
-            <ArrowRightBoldOutlineIcon size="26"/>
           </div>
           <div tooltip="Смена темы" @click="$parent.themeChange" class="profile-nav__button">
             <WeatherNightIcon size="26"/>
           </div>
-          <div tooltip="Выход" @click="logout" class="profile-nav__button">
-            <LogoutVariantIcon size="26"/>
+          <div tooltip="Настройки" @click="next('s0')" class="profile-nav__button">
+            <CogOutlineIcon size="26"/>
           </div>
         </div>
       </div>
 
-      <!-- TODO: почекать работоспособность ENTER -->
+      <template>
+        <div v-if="menu == 'mod0'" key="mod0" class="profile-nav">
+          <div class="profile-nav__row">
+            <HelpInput type="text" placeholder="Никнейм"
+                       v-model="username"
+                       :items="users.map(u => u.username + (u.frozen) ? ' [F]' : '').filter(u => u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
+                       @enterpress="!!users.find(u => u.username == username) ? next('mod1') : ''"
+                       />
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="next('mod1')" class="profile-nav__button profile-nav__button--w3"
+                 :class="{'profile-nav__button--disabled': !users.find(u => u.username + (u.frozen) ? ' [F]' : '' == username)}">
+              Далее
+            </div>
+          </div>
+        </div>
+        <div v-if="menu == 'mod1'" key="mod1" class="profile-nav">
+          <div class="profile-nav__row">
+            <div>
+              Пользователь: <b>{{username}}</b>
+            </div>
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back('mod0')" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="freezeUser" class="profile-nav__button profile-nav__button--w3">
+              Переключить
+            </div>
+          </div>
+        </div>
+      </template>
+
 
       <!-- MONEY SENDING -->
       <template>
@@ -199,7 +230,67 @@
 
       <!-- SETTINGS -->
       <template>
-        <Settings v-if="menu == 's0'" @back="back(false, true)" />
+        <!-- MAIN -->
+        <div v-if="menu == 's0'" key="s0" class="profile-nav">
+          <div class="profile-nav__row">
+            <div tooltip="Смена пароля" @click="back(false, true)" class="profile-nav__button">
+              <FormTextboxPasswordIcon size="26"/>
+            </div>
+            <div tooltip="Скачать логи" @click="back(false, true)" class="profile-nav__button">
+              <DatabaseArrowDownOutlineIcon size="26"/>
+            </div>
+            <div tooltip="Очистить все сессии" @click="next('s-eraser')" class="profile-nav__button">
+              <CloseNetworkOutlineIcon size="26"/>
+            </div>
+          </div>
+          <div class="profile-nav__row">
+
+            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div tooltip="Обновить никнейм" @click="back(false, true)" class="profile-nav__button">
+              <AccountConvertOutlineIcon size="26"/>
+            </div>
+            <!-- <div tooltip="Безобидная кнопка" @click="back(false, true)" class="profile-nav__button profile-nav__button--disabled">
+            </div> -->
+            <div tooltip="Выход" @click="next('s-exit')" class="profile-nav__button">
+              <LogoutVariantIcon size="26"/>
+            </div>
+            <!-- <div @click="next('b1')" class="profile-nav__button profile-nav__button--w3"
+                 :class="{'profile-nav__button--disabled': !posts.find(p => p.name == post)}">
+              Далее
+            </div> -->
+          </div>
+        </div>
+        <div v-if="menu == 's-eraser'" key="s-eraser" class="profile-nav">
+          <div class="profile-nav__row">
+            <div>
+              Вы уверены, что хотите завершить <b>ВСЕ сессии</b>?
+            </div>
+          </div>
+          <div class="profile-nav__row">
+            <div @click="back('s0', true)" class="profile-nav__button profile-nav__button--w2">
+              Отмена
+            </div>
+            <div @click="clearAllSessions" class="profile-nav__button profile-nav__button--w2">
+              Завершить
+            </div>
+          </div>
+        </div>
+        <div v-if="menu == 's-exit'" key="s-exit" class="profile-nav">
+          <div class="profile-nav__row">
+            <div>Вы уверены, что хотите <b>выйти</b>?</div>
+          </div>
+          <div class="profile-nav__row">
+            <div @click="back('s0', true)" class="profile-nav__button profile-nav__button--w2">
+              Отмена
+            </div>
+            <div @click="logout" class="profile-nav__button profile-nav__button--w2">
+              Выйти
+            </div>
+          </div>
+        </div>
+
       </template>
 
     </transition>
@@ -208,7 +299,7 @@
 <script>
 import AccountTieVoiceOutlineIcon from "mdi-vue/AccountTieVoiceOutline.vue";
 import CubeScanIcon from "mdi-vue/CubeScan.vue";
-import AccountCogOutlineIcon from "mdi-vue/AccountCogOutline.vue";
+import CogOutlineIcon from "mdi-vue/CogOutline.vue";
 import ArrowRightBoldOutlineIcon from "mdi-vue/ArrowRightBoldOutline.vue";
 import WeatherNightIcon from "mdi-vue/WeatherNight.vue";
 import LogoutVariantIcon from "mdi-vue/LogoutVariant.vue";
@@ -216,8 +307,11 @@ import AccountCashOutlineIcon from "mdi-vue/AccountCashOutline.vue";
 import AccountGroupOutlineIcon from "mdi-vue/AccountGroupOutline.vue";
 import BackIcon from "mdi-vue/ArrowLeft.vue";
 import HelpInput from "~/components/HelpInput.vue";
+import FormTextboxPasswordIcon from "mdi-vue/FormTextboxPassword.vue";
+import AccountConvertOutlineIcon from "mdi-vue/AccountConvertOutline.vue";
+import CloseNetworkOutlineIcon from "mdi-vue/CloseNetworkOutline.vue";
 
-import Settings from "~/components/HeaderButtons/Settings.vue";
+// import Settings from "~/components/HeaderButtons/Settings.vue";
 
 export default {
   props: ["moder", "banker", "posts", "users"],
@@ -232,15 +326,18 @@ export default {
   components: {
     AccountTieVoiceOutlineIcon,
     CubeScanIcon,
-    AccountCogOutlineIcon,
+    CogOutlineIcon,
     ArrowRightBoldOutlineIcon,
     WeatherNightIcon,
     LogoutVariantIcon,
     AccountCashOutlineIcon,
     AccountGroupOutlineIcon,
+    FormTextboxPasswordIcon,
+    AccountConvertOutlineIcon,
+    CloseNetworkOutlineIcon,
     BackIcon,
     HelpInput,
-    Settings
+    // Settings
   },
   computed: {
     sumCheck () {
@@ -266,17 +363,27 @@ export default {
       this.post = "";
       this.comment = "";
     },
+    async clearAllSessions () {
+      try {
+        await this.$api.post('/users/@me/clear', {}, { withCredentials: true });
+        this.$auth.logout();
+      } catch (e) {}
+    },
     bankerAddMoney() {
-      this.$api.post(`/money/${this.users.find(u => u.username == this.username).id}/add`, {
-        sum: this.sum,
-        post: this.posts.find(p => p.name == this.post).id
-      }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
+      try {
+        this.$api.post(`/money/${this.users.find(u => u.username == this.username).id}/add`, {
+          sum: this.sum,
+          post: this.posts.find(p => p.name == this.post).id
+        }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
+      } catch (e) {}
     },
     sendMoney() {
-      this.$api.post(`/money/send/${this.users.find(u => u.username == this.username).id}`, {
-        sum: this.sum,
-        comment: this.comment
-      }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
+      try {
+        this.$api.post(`/money/send/${this.users.find(u => u.username == this.username).id}`, {
+          sum: this.sum,
+          comment: this.comment
+        }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
+      } catch (e) {}
     }
   }
 };

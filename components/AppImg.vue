@@ -85,6 +85,7 @@ $font: "Rubik", Arial, sans-serif;
       z-index: 1;
       background-size: cover;
       background-repeat: no-repeat;
+      background-position: center center;
     }
     & > div {
       height: 100%;

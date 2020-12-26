@@ -13,7 +13,7 @@
       </div>
       <div class="icons">
         <div class="app-img app-img--big">
-          <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
+          <img alt="User avatar" v-if="$auth.loggedIn" :src="`https://minotar.net/armor/bust/${$auth.user.uuid || $auth.user.username}/300.png`">
         </div>
         <div class="arrow"></div>
         <!-- TODO: чекнуть работоспособность -->
@@ -54,7 +54,7 @@
 </template>
 <script>
 
-// TODO подключить API
+// TODO: норм дизайн как и везде
 
 import CheckIcon from "mdi-vue/Check.vue";
 import AppImg from "~/components/AppImg";

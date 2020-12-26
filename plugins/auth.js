@@ -50,8 +50,9 @@ class Auth {
     } catch (e) {
       console.warn(e.response ? e.response.data : e);
       debug("/*/ fuck error");
-      this.user = false;
-      debug("/*/ user false");
+      debug("/*/ Da response", e.response.data);
+      this.user = (e.response && e.response.data && e.response.data.uuid) ? e.response.data : false;
+      debug("/*/ user", this.user);
       this.loggedIn = false;
       debug("/*/ not logged in");
       this.error = e.response ? e.response.data : e;
@@ -61,6 +62,11 @@ class Auth {
       if (!retry && e.response && e.response.data.error == "retry"){
         debug("/*/ refetch");
         return await this.fetchUser(true);
+      }
+      if (e.response && (e.response.data.error == "Frozen" || e.response.data.e == "F")) {
+        debug("/*/ I'm frozen");
+        if (process.server) {debug("/*/ redirect"); this.redirect("/frozen");}
+        if (process.browser) {debug("/*/ push"); this.app.router.push("/frozen");}
       }
       debug("/*/ false\nEND\n");
       return false;
@@ -126,7 +132,7 @@ function randString() {
 
 const debug = (...args) => console.log(...args);
 
-const free = ["/user", "/app"];
+const free = ["/user", "/app", '/frozen'];
 
 export default async function (ctx, inject) {
 

@@ -4,9 +4,13 @@
       <div class="profile-header__overlay"></div>
       <div class="profile-header__holder">
         <div class="profile-header__holder__spacer profile-header__holder__spacer--0"></div>
-        <UserAvatar :user="$auth.user" />
+        <client-only>
+          <UserAvatar :user="$auth.user" />
+        </client-only>
         <div class="profile-header__holder--nick-bal">
           <div class="profile-header__nickname">
+
+            <!-- IDEA: nickname click copying send link -->
             <div class="profile-header__nickname--name">{{$auth.user && $auth.user.username}}</div>
             <label>
               <input class="profile-header__nickname--status"
@@ -47,6 +51,13 @@
 </template>
 
 <script>
+
+const types = {
+  "send-to": { t: "Перевод", d: "{0} отправил вам {1} АР{2}"},
+  "banker-void": { t: "Пополнение/Снятие" , d: "{0} изменил ваш баланс на {1} АР" },
+  "app-from": { t: "Перевод приложения", d: "Приложение {0} отправило вам {1} АР{2}"}
+}
+
 /* global process */
 import HeaderButtons from "~/components/HeaderButtons.vue";
 import Call from "~/components/Call.vue";
@@ -105,7 +116,25 @@ export default {
     this.socket.on("logs", logs => {
       console.log("[WS] recieved logs");
       if (logs != this.$store.state.logs) {
-        this.$refs.newOperationSound.play();
+        try {
+          this.$refs.newOperationSound.play();
+        } catch (e) {}
+        (function(self) {
+          const log = logs[0];
+          console.log("[logs]", !log.toUser, log.toUser ? log.toUser._id != self.$auth.user._id : '');
+          console.log("[logs]", log);
+          if (!log.toUser || log.toUser._id != self.$auth.user._id) return;
+          const descr = types[log.action].d.replace(
+            "{0}", ((log.fromUser ? log.fromUser.username : '') || (log.fromApp ? log.fromApp.name : ''))
+          ).replace("{1}", log.sum).replace("{2}", logs.description ? `с комментарием ${logs.description}` : '');
+          self.$store.dispatch('addNotification', {
+            img: (
+              (log.fromUser ? `https://minotar.net/armor/bust/${log.fromUser.uuid || log.fromUser.username}}/300.png` : '') ||
+              (log.fromApp ? log.fromApp.avatar : '')
+              ),
+            title: types[log.action].t, descr
+          })
+        })(this);
       }
       this.$store.commit("setLogs", logs);
     });

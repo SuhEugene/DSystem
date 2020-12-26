@@ -11,7 +11,8 @@ const userModel = new Schema({
   sex:      { type: Number },
   balance:  { type: Number },
   role:     { type: Number },
+  badges:   { type: Number },
   mayHave:  { type: Number },
-  freezed:  { type: Boolean, default: false}
+  frozen:  { type: Boolean }
 });
 module.exports = mongoose.model("users", userModel);

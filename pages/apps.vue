@@ -278,7 +278,6 @@ export default {
       }, { withCredentials: true }).then(this.refreshApps).catch(this.errorRefresh);
       this.appName = "";
     },
-    // BUG: avatar twice
     sendAllOfUs () {
       this.$refs.appName.innerText = this.$refs.appName.innerText.replace("\n", "");
       this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.replace("\n", "");

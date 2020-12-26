@@ -112,7 +112,8 @@ app.get("/user/:id", (req, res) => {
       id: user.id,
       role: user.role,
       status: user.status,
-      username: user.username
+      username: user.username,
+      badges: user.badges
     });
   });
 });
@@ -150,7 +151,13 @@ app.use(function(req, res, next) {
       } catch (e) {
         return res.status(400).send({ error: "Non registred", e: "NRG" })
       }
-      if (req.user.freezed) return res.status(418).send({ error: "Freezed", e: "F" })
+      if (req.user.frozen) return res.status(418).send({
+        error: "Frozen", e: "F",
+        id: req.user.id,
+        uuid: req.user.uuid,
+        _id: req.user._id,
+        username: req.user.username
+      })
       req.io = io;
       next();
     });

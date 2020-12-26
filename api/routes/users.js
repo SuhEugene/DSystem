@@ -1,5 +1,6 @@
 /* global require module */
 const express = require("express");
+const mongoose = require("mongoose");
 const User = require("../models/user");
 const Logs = require("../models/logs");
 const userRouter = express.Router();
@@ -41,7 +42,8 @@ userRouter
       username: req.user.username,
       mayHave: req.user.mayHave,
       sex: req.user.sex,
-      logs: await getLogs(req)
+      logs: await getLogs(req),
+      badges: req.user.badges
     });
   })
   .get("/@me/logs", (req, res) => {
@@ -61,6 +63,22 @@ userRouter
       username: req.user.username,
       logs: await getLogs(req)
     });
+  })
+  .use("/@me/clear", async (req, res) => {
+    let cd = cooldown[req.user.id] ? cooldown[req.user.id]["clearCookie"] : {};
+    if (cd && cd > Date.now()) return res.status(400).send({ error: "Cooldown", time: cd });
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    req.user.login = randStr();
+    if (!cooldown[req.user.id]) cooldown[req.user.id] = {};
+    cooldown[req.user.id]["clearCookie"] = Date.now() + 600000; // 10 mins
+    await req.user.save();
+
+    await session.commitTransaction();
+    session.endSession();
+    res.send();
   })
   .use("/:id", (req, res, next) => {
     if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
@@ -102,7 +120,7 @@ userRouter
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    req.subUser.freezed = !req.subUser.freezed;
+    req.subUser.frozen = !req.subUser.frozen;
     await req.subUser.save();
 
     await session.commitTransaction();
@@ -111,5 +129,13 @@ userRouter
     logger.log("(Frozen)", req.user.id, "frozen", req.subUser.id );
 
   });
+
+  const alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-_+=$#";
+  const rand = () => alphabet[Math.floor(Math.random()*alphabet.length)];
+  const randStr = () => {
+    let text = "";
+    for (let i = 0; i < 10; i++) { text += rand() }
+    return text;
+  }
 
 module.exports = userRouter;

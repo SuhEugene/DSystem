@@ -76,7 +76,6 @@ router
   .use("/logout", (req, res) => {
     res.clearCookie("auth").clearCookie("refresh").send();
   })
-
   .use("/discord", async (req, res) => {
     let { id, username } = await getDiscord(
       req.body.client_id,

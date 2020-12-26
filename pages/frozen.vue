@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <img :src="this.$auth.user ? `https://minotar.net/armor/bust/${this.$auth.user.uuid || this.$auth.user.username}/300.png` : ''" alt="">
+    <img :src="this.$auth.user ? `https://minotar.net/armor/bust/${this.$auth.user.uuid || this.$auth.user.username}/300.png` : '/favicon.png'" alt="">
     <div class="big">Чел ты... заморожен</div>
     <div class="small">Нет блять забанен</div>
   </div>
@@ -31,11 +31,14 @@ export default {
     img {
       max-width: 300px;
       width: calc(100% - 120px);
-      background: #222;
       box-sizing: content-box;
       padding: 25px;
       border: 3px solid white;
       box-shadow: 0 0 0 4px black, 0 0 0 5px white;
+      background: #151515;
+      background-image: linear-gradient(45deg, #333 25%, transparent 25%), linear-gradient(-45deg, #333 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #333 75%), linear-gradient(-45deg, transparent 75%, #333 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     }
     .big, .small {
       font-family: "Merriweather", "Times New Roman", serif;

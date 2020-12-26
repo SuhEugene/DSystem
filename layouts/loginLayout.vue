@@ -41,11 +41,11 @@ export default {
         },
         {
           property: "og:title",
-          content: "Dromon"
+          content: "Dromon - быстро, чётко, заебись!"
         },
         {
           name: "title",
-          content: "Dromon"
+          content: "Dromon - быстро, чётко, заебись!"
         },
         {
           property: "og:url",

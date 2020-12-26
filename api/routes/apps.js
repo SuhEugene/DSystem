@@ -135,22 +135,24 @@ router
     res.send({ success: true });
 
     if (!req.app.eventUrl) return;
-    fetch(req.app.eventUrl, {
-      body: JSON.stringify({
-        text: req.body.text || 'Пожертвование',
-        uid: req.body.uid || '0',
-        time: logs.timestamp,
-        sum,
-        user: {
-          username: req.user.username,
-          id: req.user.id,
-          uuid: req.user.uuid,
-          _id: req.user._id
-        }
-      }),
-      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${md5(String(req.app.secret))}` },
-      method: "POST"
-    }).then(pass).catch(pass);
+    try {
+      fetch(req.app.eventUrl, {
+        body: JSON.stringify({
+          text: req.body.text || 'Пожертвование',
+          uid: req.body.uid || '0',
+          time: logs.timestamp,
+          sum,
+          user: {
+            username: req.user.username,
+            id: req.user.id,
+            uuid: req.user.uuid,
+            _id: req.user._id
+          }
+        }),
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${md5(String(req.app.secret))}` },
+        method: "POST"
+      }).then(pass).catch(pass);
+    } catch (e) {}
   })
   .use((req, res, next) => {
     if (String(req.app.owner) != String(req.user._id)) return res.status(403).send({ error: "Access denied" });

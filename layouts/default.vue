@@ -5,6 +5,11 @@
         <div style="margin-bottom:2px"><b>Интернет соединение потеряно</b></div>
         <div style="opacity:0.75">Данные могут быть неактуальны</div>
       </div>
+      <div id="notifications">
+        <transition-group name="notification">
+          <Notification v-for="n in $store.state.notifications" :data="n" :key="n.id" />
+        </transition-group>
+      </div>
     </client-only>
     <transition name="page">
       <div v-if="readyState" class="main-loading-page" :class="rand">
@@ -18,6 +23,7 @@
 /* global process */
 
 import DromonLogo from "~/components/DromonLogo";
+import Notification from "~/components/Notification";
 
 // console.log(Date.now().getHour())
 
@@ -35,8 +41,8 @@ export default {
         lang: 'ru'
       },
       meta: [
-        { property: "og:title", content: "Dromon System" },
-        { name: "title", content: "Dromon" },
+        { property: "og:title", content: "Dromon - быстро, чётко, заебись!" },
+        { name: "title", content: "Dromon - быстро, чётко, заебись!" },
         {
           property: "og:url",
           content: process.env.thisUrl+"/"
@@ -61,6 +67,6 @@ export default {
       this.readyState = false;
     }
   },
-  components: { DromonLogo }
+  components: { DromonLogo, Notification }
 };
 </script>

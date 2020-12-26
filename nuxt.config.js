@@ -55,14 +55,14 @@ export default {
    ** Doc: https://vue-meta.nuxtjs.org/api/#metainfo-properties
    */
   head: {
-    title: "Dromon",
+    title: "Dromon - быстро, чётко, заебись!",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      {
-        property: "theme-color",
-        content: "#346db3"
-      }
+      // {
+      //   property: "theme-color",
+      //   content: "#346db3"
+      // }
     ],
     link: [
       // {
@@ -80,16 +80,16 @@ export default {
       // TODO: Большая круглая икнока на сайте, маленькая квадратная в приложении
       {
         rel: "icon",
-        href: "/favicon.ico"
+        href: "/favicon.png"
       },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap"
       },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap"
-      }
+      // {
+      //   rel: "stylesheet",
+      //   href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap"
+      // }
     ]
   },
   // serverMiddleware: { "/api": "~/api" },
@@ -142,11 +142,16 @@ export default {
   ],
   pwa: {
     meta: {
-      name: "Dromon",
+      name: null,
+      title: null,
+      ogTitle: null,
       author: "SuhEugene",
-      description: "Приложение для быстрой оплаты АРами чего угодно, где угодно и когда угодно",
+      description: null,
       theme_color: "#346db3",
+      ogSiteName: "Dromon System",
+      twitterCreator: "SuhEugene",
       lang: "ru",
+      favicon: false
     },
     manifest: {
       name: 'Dromon - оплати здесь и сейчас',
