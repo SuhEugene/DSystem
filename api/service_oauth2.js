@@ -58,7 +58,15 @@ const tokenExchange = Joi.object({
   code: Joi.string().min(12).required()
 });
 
-const validator = { tokenExchange, getCode, refreshExchange: tokenExchange };
+const refreshExchange = Joi.object({
+  client_id: Joi.string().hex().length(24).required(),
+  client_secret: Joi.string().min(6).required(),
+  redirect_uri: Joi.string().max(64).required(),
+  scope: Joi.array().items(Joi.string().max(20)).required(),
+  refresh_token: Joi.string().min(12).required()
+});
+
+const validator = { tokenExchange, getCode, refreshExchange };
 
 
 let codes = [];
@@ -160,7 +168,7 @@ app
       });
     });
   })
-  .use(async (req, res) => {
+  .use(async (req, res, next) => {
     let token = req.headers.authorization && req.headers.authorization.replace("Bearer ", "");
     if (!token) return;
     jwt.verify(token, process.env.ACCESS_SECRET, async (err, data) => {
@@ -168,17 +176,23 @@ app
       if (err) return res.status(400).send({ error: "Invalid token", e: "IT" });
       try {
         const user = await User.findOne({ _id: data.user_id });
-        let response = {};
-        for (let scope in scopeUserData) {
-          if (!data.scope.includes(scope)) continue;
-          for (let field of scopeUserData[scope])
-            response[field] = user[field];
-        }
-        return res.send(response);
+        if (!user) return res.status(404).send({ error: "User not found", e: "UNF" });
+        req.user = user;
+        req.data = data;
+        next()
       } catch (e) {
         return res.status(400).send({ error: "Invalid user", e: "EIU" });
       }
     })
+  })
+  .get("/api/user", async (req, res) => {
+    let response = {};
+    for (let scope in scopeUserData) {
+      if (!req.data.scope.includes(scope)) continue;
+      for (let field of scopeUserData[scope])
+        response[field] = req.user[field];
+    }
+    return res.send(response);
   })
 
 app.listen(8082, () => console.log("> OAuth2 service started on *:8082"))

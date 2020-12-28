@@ -95,6 +95,14 @@ router
     if (!verifyPassword(req.body.password, req.user.password))
       return res.status(403).send({ error: "Invalid password", e: "IP" });
 
+    if (req.app.sign){
+      if (!req.body.sign) return res.status(400).send({ error: "Signature" });
+
+      const hash = md5(`${req.body.uid}.${req.body.text}.${req.body.sum}.${req.app._id}.${req.app.secret}`);
+      logger.log("(Apps SEND) hash", hash, req.body.sign);
+      if (req.body.sign != hash) return res.status(400).send({ error: "Signature" })
+    }
+
     let { value: sum, error } = sumTest.validate(req.body.sum);
     if (!!error) return res.status(400).send({ error: "Invalid body", e: "IB", joie: error });
 

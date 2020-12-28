@@ -2,7 +2,7 @@
   <form id="app-send" onsubmit="() => false">
     <div v-if="app === false">
       <h2>Ошибка</h2>
-      <p>Приложение не найдено</p>
+      <p>{{loadErr == "sign" ? 'Неверная подпись запроса приложения' : 'Приложение не найдено'}}</p>
       <a href="javascript:void(0)" class="primary btn" @click="back">Назад</a>
     </div>
     <SuccessOverlay v-if="page === 2" />
@@ -99,15 +99,25 @@ import ErrorOverlay from "~/components/ErrorOverlay";
       error: null,
       redirectValid: false
     }),
-    async asyncData({ app, params }) {
+    async asyncData({ app, params, route, ...args }) {
       try {
+        let sendData = [
+          `uid=${route.query.uid || '0'}`,
+          `sum=${params.sum || '0'}`,
+          `text=${route.query.text || '0'}`,
+          `sign=${route.query.sign || '0'}`
+        ]
         console.log(`/apps/${params.app.split("?")[0].split("#")[0]}`);
-        console.log((await app.$api.get(`/apps/${params.app.split("?")[0].split("#")[0]}`)).data);
-        return {app: (await app.$api.get(`/apps/${params.app.split("?")[0].split("#")[0]}`)).data};
-      } catch (err) {
-        console.warn("SUKA ERR", err);
-        console.warn(err.response.data);
-        return {app: false};
+        // console.log((await app.$api.get(`/apps/${params.app.split("?")[0].split("#")[0]}`)).data);
+        return { app: (
+          await app.$api.get(`/apps/${params.app.split("?")[0].split("#")[0]}${encodeURI(route.query.sign ? '?' + sendData.join("&") : '')}`)
+        ).data, loadErr: null };
+      } catch (e) {
+        console.warn("SUKA ERR", e);
+        console.warn(e.response);
+        if (e.response && e.response.data && e.response.data.error == "Signature")
+          return { app: false, loadErr: "sign"}
+        return {app: false, loadErr: true};
       }
     },
     methods: {
@@ -145,6 +155,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
 
         (this.$route.query.text) ? data.text = this.$route.query.text : '';
         (this.$route.query.uid)  ? data.uid  = this.$route.query.uid  : '';
+        (this.$route.query.sign)  ? data.sign  = this.$route.query.sign  : '';
         (this.$route.query.redirect_uri)  ? data.redirectURI  = this.$route.query.redirect_uri  : '';
         try {
           let r = await this.$axios.post( `/apps/${this.$route.params.app}/send`, data, { withCredentials: true });
@@ -174,7 +185,9 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     components: { SuccessOverlay, ErrorOverlay, AppImg },
     fetchOnServer: true,
     head () {
-      const title = !this.app.name ? 'Ошибка - приложение не найдено' : ((this.$route.params.sum) ?
+      const title = this.loadErr ?(this.loadErr == 'sign' ?
+      'Ошибка - неверная подпись запроса приложения' :'Ошибка - приложение не найдено'):
+      ((this.$route.params.sum) ?
         `${this.app.name} - запрос ${this.$route.params.sum} АР` :
         `${this.app.name} - перевод приложению`);
       const description = !this.app.name ? 'Приложение не существует или идентификатор указан неправильно' : this.app.description;

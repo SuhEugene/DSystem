@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const appModel = new Schema({
   balance: { type: Number, default: 0 },
+  sign:        { type: Boolean },
   name:        { type: String },
   avatar:      { type: String },
   avatarDel:   { type: String },

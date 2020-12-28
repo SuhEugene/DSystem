@@ -16,6 +16,7 @@ const userRouter = require("./routes/users");
 const appRouter = require("./routes/apps");
 const moneyRouter = require("./routes/money");
 const authRouter = require("./routes/auth");
+const md5 = require('js-md5');
 const Joi = require("joi");
 require("dotenv").config();
 
@@ -94,6 +95,8 @@ app.use((req, res, next) => {
   next();
 });
 
+// TODO: Кэширование
+
 app.get("/user/:id", (req, res) => {
   console.log(req.method, req.path, req.params.id);
   if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
@@ -125,6 +128,14 @@ app.get("/apps/:id", async (req, res) => {
     app = await App.findOne({ _id: req.params.id });
   }
   if (!app) return res.status(404).send({ error: "App not found" });
+  console.log("SIGN", app.sign)
+  if (app.sign) {
+    if (!req.query.sign) return res.status(400).send({ error: "Signature" });
+
+    const hash = md5(`${req.query.uid}.${req.query.text}.${req.query.sum}.${app._id}.${app.secret}`);
+    logger.log("(Apps GETTER) hash", hash, req.query.sign);
+    if (req.query.sign != hash) return res.status(400).send({ error: "Signature" })
+  }
   req.app = app;
   res.status(200).send(app);
 });
