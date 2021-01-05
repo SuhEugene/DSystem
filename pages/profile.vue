@@ -62,7 +62,7 @@
           <h1 style="margin-top: 40px;">Приложения</h1>
           <div id="apps-page" class="apps-container" style="flex-direction: row; flex-wrap: wrap; justify-content: flex-start;">
             <template v-if="$fetchState.pending">
-              <div class="app app--many loading" v-for="t in 3" :key="t">
+              <div class="app app--many loading" style="max-width: 250px;"  v-for="t in 3" :key="t">
                 <AppImg :app="false" />
                 <div class="app__data">
                   <div class="app__title"></div>

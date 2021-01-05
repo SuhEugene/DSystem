@@ -16,9 +16,7 @@
           </div>
         </div>
         <div class="profile-nav__row">
-          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
-            <CubeScanIcon size="26"/>
-          </div>
+
           <!-- TODO фриз/анфриз модерами по нику -->
           <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
             <AccountGroupOutlineIcon size="26"/>
@@ -26,6 +24,9 @@
 
           <div tooltip="Смена темы" @click="$parent.themeChange" class="profile-nav__button">
             <WeatherNightIcon size="26"/>
+          </div>
+          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
+            <CubeScanIcon size="26"/>
           </div>
           <div tooltip="Настройки" @click="next('s0')" class="profile-nav__button">
             <CogOutlineIcon size="26"/>
