@@ -114,6 +114,10 @@ p, .p {
   color: $text-subtext;
 }
 
+n {
+  font-weight: normal;
+}
+
 .error   { color: $always-error; }
 .danger  { color: $always-danger; }
 .success { color: $always-success; }
@@ -315,8 +319,8 @@ input[type=text], input[type=password], input[type=number], input[type=email], i
   }
 }
 
-input[type=radio] {
-  position: absolute;
+input[type=radio], input[type=checkbox] {
+  position: fixed;
   top: 0;
   left: 0;
   opacity: 0;
@@ -324,7 +328,7 @@ input[type=radio] {
   height: 1px;
   cursor: pointer;
 }
-label.radio {
+label.radio, label.checkbox {
   cursor: pointer;
   display: flex;
   justify-content: flex-start;
@@ -871,189 +875,25 @@ button, a.btn, .btn {
     }
   }
 }
-.history-el {
-  display: grid;
-  grid-template-columns: 110px 150px 150px 1fr auto;
-  // grid-template-rows: auto;
-  grid-gap: 32px;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px 30px;
-  border-radius: $card-border-radius;
-  transition: 0.13s all;
-  // height: 80px;
-  // cursor: pointer;
-  background: $card-background;
-  box-shadow: $card-shadow;
-  margin-bottom: 8px;
-  animation: yellowbg 2s;
-  &:last-child {
-    margin-bottom: 0;
-  }
-  &:hover {
-    // background: $card-hover;
-    box-shadow: $card-hshadow;
-  }
-  &__space {display:none; flex-grow: 1;}
-  &__icon {
-    // grid-area: icon;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    &--i {
-      margin-right: 12px;
-      color: $text-simple;
-      &[tooltip] {position: relative;}
-      &[tooltip]::before {
-        font-weight: normal;
-        content: attr(tooltip);
-        color: $always-white;
-        background: $always-black;
-        padding: 6px 8px;
-        border-radius: 6px;
-        font-size: 14px;
-        line-height: 16px;
-        display: block;
-        position: absolute;
-        left: 100%;
-        top: 6px;
-        margin-left:2px;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-      }
-      &[tooltip]::after {
-        font-weight: normal;
-        content: "";
-        width: 0;
-        height: 0;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-        border-right: 5px solid $always-black;
-        position: absolute;
-        top: 16px;
-        right: -2px;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-      }
-      &:hover {
-        &[tooltip]::before, &[tooltip]::after {
-          opacity: 1;
-        }
-      }
-    }
-    &--datetime {
-      font-size: 14px;
-      color: $text-light;
-    }
-  }
-  &__user {
-    // &--1 { grid-area: user1; }
-    // &--2 { grid-area: user2; }
-    max-width: 100%;
-    overflow: hidden;
-    &--title {
-      font-size: 12px;
-      color: $text-light;
-    }
-    &--value {
-      max-width: 100%;
-      font-size: 20px;
-      color: $text-simple;
-      overflow: hidden;
-      display: inline-block;
-      max-height: 40px;
-      white-space: nowrap;
-      word-wrap: none;
-      word-break: keep-all;
-      text-overflow: ellipsis;
-      // font-weight: $font-bold;
-    }
-  }
-  &__comm {
-    // grid-area: comm;
-    // .history-el__user--value {
-    //   font-weight: normal;
-    max-width: 100%;
-    overflow: hidden;
-    // }
-    .history-el__user {
-      &--value {
-        max-width: 100%;
-        display: inline-block;
-        white-space: nowrap;
-        word-wrap: none;
-        word-break: keep-all;
-        text-overflow: ellipsis;
-      }
-    }
-  }
-  // &__icon,
-  // &__user,
-  // &__comm {
-  //   margin-right: 32px;
-  // }
-  &__sum {
-    justify-self: end;
-    // grid-area: sum;
-    font-size: 24px;
-    color: $text-simple;
-    &::before {
-      content: "+";
-      color: $text-light;
-      font-size: 24px;
-      margin-left: 2px;
-    }
-    &::after {
-      content: "АР";
-      color: $text-light;
-      font-size: 16px;
-      margin-left: 2px;
-    }
-    &--minus::before {
-      content: "-";
-    }
-  }
-  .dark & {
-    background: $dark-card-background;
-    box-shadow: $dark-card-shadow;
-    &:hover {
-      background: $dark-card-hover;
-    }
-    &__icon {
-      &--i {color: $dark-text-simple;}
-      &--datetime {color: $dark-text-light;}
-    }
-    &__user {
-      &--title {
-        color: $dark-text-subtext;
-      }
-      &--value {
-        color: $dark-text-simple;
-      }
-    }
-    &__sum {
-      color: $dark-text-simple;
-      &::before {
-        color: $dark-text-light;
-      }
-      &::after {
-        color: $dark-text-subtext;
-      }
-    }
-  }
-}
-.history {
+.profile-section {
   @include bcontainer;
   padding: 40px 64px;
   h1 {
     width: 100%;
   }
-  &__inner {
+  &__in {
     @include bcontainer-in;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  &__left, &__right {
+    width: calc(50% - 15px);
+  }
+}
+
+.history {
     &__data {
       padding: 5px 10px;
       height: 100%;
@@ -1087,10 +927,6 @@ button, a.btn, .btn {
         }
       }
     }
-  }
-}
-@keyframes yellowbg {
-  from {background: $always-primary;}
 }
 
 .send-money {
@@ -1130,7 +966,7 @@ button, a.btn, .btn {
 }
 
 #notifications {
-  position: absolute;
+  position: fixed;
   top: 2px;
   z-index: 30;
   right: 2px;
@@ -1175,6 +1011,7 @@ button, a.btn, .btn {
     max-width: 50px;
     max-height: 50px;
     margin-right: 10px;
+    border-radius: 8px;
   }
   &__title {
     font-weight: bold;
@@ -1289,6 +1126,25 @@ button, a.btn, .btn {
       font-weight: normal;
       .dark & { color: $dark-text-subtext; }
     }
+    &.loading {
+      animation: app_pulse 1s linear infinite both;
+      .app__title {
+        height: 20px;
+        width: 160px;
+        background: $text-light;
+        border-radius: 4px;
+      }
+      .app__info {
+        height: 16px;
+        background: $text-light;
+        border-radius: 4px;
+        width: 100px;
+        margin-top: 4px;
+        &:last-child {
+          width: 130px;
+        }
+      }
+    }
     &--many { margin: 5px 10px; }
     &.active {
       box-shadow: $card-shadow, inset 0 0 0 1px $always-primary;
@@ -1298,7 +1154,10 @@ button, a.btn, .btn {
     }
     &__info {
       display: -webkit-box;
+      -moz-line-clamp: 2;
+      -moz-box-orient: vertical;
       -webkit-line-clamp: 2;
+      line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1319,7 +1178,10 @@ button, a.btn, .btn {
       margin-bottom: 5px;
       word-break: break-word;
       display: -webkit-box;
+      -moz-line-clamp: 1;
+      -moz-box-orient: vertical;
       -webkit-line-clamp: 1;
+      line-clamp: 1;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1401,10 +1263,43 @@ button, a.btn, .btn {
         box-shadow: $dark-card-shadow, inset 0 0 0 1px $always-primary;
       }
       &__title {color: $dark-text-heading;}
+      &.loading {
+        animation: dark_app_pulse 1s linear infinite both;
+        .app__title {
+          background: $dark-text-light;
+        }
+        .app__info {
+          background: $dark-text-light;
+        }
+      }
     }
     #one-app {
       box-shadow: $dark-card-shadow;
     }
+  }
+}
+
+@keyframes app_pulse {
+  from {
+    background-color: $card-background;
+  }
+  50% {
+    background-color: darken($card-background, 3);
+  }
+  to {
+    background-color: $card-background;
+  }
+}
+
+@keyframes dark_app_pulse {
+  from {
+    background-color: $dark-card-background;
+  }
+  50% {
+    background-color: lighten($dark-card-background, 2);
+  }
+  to {
+    background-color: $dark-card-background;
   }
 }
 
@@ -1634,19 +1529,22 @@ button, a.btn, .btn {
         order: 2;
     }
   }
-  .history-el {
-    justify-content: space-between;
-    // grid-template-rows: none;
-    grid-gap: 16px;
-    grid-template-columns: 110px 150px 150px auto;
-    // &__icon { grid-area: icon; }
-    // &__user--1 { grid-area: user1; }
-    // &__user--2 { grid-area: user2; }
-    &__sum  { grid-row: 1; grid-column: 4;}
-    &__comm {
-      grid-row: 2;
-      grid-column-start: 1;
-      grid-column-end: 5;
+  .profile-section {
+    &__in {
+      flex-direction: column;
+      flex-wrap: wrap;
+    }
+    &__left, &__right {
+      width: 100%;
+    }
+    &__right {
+      margin-top: 50px;
+    }
+    .cards-holder {
+      justify-content: flex-start;
+      .card {
+        margin-right: 7px;
+      }
     }
   }
 }
@@ -1656,17 +1554,6 @@ button, a.btn, .btn {
   }
 }
 @media (max-width: 800px) {
-  .history-el {
-    grid-template-columns: auto auto;
-    &__icon { grid-row: 1; grid-column: 1;}
-    &__user { grid-row: 2; }
-    &__sum  { grid-row: 1; grid-column: 2;}
-    &__comm {
-      grid-row: 3;
-      grid-column-start: 1;
-      grid-column-end: 3;
-    }
-  }
 }
 @media (max-width: 680px) {
   #apps-page main .apps {
@@ -1678,8 +1565,6 @@ button, a.btn, .btn {
   .history__inner::-webkit-scrollbar {
     width: 1px;
   }
-  .history-el {
-  }
 }
 @media (max-width: 550px) {
   .send-money > .heading {margin-bottom: 15px!important;}
@@ -1687,11 +1572,14 @@ button, a.btn, .btn {
   .send-money__avatar {margin-bottom: 10px!important;}
   .send-money__data {margin-left: 0!important;}
   .send-money__link {text-align: center!important;}
-  .history {
-    padding: 40px 20px;
+  .apps-container {
+    justify-content: center!important;
   }
-  .history-el__user--value {
-    font-size: 18px;
+  .cards-holder {
+    justify-content: center!important;
+  }
+  .profile-section {
+    padding: 32px 16px;
   }
   .profile-header {
     flex-direction: column;

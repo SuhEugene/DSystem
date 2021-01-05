@@ -11,10 +11,10 @@
         <p>Пароль</p>
         <input @focus="ck = false" type="password" v-model="login.password">
       </div> -->
-      <div>
+      <div style="margin-bottom: 0;">
         <button class="primary" @click="discordLogin" type="button">Открыть Discord</button>
         <!-- <button class="secondary" @click="discordLogin" type="button">Дискорд</button> -->
-        <NLink style="font-size: 16px; text-align: center; width: 100%;display:inline-block;margin-bottom:0;"
+        <NLink style="font-size: 16px; text-align: center; width: 100%;display:inline-block;margin-bottom:0!important;"
           to="/register"
         >Я не зарегистрирован...</NLink>
       </div>

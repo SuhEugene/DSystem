@@ -16,6 +16,8 @@ let getLogs = require("./getLogs");
 const sumTest = Joi.number().integer().min(1);
 const sumTestZero = Joi.number().integer().min(0);
 
+const hashTest = Joi.string().hex().length(24);
+
 const verifyPassword = (password, hash) => bcrypt.compareSync(password, hash);
 
 let cooldown = {
@@ -82,9 +84,12 @@ router
     if (!req.params.id) return res.status(400).send();
 
     let app = await App.findOne({ shortname: String(req.params.id) });
-    if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
-      app = await App.findOne({ _id: req.params.id });
-    }
+
+    try {
+      if (!app && parseInt(req.params.id, 16) && req.params.id.length == 24) {
+        app = await App.findOne({ _id: req.params.id });
+      }
+    } catch (e) {}
 
     if (!app) return res.status(404).send({ error: "App not found" });
     req.app = app;
@@ -98,9 +103,10 @@ router
     if (req.app.sign){
       if (!req.body.sign) return res.status(400).send({ error: "Signature" });
 
+      logger.log("(Apps SEND)", req.body,`${req.body.uid}.${req.body.text}.${req.body.sum}.${req.app._id}.${req.app.secret}`);
       const hash = md5(`${req.body.uid}.${req.body.text}.${req.body.sum}.${req.app._id}.${req.app.secret}`);
       logger.log("(Apps SEND) hash", hash, req.body.sign);
-      if (req.body.sign != hash) return res.status(400).send({ error: "Signature" })
+      if (req.body.sign != hash) return res.status(400).send({ error: "Signature" });
     }
 
     let { value: sum, error } = sumTest.validate(req.body.sum);
@@ -142,9 +148,11 @@ router
 
     res.send({ success: true });
 
+    logger.log("Have we any url?", !!req.app.eventUrl);
     if (!req.app.eventUrl) return;
+    logger.log("Trying send");
     try {
-      fetch(req.app.eventUrl, {
+      let r = await fetch(req.app.eventUrl, {
         body: JSON.stringify({
           text: req.body.text || 'Пожертвование',
           uid: req.body.uid || '0',
@@ -158,9 +166,29 @@ router
           }
         }),
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${md5(String(req.app.secret))}` },
-        method: "POST"
-      }).then(pass).catch(pass);
-    } catch (e) {}
+        method: "POST",
+        timeout: 30000,
+        redirect: 'error',
+        follow: 0
+      }).catch(pass);
+      try { logger.log("Stupid response", await r.json()); } catch (e) {logger.log("No response");}
+    } catch (e) {logger.log("[APP SEND ERRAR BLYAT]", e);}
+  })
+  .use("/:id/publish", async (req, res) => {
+    if (req.user.role < 3) return res.sendStatus(403);
+    const { error } = hashTest.validate(req.params.id);
+    if (error) return res.sendStatus(400);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    req.app.public = req.method == "POST";
+    await req.app.save();
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.sendStatus(200);
   })
   .use((req, res, next) => {
     if (String(req.app.owner) != String(req.user._id)) return res.status(403).send({ error: "Access denied" });
@@ -243,6 +271,10 @@ router
       if (!req.body[f] || req.app[f] == req.body[f]) continue;
       changed = true;
       req.app[f] = req.body[f].substr(0, fields[f]);
+    }
+
+    if (req.body.sign !== null && !!req.body.sign !== req.app.sign) {
+      req.app.sign = !!req.body.sign;
     }
 
     for (let f in changable) {

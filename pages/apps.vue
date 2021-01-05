@@ -10,7 +10,17 @@
     <main>
       <h1 style="margin-top: 30px;">Все приложения</h1>
       <div class="apps-container">
-        <a v-for="app in apps" :key="app._id"
+        <template v-if="$fetchState.pending">
+          <div class="app app--many loading" v-for="t in 3" :key="t">
+            <AppImg :app="false" />
+            <div class="app__data">
+              <div class="app__title"></div>
+              <div class="app__info"></div>
+              <div class="app__info"></div>
+            </div>
+          </div>
+        </template>
+        <a v-for="app in apps" :id="app._id" :key="app._id"
            target="_blank" rel="noreferrer"
            class="app app--many"
            :href="app.url">
@@ -30,7 +40,15 @@
         </div> -->
         <div class="wrap">
           <div class="apps">
-
+            <template v-if="$fetchState.pending">
+              <div class="app loading" v-for="t in 3" :key="t">
+                <AppImg :app="false" />
+                <div class="app__data">
+                  <div class="app__title"></div>
+                  <div class="app__info"></div>
+                </div>
+              </div>
+            </template>
             <div @click="setApp(app)" :class="{'active': currentApp._id == app._id & appOpened}" class="app" v-for="app in myApps" :key="app.id">
               <AppImg :app="app" />
               <div class="app__data">
@@ -40,7 +58,7 @@
             </div>
 
             <div @click="createAppMenu = !createAppMenu; appOpened = false" class="app"
-                 v-if="myApps.length < 3 || ($auth.user.mayHave && myApps.length < $auth.user.mayHave)">
+                 v-if="!$fetchState.pending && (myApps.length < 3 || ($auth.user.mayHave && myApps.length < $auth.user.mayHave))">
               <img src="https://docs.updatefactory.io/images/plus-icon.png" alt="add icon" class="app__image">
               <div class="app__data">
                 <div class="app__title">Создать</div>
@@ -71,12 +89,6 @@
 
               <h1 ref="appName" @blur="checkName" contenteditable class="app-name" v-text="currentApp.name"></h1>
               <div style="margin-bottom:15px;" ref="appDesc" class="app-description" @blur="checkDesc" contenteditable v-text="currentApp.description"></div>
-              <div v-if="secretPage" style="margin-top:7px"><b>ID:</b> {{currentApp._id}}</div>
-              <div v-if="secretPage" style="margin-top:7px">
-                <b>Secret:</b>
-                <span v-if="secretShow">{{currentApp.secret}}</span>
-                <a @click="secretShow = !secretShow" href="javascript:void(0)">{{secretShow ? "Скрыть" : "Показать"}}</a>
-              </div>
               <div style="margin-top:7px">
                 <b>Ссылка:</b>
                 <span>{{`https://drom.one/${currentApp.shortname || currentApp._id}`}}</span>
@@ -88,12 +100,22 @@
                 <small v-if="appError == 'url'">Такой url уже существует</small>
               </div>
               <div class="input">
-                <!-- TODO: design -->
                 Аватар
                 <label class="btn min" :class="!this.avatar ? 'primary' : 'secondary'" style="display: flex; margin-top: 5px;">
                   {{ !this.avatar ? "Загрузить" : "Файл прикреплён" }}
                   <input style="display: none" type="file" accept="image/jpeg,image/x-png,image/png" @change="newFile" />
                 </label>
+              </div>
+
+              <div class="input">
+                <a href="javascript:void(0)" @click="secretPage=!secretPage">Раздел хакера [{{secretPage ? 'Вкл' : 'Выкл'}}]</a>
+              </div>
+
+              <div v-if="secretPage" style="margin-top:14px"><b>ID:</b> {{currentApp._id}}</div>
+              <div v-if="secretPage" style="margin-top:7px">
+                <b>Secret:</b>
+                <span v-if="secretShow">{{currentApp.secret}}</span>
+                <a @click="secretShow = !secretShow" href="javascript:void(0)">{{secretShow ? "Скрыть" : "Показать"}}</a>
               </div>
               <div v-if="secretPage" class="input">
                 Ссылка на сайт
@@ -107,9 +129,12 @@
                 URL события
                 <input placeholder="https://example.com/handler.php" @blur="checkEventUrl" type="url" v-model="eventUrl">
               </div>
-
-              <div class="input">
-                <a href="javascript:void(0)" @click="secretPage=!secretPage">Режим хакера [{{secretPage ? 'Вкл' : 'Выкл'}}]</a>
+              <div v-if="secretPage" class="input">
+                Подпись товара
+                <label class="checkbox" :class="{'checked': sign }">
+                  <n>{{sign ? 'П' : 'Не п'}}роверяется</n>
+                  <input type="checkbox" v-model="sign">
+                </label>
               </div>
 
 
@@ -157,6 +182,13 @@
           </div>
         </div>
       </div>
+      <div class="apps" style="margin-top:50px;" v-if="$auth.user && $auth.user.role >= 3">
+        <input placeholder="app id" type="text" v-model="appToPublish">
+        <div class="input" style="margin-top: 10px;">
+          <button @click="publishApp(true)" class="min primary">Опубликовать</button>
+          <button @click="publishApp(false)" class="min primary">Удалить</button>
+        </div>
+      </div>
     </main>
   </section>
 </template>
@@ -169,21 +201,26 @@ import AppImg from "~/components/AppImg.vue";
 const accept = ["image/png", "image/jpeg", "image/jpg"]
 
 export default {
-  async asyncData({ $api, $axios, app }) {
+  name: "Apps",
+  async fetch() {//{ $api, $axios, app }
+    console.log("fetch")
     // console.log("helo")
     // console.log(app.$api.post)
     // console.log($api, $axios)
     let allApps = [];
     let myApps = [];
     try {
-      allApps = (await app.$api.get('/apps/all/public', { withCredentials: true })).data || [];
+      allApps = (await this.$api.get('/apps/all/public', { withCredentials: true })).data || [];
     } catch (e) {}
     try {
-      myApps = (await app.$api.get('/apps', { withCredentials: true })).data || [];
+      myApps = (await this.$api.get('/apps', { withCredentials: true })).data || [];
     } catch (e) {}
-    return { myApps: myApps, apps: allApps };
+    // return { myApps: myApps, apps: allApps };
+    this.myApps = myApps;
+    this.apps = allApps;
 
   },
+  fetchOnServer: false,
   data: () => ({
     myApps: [],
     apps: [],
@@ -196,9 +233,11 @@ export default {
     appName: '',
     shortname: '',
     avatar: '',
+    sign: null,
     url: '',
     eventUrl: '',
     redirectURI: '',
+    appToPublish: '',
     secretShow: false,
     loc: null,
     appError: false,
@@ -207,6 +246,10 @@ export default {
   mounted () {
     if (!this.$auth.loggedIn) this.$router.push('/login');
     if (process.browser) this.loc = window.location.host;
+    try {
+      // console.log("Mount fetch");
+      this.$fetch();
+    } catch (e) {console.warn(e)}
   },
   methods: {
     setApp (app) {
@@ -215,6 +258,7 @@ export default {
       this.appOpened = this.currentApp != app || !this.appOpened;
       this.currentApp = app;
       this.shortname = this.currentApp.shortname;
+      this.sign = this.currentApp.sign;
       // this.avatar = this.currentApp.avatar;
       this.url = this.currentApp.url;
       this.redirectURI = this.currentApp.redirectURI;
@@ -278,6 +322,13 @@ export default {
       }, { withCredentials: true }).then(this.refreshApps).catch(this.errorRefresh);
       this.appName = "";
     },
+    async publishApp (bool) {
+      if (!this.appToPublish) return;
+      if (bool) await this.$axios.post(`/apps/${this.appToPublish}/publish`)
+      else await this.$axios.delete(`/apps/${this.appToPublish}/publish`);
+
+      this.refreshApps(true);
+    },
     sendAllOfUs () {
       this.$refs.appName.innerText = this.$refs.appName.innerText.replace("\n", "");
       this.$refs.appDesc.innerText = this.$refs.appDesc.innerText.replace("\n", "");
@@ -288,7 +339,8 @@ export default {
         avatar: (this.avatar) ? this.avatar : '',
         url: (this.url) ? this.url.trim().substr(0, 64) : '',
         redirectURI: (this.redirectURI) ? this.redirectURI.trim().substr(0, 64) : '',
-        eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : ''
+        eventUrl: (this.eventUrl) ? this.eventUrl.trim().substr(0, 64) : '',
+        sign: (this.sign !== null) ? !!this.sign : null
       }
       this.$axios.$put(`/apps/${this.currentApp._id}`, data, { withCredentials: true })
       .then(_r => {this.refreshApps(true); this.avatar = "";}).catch(this.errorRefresh);
@@ -299,9 +351,14 @@ export default {
     },
     async refreshApps (save=false) {
       this.appError = false;
-      let apps = await this.$axios.get('/apps', { withCredentials: true });
+      let apps = await this.$api.get('/apps', { withCredentials: true });
       this.myApps = apps.data;
       console.log("SAVE", save);
+
+      try {
+        let allApps = (await this.$api.get('/apps/all/public', { withCredentials: true })).data || [];
+        this.apps = allApps;
+      } catch (e) {}
 
       if (save) return;
       this.bottomMenuStep = 0;
@@ -324,10 +381,9 @@ export default {
       this.outError = false;
       try {
         let r = await this.$axios.post(`/apps/${this.currentApp._id}/take`, { sum: this.outSum || 0 }, { withCredentials: true });
-        this.outSum = null;
         if (!r) { this.outError = "Неизвестная ошибка"; this.bottomMenuStep = 5; return;}
         this.bottomMenuStep = 4;
-        setTimeout(() => {this.refreshApps(false)}, 1000);
+        setTimeout(async () => {await this.refreshApps(false); this.outSum = null;}, 1000);
       } catch (e) {
         this.outError = "Неизвестная ошибка";
         if (e && e.response && e.response.data.e == "NEM") {

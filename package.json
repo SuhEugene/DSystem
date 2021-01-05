@@ -34,6 +34,7 @@
     "node-sass": "^4.14.1",
     "nuxt": "^2.12.2",
     "nuxt-socket-io": "^1.1.8",
+    "portal-vue": "^2.1.7",
     "reqlim": "^0.0.0",
     "sass-loader": "^9.0.2",
     "socket.io": "^2.3.0",

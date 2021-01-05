@@ -1,18 +1,25 @@
 <template>
-    <div class="app-img">
-        <div v-if="app.level == -1" class="app-badge app-badge--gray" tooltip="Сомнительное">!</div>
-        <div v-if="app.level == 1" class="app-badge" tooltip="Подтверждённое"><CheckIcon size="16"/></div>
-        <div v-if="app.level == 2" class="app-badge" tooltip="Партнёр"><ShipWheelIcon size="16"/></div>
-        <div v-if="app.level == 3" class="app-badge" tooltip="Официальное"><SailBoatIcon size="16"/></div>
-        <div class="app-image">
-            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-                 :style="app.avatar ? `background-image: url('${app.level >= 0 ? app.avatar: ''}')` : ''">
-            <div>
-              <CubeOutlineIcon v-if="app.level >=0" size="38" />
-              <EmoticonDevilOutlineIcon v-else size="38" />
-            </div>
+  <div class="app-img" :class="type=='52' ? 'app-img--52' : ''">
+    <template v-if="app">
+      <div v-if="app.level == -1" class="app-badge app-badge--gray" tooltip="Сомнительное">!</div>
+      <div v-if="app.level == 1" class="app-badge" tooltip="Подтверждённое"><CheckIcon size="16"/></div>
+      <div v-if="app.level == 2" class="app-badge" tooltip="Партнёр"><ShipWheelIcon size="16"/></div>
+      <div v-if="app.level == 3" class="app-badge" tooltip="Официальное"><SailBoatIcon size="16"/></div>
+      <div class="app-image">
+        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+             :style="app.avatar ? `background-image: url('${app.level >= 0 ? app.avatar: ''}')` : ''">
+        <div>
+          <CubeOutlineIcon v-if="app.level >=0" :size="type=='52' ? 30 : 38" />
+          <EmoticonDevilOutlineIcon v-else :size="type=='52' ? 30 : 38" />
         </div>
+      </div>
+    </template>
+    <div v-else class="app-image">
+      <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+      <div>
+      </div>
     </div>
+  </div>
 </template>
 <script>
 import CheckIcon from "mdi-vue/Check.vue";
@@ -23,7 +30,7 @@ import EmoticonDevilOutlineIcon from "mdi-vue/EmoticonDevilOutline.vue";
 // https://www.penpublishing.com/squaresMobileTest.jpg
 export default {
     name: "AppImg",
-    props: ["app"],
+    props: ["app", "type"],
     components: { CubeOutlineIcon, CheckIcon, SailBoatIcon, ShipWheelIcon, EmoticonDevilOutlineIcon }
 };
 </script>
@@ -69,6 +76,18 @@ $font: "Rubik", Arial, sans-serif;
   &--big, &--big img {
     height: 80px!important;
     width: 80px!important;
+  }
+  &--52 {
+    height: 52px!important;
+    width: 52px!important;
+    & > img, & > .app-image {
+      height: 52px!important;
+      width: 52px!important;
+      & > img {
+        height: 52px!important;
+        width: 52px!important;
+      }
+    }
   }
   & > img, & > .app-image {
     height: 64px;

@@ -36,6 +36,19 @@ class Auth {
       let r = await this.$api.get(this.$auth.discord.userinfo_endpoint, { withCredentials: true });
       debug("/*/ req was");
       this.user = r.data;
+      if (this.user.logs) {
+        let logs = [...this.user.logs];
+        let date = -1;
+        for (let i in logs) {
+          const d = new Date(logs[i].timestamp);
+          console.log("/*/ ds", d.getDate(), date);
+          if (d.getDate() == date) continue;
+          date = d.getDate();
+          logs[i].firstOfDay = true;
+        }
+        console.log("DDD", logs);
+        this.$store.commit("setLogs", logs);
+      }
       debug("/*/ user set");
       this.loggedIn = true;
       debug("/*/ logged in");
@@ -50,7 +63,7 @@ class Auth {
     } catch (e) {
       console.warn(e.response ? e.response.data : e);
       debug("/*/ fuck error");
-      debug("/*/ Da response", e.response.data);
+      debug("/*/ Da response", e.response ? e.response.data : 'no data');
       this.user = (e.response && e.response.data && e.response.data.uuid) ? e.response.data : false;
       debug("/*/ user", this.user);
       this.loggedIn = false;
@@ -132,7 +145,7 @@ function randString() {
 
 const debug = (...args) => console.log(...args);
 
-const free = ["/user", "/app", '/frozen'];
+const free = ["/user", "/app", '/frozen', '/oauth2'];
 
 export default async function (ctx, inject) {
 

@@ -29,6 +29,7 @@ export default {
   head () {
     if (this.$route.path.startsWith("/user")) return;
     if (this.$route.path.startsWith("/app")) return;
+    if (this.$route.path.startsWith("/oauth2")) return;
     return ({
       htmlAttrs: {
         lang: 'ru'

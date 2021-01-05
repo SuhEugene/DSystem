@@ -8,21 +8,22 @@
           <!-- TODO ВЫЗОВ БАНКИРА -->
           <div tooltip="Вызвать банкира" class="profile-nav__button">
             <AccountTieVoiceOutlineIcon size="26"/>
-          </div><div tooltip="Перевод" @click="next('t0')" class="profile-nav__button">
+          </div><div tooltip="Перевод" @click="next('t-1')" class="profile-nav__button">
             <ArrowRightBoldOutlineIcon size="26"/>
-          </div>
-          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
-            <CubeScanIcon size="26"/>
-          </div>
-        </div>
-        <div class="profile-nav__row">
-          <!-- TODO фриз/анфриз модерами по нику -->
-          <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
-            <AccountGroupOutlineIcon size="26"/>
           </div>
           <div tooltip="Банкир панель" @click="next('b0')" v-if="banker" class="profile-nav__button">
             <AccountCashOutlineIcon size="26"/>
           </div>
+        </div>
+        <div class="profile-nav__row">
+          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
+            <CubeScanIcon size="26"/>
+          </div>
+          <!-- TODO фриз/анфриз модерами по нику -->
+          <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
+            <AccountGroupOutlineIcon size="26"/>
+          </div>
+
           <div tooltip="Смена темы" @click="$parent.themeChange" class="profile-nav__button">
             <WeatherNightIcon size="26"/>
           </div>
@@ -37,7 +38,7 @@
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
                        v-model="username"
-                       :items="users.map(u => u.username + (u.frozen) ? ' [F]' : '').filter(u => u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
+                       :items="users.map(u => u.username + (u.frozen) ? ' [F]' : '').filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
                        @enterpress="!!users.find(u => u.username == username) ? next('mod1') : ''"
                        />
           </div>
@@ -71,17 +72,35 @@
 
       <!-- MONEY SENDING -->
       <template>
+        <div v-if="menu == 't-1'" key="t-1" class="profile-nav">
+          <div class="profile-nav__row">
+            <HelpInput type="text" placeholder="Карта"
+                       v-model="card"
+                       :items="cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()) )"
+                       @enterpress="!!cards.find(c => `${c.text} [${c.id}]` == card) ? next('t0') : ''"
+                       />
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="next('t0')" class="profile-nav__button profile-nav__button--w3"
+                 :class="{'profile-nav__button--disabled': !cards.find(c => `${c.text} [${c.id}]` == card)}">
+              Далее
+            </div>
+          </div>
+        </div>
         <!-- Username -->
         <div v-if="menu == 't0'" key="t0" class="profile-nav">
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
                        v-model="username"
-                       :items="users.map(u => u.username).filter(u => u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
+                       :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
                        @enterpress="!!users.find(u => u.username == username) ? next('t1') : ''"
                        />
           </div>
           <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+            <div tooltip="Назад" @click="back('t-1')" class="profile-nav__button">
               <BackIcon size="26"/>
             </div>
             <div @click="next('t1')" class="profile-nav__button profile-nav__button--w3"
@@ -156,7 +175,7 @@
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Отделение"
                        v-model="post"
-                       :items="posts.map(p => p.name).filter(p => p.toLowerCase().includes(post.toLowerCase()))"
+                       :items="posts.map(p => p.name).filter(p => p && p.toLowerCase().includes(post.toLowerCase()))"
                        @enterpress="!!posts.find(p => p.name == post) ? next('b1') : ''"/>
           </div>
           <div class="profile-nav__row">
@@ -174,8 +193,8 @@
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
               v-model="username"
-              :items="users.map(u => u.username).filter(u => u.toLowerCase().includes(username.toLowerCase() && u != $auth.user.username))"
-              @enterpress="!!users.find(u => u.username == username && u.username != $auth.user.username) ? next('b2') : ''"
+              :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase() /*&& u != $auth.user.username*/))"
+              @enterpress="!!users.find(u => u.username == username/* && u.username != $auth.user.username*/) ? next('b2') : ''"
               />
           </div>
           <div class="profile-nav__row">
@@ -183,7 +202,7 @@
               <BackIcon size="26"/>
             </div>
             <div @click="next('b2')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': !users.find(u => u.username == username && u.username != $auth.user.username)}">
+                 :class="{'profile-nav__button--disabled': !users.find(u => u.username == username /*&& u.username != $auth.user.username*/)}">
               Далее
             </div>
           </div>
@@ -314,14 +333,15 @@ import CloseNetworkOutlineIcon from "mdi-vue/CloseNetworkOutline.vue";
 // import Settings from "~/components/HeaderButtons/Settings.vue";
 
 export default {
-  props: ["moder", "banker", "posts", "users"],
+  props: ["moder", "banker", "posts", "users", "cards"],
   data: () => ({
     menu: false,
     animBack: false,
     username: "",
     sum: null,
     post: "",
-    comment: ""
+    comment: "",
+    card: ""
   }),
   components: {
     AccountTieVoiceOutlineIcon,
@@ -362,6 +382,7 @@ export default {
       this.sum = "";
       this.post = "";
       this.comment = "";
+      this.card = "";
     },
     async clearAllSessions () {
       try {
@@ -369,21 +390,87 @@ export default {
         this.$auth.logout();
       } catch (e) {}
     },
-    bankerAddMoney() {
+    async bankerAddMoney() {
       try {
-        this.$api.post(`/money/${this.users.find(u => u.username == this.username).id}/add`, {
+        await this.$api.post(`/cards/${this.users.find(u => u.username == this.username)._id}/add`, {
           sum: this.sum,
           post: this.posts.find(p => p.name == this.post).id
-        }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
-      } catch (e) {}
+        }, { withCredentials: true });
+        this.next(false);
+        this.clear();
+      } catch (e) {
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error == "Invalid card") {
+          text = "Неверная карта получателя"
+        }
+        if (err.error == "Invalid id") {
+          text = "Нельзя выполнять операции банкира с самим собой"
+        }
+        if (err.error == "Not enough money") {
+          text = "Недостаточно АР на счету"
+        }
+        if (err.error == "User not found") {
+          text = "Получатель не найден"
+        }
+        if (err.error == "toCard not found") {
+          text = "У получателя нет ни единой карты"
+        }
+        if (err.error == "Cooldown") {
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Может ты и банкир, но дудосить сервер тебе не разрешали'
+          })
+        }
+
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось совершить перевод: ${text}`
+        })
+      }
     },
-    sendMoney() {
+    async sendMoney() {
       try {
-        this.$api.post(`/money/send/${this.users.find(u => u.username == this.username).id}`, {
+        await this.$api.post(`/cards/send/${this.users.find(u => u.username == this.username)._id}`, {
+          card: this.cards.find(c => `${c.text} [${c.id}]` == this.card).id,
           sum: this.sum,
           comment: this.comment
-        }, { withCredentials: true }).then(r => { this.next(false); this.clear() });
-      } catch (e) {}
+        }, { withCredentials: true });
+        this.next(false);
+        this.clear();
+      } catch (e) {
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error == "Invalid card") {
+          text = "Неверная карта получателя"
+        }
+        if (err.error == "Invalid id") {
+          text = "Нельзя совершить перевод сам себе используя данный метод"
+        }
+        if (err.error == "Not enough money") {
+          text = "Недостаточно АР на счету"
+        }
+        if (err.error == "Card not found") {
+          text = "У вас нет ни единой карты"
+        }
+        if (err.error == "User not found") {
+          text = "Получатель не найден"
+        }
+        if (err.error == "toCard not found") {
+          text = "У получателя нет ни единой карты"
+        }
+        if (err.error == "Cooldown") {
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Всего пара сек и можно попытаться перевести ещё раз'
+          })
+        }
+
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось совершить перевод: ${text}`
+        })
+      }
     }
   }
 };

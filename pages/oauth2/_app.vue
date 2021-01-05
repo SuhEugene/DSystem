@@ -102,9 +102,9 @@ export default {
   layout: "loginLayout",
   async asyncData({ app, params }) {
     try {
-      return { app: (await app.$api.get(`/apps/${params.app}`)).data };
+      return { app: (await app.$api.get(`/apps/${params.app}`)).data, loadErr: false };
     } catch (err) {
-      return { app: false };
+      return { app: false, loadErr: true };
     }
   },
   data: () => ({
@@ -162,7 +162,24 @@ export default {
       }
     }
   },
-  components: { CheckIcon, SuccessOverlay, ErrorOverlay, CloseIcon, AppImg }
+  components: { CheckIcon, SuccessOverlay, ErrorOverlay, CloseIcon, AppImg },
+  head () {
+    const title = this.loadErr ? 'Ошибка - приложение не найдено' : `${this.app.name} - авторизация в приложении`;
+    const description = !this.app.name ? 'Приложение не существует или идентификатор указан неправильно' : this.app.description;
+    return ({
+      title,
+      meta: [
+        { name: "title", content: title },
+        { property: "og:title", content: title },
+        { hid: "description", name: "description", content: description || "Описание отсутствует" },
+        { property: "og:description", content: description || "Описание отсутствует" },
+        { property: "og:url", content: `${process.env.thisUrl}${this.$route.path}` },
+        { property: "og:site_name", content: "Dromon System" },
+        { property: "og:image", content: this.app.avatar || '' },
+      ],
+      link: [{ rel: "canonical", href: `${process.env.thisUrl}${this.$route.path}` }]
+    });
+  }
 };
 </script>
 <style>
