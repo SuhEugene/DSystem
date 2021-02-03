@@ -117,6 +117,7 @@ export default {
     "@nuxtjs/axios",
     // "@nuxtjs/auth",
     // "@nuxtjs/proxy",
+    'portal-vue/nuxt',
     "nuxt-socket-io"
   ],
 

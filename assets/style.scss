@@ -489,6 +489,7 @@ button, a.btn, .btn {
     overflow: auto;
     &__item {
       padding: 10px 20px;
+      margin-bottom: 0!important;
       color: $text-simple;
       cursor: pointer;
       &--selected {
@@ -728,6 +729,9 @@ button, a.btn, .btn {
     }
     &--w3 {
       width: 165px;
+    }
+    &--w4 {
+      width: 225px;
     }
     &--disabled {
       opacity: 0.5;

@@ -95,11 +95,14 @@ app.get("/user/:id", (req, res) => {
 });
 
 app.get("/apps/:id", async (req, res) => {
+  console.log("APPS GET", req.params.id);
   if (!req.params.id) return res.status(400).send();
+
   let app = await App.findOne({shortname: String(req.params.id).toLowerCase()});
   if (!app && parseInt(req.params.id, 16) && req.params.id.length === 24) {
     app = await App.findOne({ _id: req.params.id });
   }
+  console.log("WHERE APP?", app);
   if (!app) return res.status(404).send({ error: "App not found" });
   console.log("SIGN", app.sign)
   if (app.sign) {

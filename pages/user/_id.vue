@@ -22,30 +22,29 @@
             </div>
             <div class="send-money__data">
               <div class="attrs">
-                <div class="attrs__one" style="margin-bottom: 10px;" v-if="$auth.loggedIn && $auth.user.balance > 0">
-                  <div class="attrs__one__title">Ваш баланс</div>
-                  <div class="attrs__one__text">{{$auth.user.balance}} АР</div>
-                </div>
                 <div class="attrs__one" style="margin-bottom: 10px;" v-if="$route.params.sum">
                   <div class="attrs__one__title">Сумма</div>
                   <div class="attrs__one__text">{{parseInt($route.params.sum, 10)}} АР</div>
                 </div>
               </div>
-              <div class="last" v-if="!$auth.loggedIn">Войдите, чтобы получить возможность перевести {{sum || "какую-либо сумму"}} АР</div>
-              <div class="last" v-if="$auth.loggedIn && ($auth.user.balance <= 0 || (parseInt($route.params.sum, 10) && $auth.user.balance < $route.params.sum))">
-                На вашем счету недостаточно средств, чтобы перевести {{sum || "какую-либо сумму"}} АР
-              </div>
+              <div class="last" v-if="!$auth.loggedIn">Войдите, чтобы получить возможность перевести {{intSum || "какую-либо сумму"}} АР</div>
 
-              <div v-if="!$route.params.sum && $auth.loggedIn && $auth.user.balance > 0">
+              <div v-if="!$route.params.sum && $auth.loggedIn">
                 <div class="attrs__one__title">Сумма</div>
                 <input type="number" min="1" v-model="sum">
               </div>
-              <div style="margin-top:10px;" v-if="$auth.loggedIn && $auth.user.balance > 0">
-                <button class="primary"
-                        @click="step = 1"
-                        type="button"
-                        :class="{'disabled': $auth.user.balance < sum || sum <= 0 || sum > 62208}"
-                  >Отправить сумму</button>
+              <div class="attrs__one" v-if="!$route.params.sum && $auth.loggedIn">
+                <div class="attrs__one__title">Карта</div>
+                <HelpInput type="text" v-model="card"
+                           :items="$auth.user.cards.map(c => `${c.id} [${c.balance}АР]`)
+                                        .filter(c => c.toLowerCase()
+                                        .includes(card.toLowerCase()))" />
+              </div>
+
+              <div style="margin-top:10px;" v-if="$auth.loggedIn">
+                <button class="primary" @click="step = 1"
+                        :class="!currentCard._id || !intSum || currentCard.balance < intSum ? 'disabled' : ''"
+                        type="button">Отправить сумму</button>
                 <NLink
                   style="font-size: 16px; text-align: left; width: 100%;display:inline-block"
                   :to="$auth.loggedIn ? '/profile' : '/login'"
@@ -53,11 +52,9 @@
                 >Нет, не хочу отправлять</NLink>
               </div>
               <NLink
-                  v-else
+                  v-else :to="$auth.loggedIn ? '/profile' : '/login'"
                   style="font-size: 16px; text-align: left; width: 100%;display:inline-block"
-                  :to="$auth.loggedIn ? '/profile' : '/login'"
-                  class="send-money__link"
-                >{{$auth.loggedIn ? "В профиль" : "Вход"}}</NLink>
+                  class="send-money__link">{{$auth.loggedIn ? "В профиль" : "Вход"}}</NLink>
             </div>
           </div>
           <div v-if="step == 1" key=1 style="display: flex;flex-direction: column;align-items: center;justify-content: center;">
@@ -71,7 +68,7 @@
                 <div class="attrs__one__title">Пользователь</div>
                 <div class="attrs__one__text">{{user.username}}</div>
               </div>
-              <div class="attrs__one">
+              <div class="attrs__one" style="width: 100%;">
                 <div class="attrs__one__title">Пароль</div>
                 <input type="password" @keypress.enter="sendSum" v-model="password">
               </div>
@@ -126,20 +123,21 @@
 import UserAvatar from "~/components/UserAvatar.vue";
 import SuccessOverlay from "~/components/SuccessOverlay.vue";
 import ErrorOverlay from "~/components/ErrorOverlay.vue";
+import HelpInput from "~/components/HelpInput.vue";
 
 export default {
   auth: false,
   layout: "loginLayout",
   components: {
-    UserAvatar,
-    SuccessOverlay,
-    ErrorOverlay
+    UserAvatar, SuccessOverlay,
+    ErrorOverlay, HelpInput
   },
   data: () => ({
     user: null,
     sum: 0,
     step: 0,
     password: "",
+    card: "",
     error: "",
     errors: {
       "User not found": "Пользователь не найден",
@@ -151,12 +149,21 @@ export default {
   }),
   async asyncData({ app, params }) {
     try {
+      // return {user: false};
       return {user: (await app.$api.get(`/user/${params.id}`)).data};
     } catch (err) {
       return {user: false};
     }
   },
   fetchOnServer: true,
+  computed: {
+    currentCard () {
+      return this.card ? this.$auth.user.cards.find(c => `${c.id} [${c.balance}АР]` == this.card) : {};
+    },
+    intSum () {
+      return parseInt(this.sum, 10);
+    }
+  },
   head () {
     const title = !this.user.username ? 'Ошибка - пользователь не найден' : ((this.$route.params.sum) ?
       `${this.user.username} - запрос ${this.$route.params.sum} АР` :
@@ -212,16 +219,18 @@ export default {
     sendSum () {
       if (!this.$auth.loggedIn) return;
       if (this.password.length < 6)  return;
-      if (isNaN(this.sum) || parseInt(this.sum, 10) < 0 || parseInt(this.sum, 10) > 62208) return;
+      if (isNaN(this.sum) || this.intSum < 0 || this.intSum > 62208) return;
       this.$axios.post(`/money/pass/send/${this.user._id}`, {
         password: this.password,
-        sum: this.sum
+        sum: this.sum,
+        card: this.currentCard.id
       }, { withCredentials: true }).then(() => {this.step=3;}, (e) => {this.step=2;this.error=e.response.data.error})
     },
     clear () {
       this.step = 0;
-      this.password = null;
-      this.sum = this.$route.params.sum || null;
+      this.password = "";
+      this.sum = this.$route.params.sum || "";
+      this.card = "";
     }
   }
 };

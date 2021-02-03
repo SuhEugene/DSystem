@@ -36,37 +36,7 @@ export default {
 </script>
 
 <style lang="scss">
-$always-white: #ffffff;
-$always-black: #000000;
-$always-transp: transparent;
-$always-transp1: rgba(0,0,0,.2);
-$always-white-stroke: rgba(0, 0, 0, 0.1);
-$always-error: #dd4444;
-$always-danger: #ffaa00;
-$always-success: #11dd33;
-$always-primary: #346db3;
-$background: #ffffff;
-$text-light: #757575;
-$text-subtext: #565656;
-$text-simple: #000000;
-$text-heading: #000000;
-$card-shadow: 0 2px 8px 0 rgba(0,0,0,.15);
-$card-hshadow: 0 2px 10px 0 rgba(0,0,0,.3);
-$card-stroke: rgba(0,0,0,.15);
-$card-hover: #fafafa;
-$card-background: #ffffff;
-$card-border-radius: 4px;
-$dark-background: #111111;
-$dark-text-light: #777777;
-$dark-text-subtext: #aaaaaa;
-$dark-text-simple: #eeeeee;
-$dark-text-heading: #ffffff;
-$dark-card-stroke: rgba(255,255,255,.15);
-$dark-card-shadow: 0 2px 6px 0 rgba(0,0,0,.2);
-$dark-card-hover: #272727;
-$dark-card-background: #222222;
-$font-bold: 500;
-$font: "Rubik", Arial, sans-serif;
+@import "~/assets/vars.scss";
 
 .app-img {
   height: 64px;
@@ -126,7 +96,7 @@ $font: "Rubik", Arial, sans-serif;
     right: -6px;
     bottom: -6px;
     border-radius: 50%;
-    z-index: 999;
+    z-index: 50;
     box-shadow: inset 0 0 0 2px $card-stroke;
     display: flex!important;
     justify-content: center!important;

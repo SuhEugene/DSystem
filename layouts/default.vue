@@ -17,6 +17,7 @@
       </div>
     </transition>
     <Nuxt/>
+    <portal-target name="modal" />
   </div>
 </template>
 <script>
