@@ -16,11 +16,12 @@
   "dependencies": {
     "@braintree/sanitize-url": "^5.0.0",
     "@nuxtjs/auth": "4.9.1",
-    "@nuxtjs/axios": "5.12.0",
+    "@nuxtjs/axios": "5.13.0",
     "@nuxtjs/proxy": "^2.0.1",
     "bcryptjs": "2.4.3",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
+    "dart-sass": "^1.25.0",
     "discord.js": "12.5.1",
     "dotenv": "8.2.0",
     "express": "4.17.1",
@@ -28,22 +29,20 @@
     "joi": "^17.2.1",
     "js-md5": "^0.7.3",
     "jsonwebtoken": "8.5.1",
-    "mdi-vue": "1.6.3",
-    "mongoose": "5.9.25",
+    "mdi-vue": "2.2.0",
+    "mongoose": "5.11.15",
     "node-fetch": "^2.6.1",
-    "node-sass": "^4.14.1",
     "nuxt": "^2.12.2",
     "nuxt-socket-io": "^1.1.8",
     "portal-vue": "^2.1.7",
     "reqlim": "^0.0.0",
-    "sass-loader": "^9.0.2",
-    "socket.io": "^2.4.0",
+    "sass-loader": "^10.1.1",
+    "socket.io": "^3.1.1",
     "vue": "^2.6.12",
     "vue-template-compiler": "^2.6.12"
   },
   "keywords": [],
   "devDependencies": {
-    "@nuxtjs/pwa": "^3.3.2",
-    "tern-node-express": "^0.4.0"
+    "@nuxtjs/pwa": "^3.3.2"
   }
 }
