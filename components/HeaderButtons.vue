@@ -11,14 +11,15 @@
           </div><div tooltip="Перевод" @click="next('t-1')" class="profile-nav__button">
             <ArrowRightBoldOutlineIcon size="26"/>
           </div>
+          <div tooltip="DPay" @click="/*next('d0')*/dpayOpened=true" class="profile-nav__button">
+            <AccountCashOutlineIcon size="26"/>
+          </div>
           <div tooltip="Банкир панель" @click="next('b0')" v-if="banker" class="profile-nav__button">
             <AccountCashOutlineIcon size="26"/>
           </div>
         </div>
         <div class="profile-nav__row">
-          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
-            <CubeScanIcon size="26"/>
-          </div>
+
           <!-- TODO фриз/анфриз модерами по нику -->
           <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
             <AccountGroupOutlineIcon size="26"/>
@@ -27,12 +28,16 @@
           <div tooltip="Смена темы" @click="$parent.themeChange" class="profile-nav__button">
             <WeatherNightIcon size="26"/>
           </div>
+          <div tooltip="Приложения" @click="$router.push('/apps')" class="profile-nav__button">
+            <CubeScanIcon size="26"/>
+          </div>
           <div tooltip="Настройки" @click="next('s0')" class="profile-nav__button">
             <CogOutlineIcon size="26"/>
           </div>
         </div>
       </div>
 
+      <!-- MODERATOR PANEL -->
       <template>
         <div v-if="menu == 'mod0'" key="mod0" class="profile-nav">
           <div class="profile-nav__row">
@@ -72,20 +77,19 @@
 
       <!-- MONEY SENDING -->
       <template>
+        <!-- Card -->
         <div v-if="menu == 't-1'" key="t-1" class="profile-nav">
           <div class="profile-nav__row">
-            <HelpInput type="text" placeholder="Карта"
-                       v-model="card"
-                       :items="cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()) )"
-                       @enterpress="!!cards.find(c => `${c.text} [${c.id}]` == card) ? next('t0') : ''"
-                       />
+            <HelpInput type="text" placeholder="Карта" v-model="card"
+                       :items="$auth.user.cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()))"
+                       @enterpress="!!currentCard ? next('t0') : ''" />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
               <BackIcon size="26"/>
             </div>
             <div @click="next('t0')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': !cards.find(c => `${c.text} [${c.id}]` == card)}">
+                 :class="{'profile-nav__button--disabled': !currentCard}">
               Далее
             </div>
           </div>
@@ -112,10 +116,8 @@
         <!-- Sum -->
         <div v-if="menu == 't1'" key="t1" class="profile-nav">
           <div class="profile-nav__row">
-            <input type="number"
-                   v-model="sum"
-                   placeholder="Сумма"
-                   @keyup.enter="(!(sumCheck || sum <= 0 || sum > $auth.user.balance)) ? next('t2') : ''"
+            <input type="number" v-model="sum" placeholder="Сумма"
+                   @keyup.enter="(!(sumCheck || sum <= 0 || sum > currentCard.balance)) ? next('t2') : ''"
                    />
           </div>
           <div class="profile-nav__row">
@@ -123,7 +125,7 @@
               <BackIcon size="26"/>
             </div>
             <div @click="next('t2')" class="profile-nav__button profile-nav__button--w3"
-            :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > $auth.user.balance}">
+            :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > currentCard.balance}">
               Далее
             </div>
           </div>
@@ -185,6 +187,85 @@
             <div @click="next('b1')" class="profile-nav__button profile-nav__button--w3"
                  :class="{'profile-nav__button--disabled': !posts.find(p => p.name == post)}">
               Далее
+            </div>
+          </div>
+        </div>
+        <!-- Username -->
+        <div v-if="menu == 'b1'" key="b1" class="profile-nav">
+          <div class="profile-nav__row">
+            <HelpInput type="text" placeholder="Никнейм"
+              v-model="username"
+              :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase() /*&& u != $auth.user.username*/))"
+              @enterpress="!!users.find(u => u.username == username/* && u.username != $auth.user.username*/) ? next('b2') : ''"
+              />
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back('b0')" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="next('b2')" class="profile-nav__button profile-nav__button--w3"
+                 :class="{'profile-nav__button--disabled': !users.find(u => u.username == username /*&& u.username != $auth.user.username*/)}">
+              Далее
+            </div>
+          </div>
+        </div>
+        <!-- Sum -->
+        <div v-if="menu == 'b2'" key="b2" class="profile-nav">
+          <div class="profile-nav__row">
+            <input type="number"
+                   v-model="sum"
+                   placeholder="Сумма"
+                   @keyup.enter="!sumCheck ? next('b3') : ''"
+                   />
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back('b1')" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="next('b3')" class="profile-nav__button profile-nav__button--w3"
+            :class="{'profile-nav__button--disabled': sumCheck}">
+              Далее
+            </div>
+          </div>
+        </div>
+        <!-- Confirm -->
+        <div v-if="menu == 'b3'" key="b3" class="profile-nav">
+          <div class="profile-nav__row">
+            <div>
+              Никнейм: <b>{{username}}</b>;
+              Отделение: <b>{{post}}</b>;
+              Операция: <b>{{sum > 0 ? 'добавить' : 'списать'}} {{sum > 0 ? sum : -sum}} АР</b>
+            </div>
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back('b2')" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="bankerAddMoney" class="profile-nav__button profile-nav__button--w3"
+            :class="{'profile-nav__button--disabled': sumCheck}">
+              {{sum > 0 ? 'Пополнить счёт' : 'Списать со счёта'}}
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- DPay -->
+      <template>
+        <!-- Post -->
+        <div v-if="menu == 'd0'" key="d0" class="profile-nav">
+          <div class="profile-nav__row">
+            <div @click="next('d0')" class="profile-nav__button profile-nav__button--w2">
+              Создание
+            </div>
+            <div @click="next('d0')" class="profile-nav__button profile-nav__button--w2">
+              Проверка
+            </div>
+          </div>
+          <div class="profile-nav__row">
+            <div @click="back(false, true)" class="profile-nav__button profile-nav__button--w1">
+              <BackIcon size="26"/>
+            </div>
+            <div class="profile-nav__button profile-nav__button--w3 profile-nav__button--disabled">
             </div>
           </div>
         </div>
@@ -309,10 +390,18 @@
             </div>
           </div>
         </div>
-
       </template>
 
     </transition>
+    <!-- DPay Code / Check -->
+    <portal to="modal">
+      <transition name="page">
+        <Modal @close="dpayOpened = false" @btn="dpayOpened = false" v-if="dpayOpened" header="Question?"
+               :buttons="[{name: 'Закрыть', type:'secondary'}]">
+          <p>Oh, shit</p>
+        </Modal>
+      </transition>
+    </portal>
   </div>
 </template>
 <script>
@@ -326,6 +415,7 @@ import AccountCashOutlineIcon from "mdi-vue/AccountCashOutline.vue";
 import AccountGroupOutlineIcon from "mdi-vue/AccountGroupOutline.vue";
 import BackIcon from "mdi-vue/ArrowLeft.vue";
 import HelpInput from "~/components/HelpInput.vue";
+import Modal from "~/components/Modal.vue";
 import FormTextboxPasswordIcon from "mdi-vue/FormTextboxPassword.vue";
 import AccountConvertOutlineIcon from "mdi-vue/AccountConvertOutline.vue";
 import CloseNetworkOutlineIcon from "mdi-vue/CloseNetworkOutline.vue";
@@ -337,6 +427,7 @@ export default {
   data: () => ({
     menu: false,
     animBack: false,
+    dpayOpened: false,
     username: "",
     sum: null,
     post: "",
@@ -355,13 +446,16 @@ export default {
     FormTextboxPasswordIcon,
     AccountConvertOutlineIcon,
     CloseNetworkOutlineIcon,
-    BackIcon,
-    HelpInput,
+    BackIcon, HelpInput,
+    Modal,
     // Settings
   },
   computed: {
     sumCheck () {
       return isNaN(this.sum) || this.sum == 0 || this.sum < -62208 || this.sum > 62208;
+    },
+    currentCard () {
+      return this.card ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` == this.card) : {};
     }
   },
   methods: {
@@ -432,7 +526,7 @@ export default {
     async sendMoney() {
       try {
         await this.$api.post(`/cards/send/${this.users.find(u => u.username == this.username)._id}`, {
-          card: this.cards.find(c => `${c.text} [${c.id}]` == this.card).id,
+          card: this.currentCard.id,
           sum: this.sum,
           comment: this.comment
         }, { withCredentials: true });

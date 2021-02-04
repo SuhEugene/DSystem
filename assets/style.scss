@@ -489,6 +489,7 @@ button, a.btn, .btn {
     overflow: auto;
     &__item {
       padding: 10px 20px;
+      margin-bottom: 0!important;
       color: $text-simple;
       cursor: pointer;
       &--selected {
@@ -728,6 +729,9 @@ button, a.btn, .btn {
     }
     &--w3 {
       width: 165px;
+    }
+    &--w4 {
+      width: 225px;
     }
     &--disabled {
       opacity: 0.5;
@@ -1130,7 +1134,7 @@ button, a.btn, .btn {
       animation: app_pulse 1s linear infinite both;
       .app__title {
         height: 20px;
-        width: 160px;
+        width: 140px;
         background: $text-light;
         border-radius: 4px;
       }
@@ -1138,10 +1142,10 @@ button, a.btn, .btn {
         height: 16px;
         background: $text-light;
         border-radius: 4px;
-        width: 100px;
+        width: 80px;
         margin-top: 4px;
         &:last-child {
-          width: 130px;
+          width: 110px;
         }
       }
     }

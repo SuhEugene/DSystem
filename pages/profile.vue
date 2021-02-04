@@ -36,7 +36,6 @@
           :cards="$auth.loggedIn ? $auth.user.cards : []" />
       </div>
     </div>
-
     <div class="profile-section">
       <div class="profile-section__in">
         <div class="profile-section__left">
@@ -62,7 +61,7 @@
           <h1 style="margin-top: 40px;">Приложения</h1>
           <div id="apps-page" class="apps-container" style="flex-direction: row; flex-wrap: wrap; justify-content: flex-start;">
             <template v-if="$fetchState.pending">
-              <div class="app app--many loading" v-for="t in 3" :key="t">
+              <div class="app app--many loading" style="max-width: 250px;"  v-for="t in 3" :key="t">
                 <AppImg :app="false" />
                 <div class="app__data">
                   <div class="app__title"></div>
@@ -114,6 +113,7 @@ import HeaderButtons from "~/components/HeaderButtons.vue";
 import Call from "~/components/Call.vue";
 import AppImg from "~/components/AppImg.vue";
 import PrivateCard from "~/components/PrivateCard.vue";
+import Modal from "~/components/Modal.vue";
 import HistoryEl from "~/components/HistoryEl.vue";
 import UserAvatar from "~/components/UserAvatar.vue";
 
@@ -125,7 +125,7 @@ export default {
     HeaderButtons,
     Call, PrivateCard,
     HistoryEl, AppImg,
-    UserAvatar,
+    UserAvatar, Modal,
     ChevronDownIcon,
     ChevronUpIcon
   },
@@ -179,44 +179,6 @@ export default {
     setTimeout(()=>{this.$auth.fetchUser()}, 500);
     this.status = this.$auth.user.status;
     this.banker = this.$auth.user.role > 1;
-
-    // this.cards = [{
-    //   _id: 0,
-    //   id: "00000001",
-    //   text: "Основная",
-    //   image: null,
-    //   balance: 20,
-    //   coowners: [],
-    //   owner: this.$auth.user,
-    //   pro: Date.now()+300000
-    // },
-    // {
-    //   _id: 1,
-    //   id: "00000002",
-    //   text: "Прибыль банка",
-    //   image: null,
-    //   balance: 20,
-    //   coowners: [],
-    //   owner: this.$auth.user
-    // },
-    // {
-    //   _id: 1,
-    //   id: "00000005",
-    //   text: "Тест общей карты",
-    //   image: null,
-    //   balance: 20,
-    //   coowners: [],
-    //   owner: {
-    //     "id":"4042364051167641621",
-    //     "uuid":"468ee80f21434afebaf6c1583c519434",
-    //     "_id":"5fdb8ac3daa7e93148dec543",
-    //     "role":3,
-    //     "status":"Насрал в кувшин",
-    //     "username":"SuhEugene",
-    //     "sex":0
-    //   },
-    //   pro: Date.now()+300000
-    // }]
 
     this.$store.commit("setLogs", this.$auth.user.logs);
     this.socket = this.$nuxtSocket({persist: true});
