@@ -14,9 +14,7 @@
 <script>
 export default {
   props: ['value', 'items', 'placeholder', 'type'],
-  data: () => ({
-    a: false
-  }),
+  data: () => ({ a: false }),
   methods: {
     toggleA() {
       setTimeout(()=>{this.a=false},300)
