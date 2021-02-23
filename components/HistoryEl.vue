@@ -6,8 +6,10 @@
       <div class="history-el__users">
         <!-- FROM -->
         <div :tooltip="from" class="history-el__user history-el--may-have-tooltip" v-if="fromType == 'user'">
-          <img :src="`https://minotar.net/armor/bust/${log.fromUser.uuid || log.fromUser.username}/100.png`"
-               :alt="log.fromUser.username">
+          <client-only>
+            <img :src="`https://visage.surgeplay.com/face/128/${log.fromUser.uuid}`"
+                 :alt="log.fromUser.username" />
+          </client-only>
         </div>
         <AppImg :tooltip="from" type="52" v-if="fromType == 'app'" :app="log.fromApp" class="history-el--may-have-tooltip" />
 
@@ -16,8 +18,14 @@
 
         <!-- TO -->
         <div :tooltip="to" class="history-el__user history-el--may-have-tooltip" v-if="toType == 'user'">
-          <img :src="`https://minotar.net/armor/bust/${log.toUser.uuid || log.toUser.username}/100.png`"
-               :alt="log.toUser.username">
+          <client-only>
+            <img :src="`https://visage.surgeplay.com/face/128/${log.toUser.uuid}`"
+                 :alt="log.toUser.username" />
+          </client-only>
+<!--          <img :src="`https://crafatar.com/avatars/${log.toUser.uuid}?overlay`"-->
+<!--               :alt="log.toUser.username">-->
+<!--          <img :src="`https://minotar.net/armor/bust/${log.toUser.uuid || log.toUser.username}/100.png`"-->
+<!--               :alt="log.toUser.username">-->
         </div>
         <AppImg :tooltip="to" type="52" v-if="toType == 'app'" :app="log.toApp" class="history-el--may-have-tooltip" />
       </div>

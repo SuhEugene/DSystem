@@ -12,8 +12,8 @@
         Перевод приложению {{app.name}}
       </div>
       <div class="icons" v-if="$auth.loggedIn">
-        <div class="app-img app-img--big">
-          <img alt="User avatar" :src="`https://minotar.net/armor/bust/${$auth.user.username}/300.png`">
+        <div class="app-img"> <!--app-img&#45;&#45;big-->
+          <img alt="User avatar" :src="`https://visage.surgeplay.com/face/128/${$auth.user.uuid}`">
         </div>
         <div class="arrow"></div>
         <AppImg :app="app" />

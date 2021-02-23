@@ -213,7 +213,7 @@ export default {
 
           self.$store.dispatch('addNotification', {
             img: (
-              (log.fromUser ? `https://minotar.net/armor/bust/${log.fromUser.uuid || log.fromUser.username}/300.png` : '') ||
+              (log.fromUser ? `https://visage.surgeplay.com/face/128/${log.fromUser.uuid}` : '') ||
               (log.fromApp ? log.fromApp.avatar : '')
               ),
             title: types[log.action].t, descr
