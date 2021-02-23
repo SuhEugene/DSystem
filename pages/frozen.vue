@@ -5,7 +5,7 @@
     <div class="small">Нет блять забанен</div>
   </div>
 </template>
-<!-- TODO 1 appelation button -->
+<!-- TODO 1 appeal button -->
 <script>
 export default {
   layout: "light",
