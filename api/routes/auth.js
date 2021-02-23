@@ -6,8 +6,6 @@ const bcrypt = require("bcryptjs");
 const fetch = require("node-fetch");
 const User = require("../models/user");
 
-// TODO: 'login' field refresh endpoint
-// TODO: 'login' field refresh endpoint frontend
 
 async function isOurUser(id) {
   let r = await fetch("http://localhost:8060/user", {

@@ -49,7 +49,7 @@
             <div class="attrs__one__title">Итого к оплате</div>
             <div class="attrs__one__text">{{(parseInt($route.params.sum, 10) || parseInt(sum, 10)) + 1}} АР</div>
           </div>
-          <div class="attrs__one">
+          <div class="attrs__one attrs__one--input">
             <div class="attrs__one__title">Пароль</div>
             <input type="password" @keypress.enter="nextPage" v-model="password">
           </div>
@@ -93,12 +93,13 @@ import ErrorOverlay from "~/components/ErrorOverlay";
     data: () => ({
       password: "",
       page: 0,
-      loading: false,
       sum: 0,
+      loading: false,
+      redirectValid: false,
       app: {},
-      error: null,
-      redirectValid: false
+      error: null
     }),
+    components: { SuccessOverlay, ErrorOverlay, AppImg },
     async asyncData({ app, params, route, ...args }) {
       try {
         let sendData = [
@@ -182,7 +183,6 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         return (this.page === 1 && this.password.length < 6);
       }
     },
-    components: { SuccessOverlay, ErrorOverlay, AppImg },
     fetchOnServer: true,
     head () {
       const title = this.loadErr ?(this.loadErr == 'sign' ?

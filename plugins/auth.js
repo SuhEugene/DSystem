@@ -213,21 +213,4 @@ export default async function (ctx, inject) {
     debug("Logged in !!!!")
     ctx.redirect("/profile");
   }
-  // inject("test", () => console.log("hello"))
-
-  // process.browser && inject("authm", $auth);
-  // console.log("uesr", await $auth.fetchUser());
-
-
-  // if ( {
-  //   console.log("HELLO")
-  // } else {
-  //   console.log("goodbye");
-  // }
-
-  // $axios.withCredentials = true;
-  // $axios.defaults.withCredentials = true;
-  // $axios.defaults.headers.common.withCredentials = true;
-  // next();
-  // console.log($axios.defaults);
 }

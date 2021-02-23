@@ -54,7 +54,7 @@ app.use((req, res, next) => {
     req.cookies[name] = value;
   }
   return next();
-})
+});
 // app.use(multer.array());
 
 app.use((req, res, next) => {
@@ -69,9 +69,7 @@ app.use((req, res, next) => {
 });
 
 // TODO: Кэширование
-
 app.get("/user/:id", (req, res) => {
-  console.log(req.method, req.path, req.params.id);
   if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
   User.findOne({
     $or: [

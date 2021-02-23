@@ -33,7 +33,7 @@
                 <div class="attrs__one__title">Сумма</div>
                 <input type="number" min="1" v-model="sum">
               </div>
-              <div class="attrs__one" v-if="!$route.params.sum && $auth.loggedIn">
+              <div class="attrs__one" v-if="$auth.loggedIn">
                 <div class="attrs__one__title">Карта</div>
                 <HelpInput type="text" v-model="card"
                            :items="$auth.user.cards.map(c => `${c.id} [${c.balance}АР]`)
