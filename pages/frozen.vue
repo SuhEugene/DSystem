@@ -1,8 +1,8 @@
 <template>
   <div class="box">
-    <img :src="this.$auth.user ? `https://minotar.net/armor/bust/${this.$auth.user.uuid || this.$auth.user.username}/300.png` : '/favicon.png'" alt="">
+    <img :src="this.$auth.user ? `https://visage.surgeplay.com/bust/300/${this.$auth.user.uuid}` : '/favicon.png'" alt="">
     <div class="big">Чел ты... заморожен</div>
-    <div class="small">Нет блять забанен</div>
+    <div class="small">Нет блять забанен. Причина: {{this.$auth.user.frozen ? `"${this.$auth.user.frozen}"` : '¯\\_(ツ)_/¯'}}</div>
   </div>
 </template>
 <!-- TODO 1 appeal button -->
@@ -14,7 +14,11 @@ export default {
       rel: "stylesheet",
       href: "https://fonts.googleapis.com/css2?family=Merriweather&display=swap"
     }]
-  })
+  }),
+  mounted () {
+    if (this.$auth.user.frozen === false || this.$auth.user.frozen === null || this.$auth.user.frozen === undefined)
+      return this.$router.push("/profile");
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -43,6 +47,7 @@ export default {
     .big, .small {
       font-family: "Merriweather", "Times New Roman", serif;
       color: white;
+      text-align: center;
     }
     .big {
       font-size: 35px;
@@ -51,6 +56,7 @@ export default {
     .small {
       font-size: 18px;
       margin-top: 7px;
+      max-width: 500px;
     }
   }
 </style>
