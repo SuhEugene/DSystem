@@ -77,34 +77,111 @@
 
       <!-- MONEY SENDING -->
       <template>
-        <!-- Card -->
-        <div v-if="menu == 't-1'" key="t-1" class="profile-nav">
-          <div class="profile-nav__row">
-            <HelpInput type="text" placeholder="Карта" v-model="card"
-                       :items="$auth.user.cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()))"
-                       @enterpress="!!currentCard ? next('t0') : ''" />
-          </div>
-          <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
-              <BackIcon size="26"/>
+        <!-- Intro -->
+        <template>
+          <!-- Card -->
+          <div v-if="menu == 't-1'" key="t-1" class="profile-nav">
+            <div class="profile-nav__row">
+              <HelpInput type="text" placeholder="Карта" v-model="card"
+                         :items="$auth.user.cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()))"
+                         @enterpress="!!currentCard ? next('t-2') : ''"/>
             </div>
-            <div @click="next('t0')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': !currentCard}">
-              Далее
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('t-2')" class="profile-nav__button profile-nav__button--w3"
+                   :class="{'profile-nav__button--disabled': !currentCard}">
+                Далее
+              </div>
             </div>
           </div>
-        </div>
-        <!-- Username -->
-        <div v-if="menu == 't0'" key="t0" class="profile-nav">
+          <!-- User or your own? -->
+          <div v-if="menu == 't-2'" key="t-2" class="profile-nav">
+            <div class="profile-nav__row">
+              <div class="profile-nav__button profile-nav__button--disabled"></div>
+              <div @click="next('tu0')" class="profile-nav__button profile-nav__button--w3">
+                Сам себе
+              </div>
+            </div>
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t-1')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('t0')" class="profile-nav__button profile-nav__button--w3">
+                Другому
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Self -->
+        <template>
+          <!-- Card -->
+          <div v-if="menu == 'tu0'" key="tu0" class="profile-nav">
+            <div class="profile-nav__row">
+              <HelpInput type="text" placeholder="Карта получения" v-model="card2"
+                         :items="$auth.user.cards.filter(c => c.id != currentCard.id).map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card2.toLowerCase()))"
+                         @enterpress="!!currentCard2 ? next('tu1') : ''"/>
+            </div>
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t-2')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('tu1')" class="profile-nav__button profile-nav__button--w3"
+                   :class="{'profile-nav__button--disabled': !currentCard2}">
+                Далее
+              </div>
+            </div>
+          </div>
+          <!-- Sum -->
+          <div v-if="menu == 'tu1'" key="tu1" class="profile-nav">
+            <div class="profile-nav__row">
+              <input type="number" v-model="sum" placeholder="Сумма"
+                     @keyup.enter="(!(sumCheck || sum <= 0 || sum > currentCard.balance)) ? next('tu2') : ''"
+              />
+            </div>
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('tu0')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('tu2')" class="profile-nav__button profile-nav__button--w3"
+                   :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > currentCard.balance}">
+                Далее
+              </div>
+            </div>
+          </div>
+          <!-- Confirm -->
+          <div v-if="menu == 'tu2'" key="tu2" class="profile-nav">
+            <div class="profile-nav__row">
+              <div>
+                С карты: <b>{{currentCard.id}}</b>;<br>
+                На карту: <b>{{currentCard2.id}}</b>;<br>
+                Сумма: <b>{{sum}} АР</b>;<br>
+              </div>
+            </div>
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t2')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="sendSelfMoney" class="profile-nav__button profile-nav__button--w3">
+                Отправить
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- AnOther -->
+        <template>
+          <!-- Username -->
+          <div v-if="menu == 't0'" key="t0" class="profile-nav">
           <div class="profile-nav__row">
-            <HelpInput type="text" placeholder="Никнейм"
-                       v-model="username"
+            <HelpInput type="text" placeholder="Никнейм" v-model="username"
                        :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
-                       @enterpress="!!users.find(u => u.username == username) ? next('t1') : ''"
-                       />
+                       @enterpress="!!users.find(u => u.username == username) ? next('t1') : ''" />
           </div>
           <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back('t-1')" class="profile-nav__button">
+            <div tooltip="Назад" @click="back('t-2')" class="profile-nav__button">
               <BackIcon size="26"/>
             </div>
             <div @click="next('t1')" class="profile-nav__button profile-nav__button--w3"
@@ -125,7 +202,7 @@
               <BackIcon size="26"/>
             </div>
             <div @click="next('t2')" class="profile-nav__button profile-nav__button--w3"
-            :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > currentCard.balance}">
+                 :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > currentCard.balance}">
               Далее
             </div>
           </div>
@@ -133,11 +210,8 @@
         <!-- Comment -->
         <div v-if="menu == 't2'" key="t2" class="profile-nav">
           <div class="profile-nav__row">
-            <input type="text"
-                   placeholder="Комментарий"
-                   v-model="comment"
-                   @keyup.enter="(comment.length <= 100) ? next('t3') : ''"
-                   />
+            <input type="text" placeholder="Комментарий" v-model="comment"
+                   @keyup.enter="(comment.length <= 100) ? next('t3') : ''" />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back('t1')" class="profile-nav__button">
@@ -168,6 +242,7 @@
             </div>
           </div>
         </div>
+        </template>
       </template>
 
       <!-- BANKER PANEL -->
@@ -432,7 +507,8 @@ export default {
     sum: null,
     post: "",
     comment: "",
-    card: ""
+    card: "",
+    card2: ""
   }),
   components: {
     AccountTieVoiceOutlineIcon,
@@ -456,6 +532,9 @@ export default {
     },
     currentCard () {
       return this.card ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` == this.card) : {};
+    },
+    currentCard2 () {
+      return this.card2 ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` == this.card2) : {};
     }
   },
   methods: {
@@ -477,6 +556,7 @@ export default {
       this.post = "";
       this.comment = "";
       this.card = "";
+      this.card2 = "";
     },
     async clearAllSessions () {
       try {
@@ -514,13 +594,13 @@ export default {
           return this.$store.dispatch('addNotification', {
             type: "danger", title: "Кулдаун",
             descr: 'Может ты и банкир, но дудосить сервер тебе не разрешали'
-          })
+          });
         }
 
         this.$store.dispatch('addNotification', {
           type: "error", title: "Ошибка",
           descr: `Не удалось совершить перевод: ${text}`
-        })
+        });
       }
     },
     async sendMoney() {
@@ -535,23 +615,72 @@ export default {
       } catch (e) {
         let err = e.response ? e.response.data || {} : {};
         let text = "Неизвестная ошибка";
-        if (err.error == "Invalid card") {
-          text = "Неверная карта получателя"
+        switch (err.error) {
+          case "Invalid card":
+            text = "Неверная карта получателя";
+            break;
+          case "Invalid id":
+            text = "Нельзя совершить перевод самому себе, используя данный метод";
+            break;
+          case "Not enough money":
+            text = "Недостаточно АР на счету";
+            break;
+          case "User not found":
+            text = "Получатель не найден";
+            break;
+          case "Card not found":
+            text = "Карта отправки не найдена";
+            break;
+          case "toCard not found":
+            text = "У получателя нет ни единой карты";
+            break;
         }
-        if (err.error == "Invalid id") {
-          text = "Нельзя совершить перевод сам себе используя данный метод"
+        if (err.error == "Cooldown") {
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Всего пара сек и можно попытаться перевести ещё раз'
+          });
         }
-        if (err.error == "Not enough money") {
-          text = "Недостаточно АР на счету"
-        }
-        if (err.error == "Card not found") {
-          text = "У вас нет ни единой карты"
-        }
-        if (err.error == "User not found") {
-          text = "Получатель не найден"
-        }
-        if (err.error == "toCard not found") {
-          text = "У получателя нет ни единой карты"
+
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось совершить перевод: ${text}`
+        });
+      }
+    },
+    async sendSelfMoney() {
+      try {
+        await this.$api.post(`/cards/send/self/${this.currentCard2.id}`, {
+          card: this.currentCard.id,
+          sum: this.sum
+        }, { withCredentials: true });
+        this.next(false);
+        this.clear();
+      } catch (e) {
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        switch (err.error) {
+          case "Invalid card":
+            text = "Неверная карта получателя";
+            break;
+          case "Invalid id":
+            text = "Нельзя совершить перевод кому-то иному, используя данный метод";
+            break;
+          case "Not enough money":
+            text = "Недостаточно АР на счету";
+            break;
+          case "User not found":
+            text = "Получатель не найден";
+            break;
+          case "Card not found":
+            text = "Карта отправки не найдена";
+            break;
+          case "toCard not found":
+            text = "Карта получения не найдена";
+            break;
+          case "Same card":
+            text = "Невозможно отправить на ту же карту";
+            break;
         }
         if (err.error == "Cooldown") {
           return this.$store.dispatch('addNotification', {

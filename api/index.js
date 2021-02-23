@@ -136,15 +136,19 @@ function authFunc(req, res, next) {
       try {
         req.user = await getUser(user._id, user.login);
       } catch (e) {
-        return res.status(400).send({ error: "Non registred", e: "NRG" })
+        return res.status(400).send({ error: "Non registered", e: "NRG" })
       }
-      if (req.user.frozen) return res.status(418).send({
-        error: "Frozen", e: "F",
-        id: req.user.id,
-        uuid: req.user.uuid,
-        _id: req.user._id,
-        username: req.user.username
-      })
+      if (req.user.frozen !== undefined &&
+        req.user.frozen !== null &&
+        req.user.frozen !== false)
+        return res.status(418).send({
+          error: "Frozen", e: "F",
+          id: req.user.id,
+          uuid: req.user.uuid,
+          _id: req.user._id,
+          username: req.user.username,
+          frozen: req.user.frozen
+        });
       req.io = io;
       next();
     });

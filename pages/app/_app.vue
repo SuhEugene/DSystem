@@ -18,11 +18,11 @@
         <div class="arrow"></div>
         <AppImg :app="app" />
       </div>
-      <div v-if="$auth.loggedIn || $route.params.sum" class="sum">
+      <div v-if="$route.params.sum || ($auth.loggedIn && page > 0)" class="sum">
         <div class="sum__title">Сумма</div>
-        <div class="sum__num" v-if="$route.params.sum || page > 0">{{$route.params.sum || sum}} АР</div>
-        <label>
-          <input type="number" v-if="!$route.params.sum && page === 0" v-model="sum">
+        <div class="sum__num">{{$route.params.sum || sum}} АР</div>
+        <label v-if="!$route.params.sum && page === 0">
+          <input type="number" v-model="sum">
         </label>
       </div>
       <!-- <transition-group name="swipe" style="position: relative"> -->
@@ -35,12 +35,19 @@
             <div class="attrs__one__title">Товар</div>
             <div class="attrs__one__text">{{$route.query.text || "Пожертвование"}}</div>
           </div>
+          <div v-if="$auth.loggedIn && !$route.params.sum && page === 0" class="attrs__one attrs__one--input">
+            <div class="attrs__one__title">Сумма</div>
+            <label><input type="number" v-model="sum"></label>
+          </div>
+          <div class="attrs__one attrs__one--input" v-if="$auth.loggedIn">
+            <div class="attrs__one__title">Карта</div>
+            <HelpInput type="text" v-model="card"
+                       :items="$auth.user.cards.map(c => `${c.id} [${c.balance}АР]`)
+                                    .filter(c => c.toLowerCase()
+                                    .includes(card.toLowerCase()))" />
+          </div>
         </div>
         <div class="attrs" v-if="page === 1" :key="1">
-          <div class="attrs__one">
-            <div class="attrs__one__title">Ваш баланс</div>
-            <div class="attrs__one__text">{{$auth.user.balance}} АР</div>
-          </div>
           <div class="attrs__one">
             <div class="attrs__one__title">Комиссия</div>
             <div class="attrs__one__text">1 АР</div>
@@ -76,7 +83,7 @@
           Ещё раз!
         </button>
         <button type="button" @click="nextPage" v-if="page < 2 && $auth.loggedIn" class="primary"
-          :class="{'disabled': sumCheck || passwordCheck}">{{(page == 0) ? "Продолжить" : "Оплатить"}}
+          :class="{'disabled': sumCheck || passwordCheck || cardCheck}">{{(page == 0) ? "Продолжить" : "Оплатить"}}
         </button>
         <button type="button" @click="backPage" v-if="page < 2 && $auth.loggedIn" class="secondary">{{(page == 0) ? "Отмена" : "Назад"}}</button>
       </div>
@@ -87,11 +94,14 @@
 import AppImg from "~/components/AppImg";
 import SuccessOverlay from "~/components/SuccessOverlay";
 import ErrorOverlay from "~/components/ErrorOverlay";
+import HelpInput from "~/components/HelpInput.vue";
+
   export default {
     auth: false,
     layout: "loginLayout",
     data: () => ({
       password: "",
+      card: "",
       page: 0,
       sum: 0,
       loading: false,
@@ -99,7 +109,7 @@ import ErrorOverlay from "~/components/ErrorOverlay";
       app: {},
       error: null
     }),
-    components: { SuccessOverlay, ErrorOverlay, AppImg },
+    components: { SuccessOverlay, ErrorOverlay, AppImg, HelpInput },
     async asyncData({ app, params, route, ...args }) {
       try {
         let sendData = [
@@ -150,8 +160,9 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         this.loading = true;
 
         let data = {
-          sum: this.$route.params.sum || this.sum,
-          password: this.password
+          sum: parseInt(this.$route.params.sum || this.sum, 10),
+          password: this.password,
+          card: this.currentCard.id
         };
 
         (this.$route.query.text) ? data.text = this.$route.query.text : '';
@@ -181,6 +192,12 @@ import ErrorOverlay from "~/components/ErrorOverlay";
       },
       passwordCheck () {
         return (this.page === 1 && this.password.length < 6);
+      },
+      currentCard () {
+        return this.card ? this.$auth.user.cards.find(c => `${c.id} [${c.balance}АР]` == this.card) : {};
+      },
+      cardCheck () {
+        return this.sumCheck || !this.currentCard || !this.currentCard.id || this.currentCard.balance < (this.$route.params.sum || this.sum);
       }
     },
     fetchOnServer: true,
@@ -204,6 +221,6 @@ import ErrorOverlay from "~/components/ErrorOverlay";
         ],
         link: [{ rel: "canonical", href: `${process.env.thisUrl}${this.$route.path}` }]
       });
-    },
+    }
   };
 </script>

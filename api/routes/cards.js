@@ -133,7 +133,67 @@ moneyRouter
       u1 && req.io.to(u1.io).emit("cards", await req.user.cards);
       u2 && req.io.to(u2.io).emit("cards", await user.cards);
     });
-  }).post("/pass/send/:id", async (req, res) => {
+  }).post("/send/self/:card", async (req, res) => {
+  console.log("toSender", req.user.username, "id", req.params.id);
+  // if ((await hex.validate(req.body.card)).error) return res.status(400).json({ error: "Invalid card" });
+  if (isNaN(req.body.sum) ||
+    !parseInt(req.body.sum, 10) ||
+    parseInt(req.body.sum, 10) > 64*36*27 ||
+    parseInt(req.body.sum, 10) < 0)
+    return res.status(400).json({ error: "Invalid body" });
+
+  if (req.body.card == req.params.card) return res.status(400).json({ error: "Same card" });
+
+  let fromCard;
+  logger.log("req card", req.body.card);
+  try {
+    fromCard = await req.user.findCard(req.body.card);
+  } catch (e) {
+    logger.log("Not found error", e);
+    return res.status(404).json({ error: "Card not found" });
+  }
+  if (!fromCard) return res.status(404).json({ error: "Card not found" });
+
+
+  if (fromCard.balance - parseInt(req.body.sum, 10) < 0)
+    return res.status(400).json({ error: "Not enough money" });
+
+  let toCard;
+  logger.log("req toCard", req.params.card);
+  try {
+    toCard = await req.user.findCard(req.params.card);
+  } catch (e) {
+    logger.log("to Not found error", e);
+    return res.status(404).json({ error: "toCard not found" });
+  }
+  if (!toCard) return res.status(404).json({ error: "toCard not found" });
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  let logs = new Logs();
+  logs.fromUser = req.user._id;
+  logs.toUser = req.user._id;
+  logs.sum = parseInt(req.body.sum, 10);
+  logs.action = "send-to";
+  logs.more = `Перевод с карты ${req.body.card} на ${req.params.card}`;
+  toCard.balance += parseInt(req.body.sum, 10);
+  fromCard.balance -= parseInt(req.body.sum, 10);
+
+  await logs.save();
+  await toCard.save();
+  await fromCard.save();
+
+  await session.commitTransaction();
+  session.endSession();
+
+  logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
+  res.send();
+
+  let u1 = req.io.users.find(u => u.id == req.user.id);
+  u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
+  u1 && req.io.to(u1.io).emit("cards", await req.user.cards);
+}).post("/pass/send/:id", async (req, res) => {
     const { error } = hex.validate(req.params.id);
     if (error) return res.status(400).json({ error: "Invalid id" });
     // if ((await hex.validate(req.body.card)).error) return res.status(400).json({ error: "Invalid card" });
@@ -156,7 +216,6 @@ moneyRouter
     }
 
     if (!fromCard) return res.status(404).json({ error: "Card not found" });
-
 
     if (fromCard.balance - parseInt(req.body.sum, 10) < 0)
       return res.status(400).json({ error: "Not enough money" });

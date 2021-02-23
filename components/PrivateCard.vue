@@ -2,18 +2,28 @@
   <div v-if="!type" @dragstart="drag" @drop="drop" @dragover.prevent="() => true" draggable="false" class="card">
     <div class="card__pro" v-if="data.pro >= now">PRO</div>
     <div class="card__top">
-      <div class="card__id">#{{id}}</div>
       <div class="card__text">{{data.text}}</div>
+      <div class="card__id">#{{id}}</div>
     </div>
     <div class="card__bottom">
       <div class="card__settings">
-        <div class="button">
-          <CogOutlineIcon v-if="settings" size="24" />
-          <AccountSettingsIcon v-else size="24" />
-        </div>
-        </div>
+<!--        <div class="button" tooltip="В разработке">-->
+<!--          <CogOutlineIcon v-if="settings" size="24" />-->
+<!--          <AccountSettingsIcon v-else size="24" />-->
+<!--        </div>-->
+      </div>
+      <!-- TODO: sum change animation -->
       <div class="card__sum">{{data.balance}} АР</div>
     </div>
+
+    <portal to="modal">
+      <transition name="page">
+        <Modal @close="cardModal = false" @btn="cardModal = false" v-if="cardModal" header="Перевод между картами"
+               :buttons="[{name: 'Закрыть', type:'secondary'}]">
+          <p>Oh, shit</p>
+        </Modal>
+      </transition>
+    </portal>
   </div>
   <div v-else-if="type == 'create'" class="card card--create" :class="{'card--create-hover': page == 0}">
     <div v-if="page == 0" @click="page = 1" class="card__center">
@@ -34,12 +44,14 @@
 import CogOutlineIcon from 'mdi-vue/CogOutline.vue';
 import AccountSettingsIcon from 'mdi-vue/AccountSettings.vue';
 import PlusIcon from 'mdi-vue/Plus.vue';
+import TransferIcon from 'mdi-vue/SwapHorizontalBold.vue';
 export default {
   name: "PrivateCard",
   props: ["data", "type", "settings"],
   data: () => ({
     now: Date.now(),
-    page: 0
+    page: 0,
+    cardModal: false
   }),
   computed: {
     id () {
@@ -77,7 +89,7 @@ export default {
       }
     }
   },
-  components: { CogOutlineIcon, PlusIcon, AccountSettingsIcon }
+  components: { CogOutlineIcon, PlusIcon, AccountSettingsIcon, TransferIcon }
 }
 </script>
 
@@ -169,11 +181,11 @@ export default {
     align-items: flex-start;
   }
   &__id {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 12px;
   }
   &__text {
-    font-size: 12px;
+    font-size: 18px;
+    font-weight: bold;
   }
   &__bottom {
     display: -webkit-flex;
@@ -186,18 +198,21 @@ export default {
     -ms-align-items: flex-end;
     align-items: flex-end;
   }
-  &__settings {
-    & > .button {
-      transition: opacity .13s;
-      cursor: pointer;
-      &:hover{
-        opacity: 0.85;
-      }
-      &:active {
-        opacity: 0.7;
-      }
-    }
-  }
+  /*&__settings {*/
+  /*  & > .button {*/
+  /*    transition: opacity .13s;*/
+  /*    !*cursor: pointer;*!*/
+  /*    opacity: 0.7;*/
+  /*    position: relative;*/
+  /*    &::after { left: 8px; }*/
+  /*    !*&:hover{*!*/
+  /*    !*  opacity: 0.85;*!*/
+  /*    !*}*!*/
+  /*    !*&:active {*!*/
+  /*    !*  opacity: 0.7;*!*/
+  /*    !*}*!*/
+  /*  }*/
+  /*}*/
   &__sum {
     font-size: 32px;
     font-weight: bold;

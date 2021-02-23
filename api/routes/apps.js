@@ -114,13 +114,22 @@ router
 
     if (req.body.redirectURI && req.body.redirectURI !== req.app.redirectURI) return res.status(400).send({ error: "Invalid redirect uri", e: "IRU" });
 
-    if (req.user.balance - 1 < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
+    let fromCard;
+    logger.log("req card", req.body.card);
+    try {
+      fromCard = await req.user.findCard(req.body.card);
+    } catch (e) {
+      logger.log("Not found error", e);
+      return res.status(404).json({ error: "Card not found" });
+    }
+    if (!fromCard) return res.status(404).json({ error: "Card not found" });
+    if (fromCard.balance - 1 < sum) return res.status(400).send({ error: "Not enough money", e: "NEM" });
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     let comApp = await App.findOne({ _id: process.env.COM_APP_ID });
-    req.user.balance -= sum+1;
+    fromCard.balance -= sum+1;
     comApp.balance += 1;
     req.app.balance += sum;
 
@@ -132,7 +141,7 @@ router
     logs.more = `${req.body.text || 'Пожертвование'} [${req.body.uid || '0'}]`;
 
     await logs.save();
-    await req.user.save();
+    await fromCard.save();
     await comApp.save();
     await req.app.save();
 
@@ -205,8 +214,9 @@ router
     const session = await mongoose.startSession();
     session.startTransaction();
 
+    let fromCard = (await req.user.cards)[0];
     req.app.balance -= sum;
-    req.user.balance += sum;
+    fromCard.balance += sum;
 
     let logs = new Logs();
     logs.fromApp = req.app._id;
@@ -217,7 +227,7 @@ router
 
     await logs.save();
     await req.app.save();
-    await req.user.save();
+    await fromCard.save();
 
     await session.commitTransaction();
     session.endSession();
