@@ -13,7 +13,7 @@ const userModel = new Schema({
   role:     { type: Number },
   badges:   { type: Number },
   mayHave:  { type: Number },
-  frozen:   { type: Boolean },
+  frozen:   { type: String },
 });
 
 userModel.virtual('cards').get(async (_null, _vt, self) => {

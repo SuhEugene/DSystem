@@ -74,12 +74,13 @@ app.post("/handdle", async (req, res) => {
   res.send();
   try {
     let usr = await client.users.fetch(req.body.user.id);
+    let hashesEq = '3f3d7f210a99c03b187c520552030420' === req.headers.authorization.replace('Bearer ','');
     await usr.send(`Ты, __${req.body.user.username}__, купил __${req.body.text}__ с __uid ${req.body.uid}__.`+
                    `Время: __${req.body.time}__\nТы потратил __${req.body.sum} АР__\n`+
                    `\`\`\`json\n${JSON.stringify(req.body, null, 2)}\n\`\`\`\n`+
                    `Хэш __${req.headers.authorization.replace('Bearer ','')}__`+
-                   `${'3f3d7f210a99c03b187c520552030420' === req.headers.authorization.replace('Bearer ','') ? '' : ' не'}`+
-                   ` равен 3f3d7f210a99c03b187c520552030420`);
+                   `${hashesEq ? '' : ' не'}`+
+                   ` равен 3f3d7f210a99c03b187c520552030420 (хэши ${hashesEq ? '' : 'не '}совпадают и операция прошла ${hashesEq ? '' : 'не '}безопасно)`);
   } catch (e) {console.log(e); console.log("FAIL :(");}
 });
 

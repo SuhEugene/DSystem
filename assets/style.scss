@@ -430,7 +430,8 @@ button, a.btn, .btn {
   input {
     transition: .13s border-color, .13s box-shadow, .13s border-radius!important;
     &:focus {
-      border-radius: 15px 15px 0 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
       transition: .13s border-color, .13s box-shadow, .13s border-radius!important;
     }
   }
@@ -848,7 +849,7 @@ button, a.btn, .btn {
 }
 .profile-section {
   @include bcontainer;
-  padding: 40px 64px;
+  padding: 40px 50px;
   h1 {
     width: 100%;
   }

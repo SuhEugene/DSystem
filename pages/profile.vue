@@ -21,7 +21,7 @@
                      name="sendStatus" autocomplete="off">
            </label>
           </div>
-          <p style="display: none;">Когда-то здесь был един баланс и не было карт...</p>
+          <p style="display: none;">Когда-то здесь был один единственный баланс и не было карт...</p>
           <!-- <div class="profile-header__balance">
             <div class="profile-header__balance--title">Баланс</div>
             <div class="profile-header__balance--value">{{$auth.user && $auth.user.balance}} АР</div>
