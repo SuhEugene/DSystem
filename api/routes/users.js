@@ -8,6 +8,23 @@ let cooldown = {};
 const getLogs = require("./getLogs");
 
 
+async function getMe (req) {
+  return ({
+    balance: req.user.balance,
+    id: req.user.id,
+    uuid: req.user.uuid,
+    _id: req.user._id,
+    role: req.user.role,
+    status: req.user.status,
+    username: req.user.username,
+    mayHave: req.user.mayHave,
+    sex: req.user.sex,
+    logs: await getLogs(req),
+    cards: await req.user.cards,
+    badges: req.user.badges
+  });
+}
+
 userRouter
   .use((req, res, next) => {
     // console.log(req.method, req.path)
@@ -32,20 +49,7 @@ userRouter
     });
   })
   .get("/@me", async (req, res) => {
-    res.json({
-      balance: req.user.balance,
-      id: req.user.id,
-      uuid: req.user.uuid,
-      _id: req.user._id,
-      role: req.user.role,
-      status: req.user.status,
-      username: req.user.username,
-      mayHave: req.user.mayHave,
-      sex: req.user.sex,
-      logs: await getLogs(req),
-      cards: await req.user.cards,
-      badges: req.user.badges
-    });
+    res.json(await getMe(req));
   })
   .get("/@me/logs", (req, res) => {
     getLogs(req)
@@ -55,15 +59,7 @@ userRouter
   .patch("/@me/status", async (req, res) => {
     req.user.status = req.body.status.substr(0, 32) || null;
     await req.user.save();
-    res.json({
-      balance: req.user.balance,
-      id: req.user.id,
-      _id: req.user._id,
-      role: req.user.role,
-      status: req.user.status,
-      username: req.user.username,
-      logs: await getLogs(req)
-    });
+    res.json(await getMe(req));
   })
   .use("/@me/clear", async (req, res) => {
     let cd = cooldown[req.user.id] ? cooldown[req.user.id]["clearCookie"] : {};
