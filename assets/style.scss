@@ -1413,6 +1413,9 @@ button, a.btn, .btn {
         font-weight: bold;
         word-break: break-word;
       }
+      &--input {
+        width: 100%;
+      }
     }
   }
   .sum {
