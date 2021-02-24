@@ -21,7 +21,7 @@
         <div class="profile-nav__row">
 
           <!-- TODO фриз/анфриз модерами по нику -->
-          <div tooltip="Модераторка" v-if="moder" class="profile-nav__button">
+          <div tooltip="Модераторка" @click="next('mod0')" v-if="moder" class="profile-nav__button">
             <AccountGroupOutlineIcon size="26"/>
           </div>
 
@@ -39,12 +39,13 @@
 
       <!-- MODERATOR PANEL -->
       <template>
-        <div v-if="menu == 'mod0'" key="mod0" class="profile-nav">
+        <div v-if="menu === 'mod0'" key="mod0" class="profile-nav">
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
                        v-model="username"
-                       :items="users.map(u => u.username + (u.frozen) ? ' [F]' : '').filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
-                       @enterpress="!!users.find(u => u.username == username) ? next('mod1') : ''"
+                       :items="users.map(u => `${u.username}${(u.frozen) ? ' [F]' : ''}`)
+                                    .filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u !== $auth.user.username)"
+                       @enterpress="!!users.find(u => u.username === username) ? next('mod1') : ''"
                        />
           </div>
           <div class="profile-nav__row">
@@ -57,18 +58,36 @@
             </div>
           </div>
         </div>
-        <div v-if="menu == 'mod1'" key="mod1" class="profile-nav">
+        <div v-if="menu === 'mod1'" key="mod1" class="profile-nav">
           <div class="profile-nav__row">
-            <div>
-              Пользователь: <b>{{username}}</b>
-            </div>
+            <input type="text" placeholder="Комментарий" v-model="comment"
+                   @keyup.enter="(comment.length <= 100) ? next('mod2') : ''" />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back('mod0')" class="profile-nav__button">
               <BackIcon size="26"/>
             </div>
-            <div @click="freezeUser" class="profile-nav__button profile-nav__button--w3">
-              Переключить
+            <div @click="next('mod2')" class="profile-nav__button profile-nav__button--w3">
+              Далее
+            </div>
+          </div>
+        </div>
+        <div v-if="menu === 'mod2'" key="mod2" class="profile-nav">
+          <div class="profile-nav__row">
+            <div>
+              Пользователь: <b>{{username}}</b><br/>
+              Причина: {{comment}}
+            </div>
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back('mod1')" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div v-if="!usr.frozen" @click="freezeUser(true)" class="profile-nav__button profile-nav__button--w3">
+              Заморозить
+            </div>
+            <div v-else @click="freezeUser(false)" class="profile-nav__button profile-nav__button--w3">
+              Разморозить
             </div>
           </div>
         </div>
@@ -80,7 +99,7 @@
         <!-- Intro -->
         <template>
           <!-- Card -->
-          <div v-if="menu == 't-1'" key="t-1" class="profile-nav">
+          <div v-if="menu === 't-1'" key="t-1" class="profile-nav">
             <div class="profile-nav__row">
               <HelpInput type="text" placeholder="Карта" v-model="card"
                          :items="$auth.user.cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()))"
@@ -97,7 +116,7 @@
             </div>
           </div>
           <!-- User or your own? -->
-          <div v-if="menu == 't-2'" key="t-2" class="profile-nav">
+          <div v-if="menu === 't-2'" key="t-2" class="profile-nav">
             <div class="profile-nav__row">
               <div class="profile-nav__button profile-nav__button--disabled"></div>
               <div @click="next('tu0')" class="profile-nav__button profile-nav__button--w3">
@@ -109,7 +128,7 @@
                 <BackIcon size="26"/>
               </div>
               <div @click="next('t0')" class="profile-nav__button profile-nav__button--w3">
-                Другому
+                Клиенту Dromon
               </div>
             </div>
           </div>
@@ -118,7 +137,7 @@
         <!-- Self -->
         <template>
           <!-- Card -->
-          <div v-if="menu == 'tu0'" key="tu0" class="profile-nav">
+          <div v-if="menu === 'tu0'" key="tu0" class="profile-nav">
             <div class="profile-nav__row">
               <HelpInput type="text" placeholder="Карта получения" v-model="card2"
                          :items="$auth.user.cards.filter(c => c.id != currentCard.id).map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card2.toLowerCase()))"
@@ -135,7 +154,7 @@
             </div>
           </div>
           <!-- Sum -->
-          <div v-if="menu == 'tu1'" key="tu1" class="profile-nav">
+          <div v-if="menu === 'tu1'" key="tu1" class="profile-nav">
             <div class="profile-nav__row">
               <input type="number" v-model="sum" placeholder="Сумма"
                      @keyup.enter="(!(sumCheck || sum <= 0 || sum > currentCard.balance)) ? next('tu2') : ''"
@@ -152,7 +171,7 @@
             </div>
           </div>
           <!-- Confirm -->
-          <div v-if="menu == 'tu2'" key="tu2" class="profile-nav">
+          <div v-if="menu === 'tu2'" key="tu2" class="profile-nav">
             <div class="profile-nav__row">
               <div>
                 С карты: <b>{{currentCard.id}}</b>;<br>
@@ -174,11 +193,11 @@
         <!-- AnOther -->
         <template>
           <!-- Username -->
-          <div v-if="menu == 't0'" key="t0" class="profile-nav">
+          <div v-if="menu === 't0'" key="t0" class="profile-nav">
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм" v-model="username"
                        :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
-                       @enterpress="!!users.find(u => u.username == username) ? next('t1') : ''" />
+                       @enterpress="!!users.find(u => u.username === username) ? next('t1') : ''" />
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back('t-2')" class="profile-nav__button">
@@ -190,8 +209,8 @@
             </div>
           </div>
         </div>
-        <!-- Sum -->
-        <div v-if="menu == 't1'" key="t1" class="profile-nav">
+          <!-- Sum -->
+          <div v-if="menu == 't1'" key="t1" class="profile-nav">
           <div class="profile-nav__row">
             <input type="number" v-model="sum" placeholder="Сумма"
                    @keyup.enter="(!(sumCheck || sum <= 0 || sum > currentCard.balance)) ? next('t2') : ''"
@@ -207,8 +226,8 @@
             </div>
           </div>
         </div>
-        <!-- Comment -->
-        <div v-if="menu == 't2'" key="t2" class="profile-nav">
+          <!-- Comment -->
+          <div v-if="menu == 't2'" key="t2" class="profile-nav">
           <div class="profile-nav__row">
             <input type="text" placeholder="Комментарий" v-model="comment"
                    @keyup.enter="(comment.length <= 100) ? next('t3') : ''" />
@@ -223,8 +242,8 @@
             </div>
           </div>
         </div>
-        <!-- Confirm -->
-        <div v-if="menu == 't3'" key="t3" class="profile-nav">
+          <!-- Confirm -->
+          <div v-if="menu == 't3'" key="t3" class="profile-nav">
           <div class="profile-nav__row">
             <div>
               Получатель: <b>{{username}}</b>;<br>
@@ -248,12 +267,12 @@
       <!-- BANKER PANEL -->
       <template>
         <!-- Post -->
-        <div v-if="menu == 'b0'" key="b0" class="profile-nav">
+        <div v-if="menu === 'b0'" key="b0" class="profile-nav">
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Отделение"
                        v-model="post"
                        :items="posts.map(p => p.name).filter(p => p && p.toLowerCase().includes(post.toLowerCase()))"
-                       @enterpress="!!posts.find(p => p.name == post) ? next('b1') : ''"/>
+                       @enterpress="!!posts.find(p => p.name === post) ? next('b1') : ''"/>
           </div>
           <div class="profile-nav__row">
             <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
@@ -266,12 +285,12 @@
           </div>
         </div>
         <!-- Username -->
-        <div v-if="menu == 'b1'" key="b1" class="profile-nav">
+        <div v-if="menu === 'b1'" key="b1" class="profile-nav">
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
               v-model="username"
               :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase() /*&& u != $auth.user.username*/))"
-              @enterpress="!!users.find(u => u.username == username/* && u.username != $auth.user.username*/) ? next('b2') : ''"
+              @enterpress="!!users.find(u => u.username === username/* && u.username != $auth.user.username*/) ? next('b2') : ''"
               />
           </div>
           <div class="profile-nav__row">
@@ -285,7 +304,7 @@
           </div>
         </div>
         <!-- Sum -->
-        <div v-if="menu == 'b2'" key="b2" class="profile-nav">
+        <div v-if="menu === 'b2'" key="b2" class="profile-nav">
           <div class="profile-nav__row">
             <input type="number"
                    v-model="sum"
@@ -304,7 +323,7 @@
           </div>
         </div>
         <!-- Confirm -->
-        <div v-if="menu == 'b3'" key="b3" class="profile-nav">
+        <div v-if="menu === 'b3'" key="b3" class="profile-nav">
           <div class="profile-nav__row">
             <div>
               Никнейм: <b>{{username}}</b>;
@@ -327,7 +346,7 @@
       <!-- DPay -->
       <template>
         <!-- Post -->
-        <div v-if="menu == 'd0'" key="d0" class="profile-nav">
+        <div v-if="menu === 'd0'" key="d0" class="profile-nav">
           <div class="profile-nav__row">
             <div @click="next('d0')" class="profile-nav__button profile-nav__button--w2">
               Создание
@@ -345,12 +364,12 @@
           </div>
         </div>
         <!-- Username -->
-        <div v-if="menu == 'b1'" key="b1" class="profile-nav">
+        <div v-if="menu === 'b1'" key="b1" class="profile-nav">
           <div class="profile-nav__row">
             <HelpInput type="text" placeholder="Никнейм"
               v-model="username"
               :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase() /*&& u != $auth.user.username*/))"
-              @enterpress="!!users.find(u => u.username == username/* && u.username != $auth.user.username*/) ? next('b2') : ''"
+              @enterpress="!!users.find(u => u.username === username/* && u.username != $auth.user.username*/) ? next('b2') : ''"
               />
           </div>
           <div class="profile-nav__row">
@@ -364,7 +383,7 @@
           </div>
         </div>
         <!-- Sum -->
-        <div v-if="menu == 'b2'" key="b2" class="profile-nav">
+        <div v-if="menu === 'b2'" key="b2" class="profile-nav">
           <div class="profile-nav__row">
             <input type="number"
                    v-model="sum"
@@ -383,7 +402,7 @@
           </div>
         </div>
         <!-- Confirm -->
-        <div v-if="menu == 'b3'" key="b3" class="profile-nav">
+        <div v-if="menu === 'b3'" key="b3" class="profile-nav">
           <div class="profile-nav__row">
             <div>
               Никнейм: <b>{{username}}</b>;
@@ -406,7 +425,7 @@
       <!-- SETTINGS -->
       <template>
         <!-- MAIN -->
-        <div v-if="menu == 's0'" key="s0" class="profile-nav">
+        <div v-if="menu === 's0'" key="s0" class="profile-nav">
           <div class="profile-nav__row">
             <div tooltip="Смена пароля" @click="back(false, true)" class="profile-nav__button">
               <FormTextboxPasswordIcon size="26"/>
@@ -437,7 +456,7 @@
             </div> -->
           </div>
         </div>
-        <div v-if="menu == 's-eraser'" key="s-eraser" class="profile-nav">
+        <div v-if="menu === 's-eraser'" key="s-eraser" class="profile-nav">
           <div class="profile-nav__row">
             <div>
               Вы уверены, что хотите завершить <b>ВСЕ сессии</b>?
@@ -452,7 +471,7 @@
             </div>
           </div>
         </div>
-        <div v-if="menu == 's-exit'" key="s-exit" class="profile-nav">
+        <div v-if="menu === 's-exit'" key="s-exit" class="profile-nav">
           <div class="profile-nav__row">
             <div>Вы уверены, что хотите <b>выйти</b>?</div>
           </div>
@@ -528,13 +547,16 @@ export default {
   },
   computed: {
     sumCheck () {
-      return isNaN(this.sum) || this.sum == 0 || this.sum < -62208 || this.sum > 62208;
+      return isNaN(this.sum) || parseInt(this.sum, 10) === 0 || this.sum < -62208 || this.sum > 62208;
     },
     currentCard () {
-      return this.card ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` == this.card) : {};
+      return this.card ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` === this.card) : {};
     },
     currentCard2 () {
-      return this.card2 ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` == this.card2) : {};
+      return this.card2 ? this.$auth.user.cards.find(c => `${c.text} [${c.id}]` === this.card2) : {};
+    },
+    usr () {
+      return this.username ? this.users.find(u => u.username === this.username || `${u.username} [F]` === this.username) : {};
     }
   },
   methods: {
@@ -566,31 +588,31 @@ export default {
     },
     async bankerAddMoney() {
       try {
-        await this.$api.post(`/cards/${this.users.find(u => u.username == this.username)._id}/add`, {
+        await this.$api.post(`/cards/${this.usr._id}/add`, {
           sum: this.sum,
-          post: this.posts.find(p => p.name == this.post).id
+          post: this.posts.find(p => p.name === this.post).id
         }, { withCredentials: true });
         this.next(false);
         this.clear();
       } catch (e) {
         let err = e.response ? e.response.data || {} : {};
         let text = "Неизвестная ошибка";
-        if (err.error == "Invalid card") {
+        if (err.error === "Invalid card") {
           text = "Неверная карта получателя"
         }
-        if (err.error == "Invalid id") {
+        if (err.error === "Invalid id") {
           text = "Нельзя выполнять операции банкира с самим собой"
         }
-        if (err.error == "Not enough money") {
+        if (err.error === "Not enough money") {
           text = "Недостаточно АР на счету"
         }
-        if (err.error == "User not found") {
+        if (err.error === "User not found") {
           text = "Получатель не найден"
         }
-        if (err.error == "toCard not found") {
+        if (err.error === "toCard not found") {
           text = "У получателя нет ни единой карты"
         }
-        if (err.error == "Cooldown") {
+        if (err.error === "Cooldown") {
           return this.$store.dispatch('addNotification', {
             type: "danger", title: "Кулдаун",
             descr: 'Может ты и банкир, но дудосить сервер тебе не разрешали'
@@ -605,7 +627,7 @@ export default {
     },
     async sendMoney() {
       try {
-        await this.$api.post(`/cards/send/${this.users.find(u => u.username == this.username)._id}`, {
+        await this.$api.post(`/cards/send/${this.usr._id}`, {
           card: this.currentCard.id,
           sum: this.sum,
           comment: this.comment
@@ -635,7 +657,7 @@ export default {
             text = "У получателя нет ни единой карты";
             break;
         }
-        if (err.error == "Cooldown") {
+        if (err.error === "Cooldown") {
           return this.$store.dispatch('addNotification', {
             type: "danger", title: "Кулдаун",
             descr: 'Всего пара сек и можно попытаться перевести ещё раз'
@@ -682,7 +704,7 @@ export default {
             text = "Невозможно отправить на ту же карту";
             break;
         }
-        if (err.error == "Cooldown") {
+        if (err.error === "Cooldown") {
           return this.$store.dispatch('addNotification', {
             type: "danger", title: "Кулдаун",
             descr: 'Всего пара сек и можно попытаться перевести ещё раз'
@@ -693,6 +715,41 @@ export default {
           type: "error", title: "Ошибка",
           descr: `Не удалось совершить перевод: ${text}`
         })
+      }
+    },
+    async freezeUser(frozen = true) {
+      try {
+        await this.$api.post(`/users/${this.usr.id}/freeze`, {
+          comment: this.comment, frozen
+        }, { withCredentials: true });
+        this.next(false);
+        this.clear();
+        this.$parent.$fetch();
+      } catch (e) {
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        switch (err.error) {
+          case "Forbidden":
+            text = "Доступ запрещён";
+            break;
+          case "Invalid id":
+            text = "Нельзя заморозить самого себя";
+            break;
+          case "User not found":
+            text = "Пользователь не найден";
+            break;
+        }
+        if (err.error === "Cooldown") {
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Всего пара сек и можно попытаться заморозить/разморозить ещё раз'
+          });
+        }
+        console.error(e);
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось совершить заморозку/разморозку: ${text}`
+        });
       }
     }
   }

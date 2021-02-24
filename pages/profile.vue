@@ -177,7 +177,8 @@ export default {
     if (!this.$auth.loggedIn) this.$router.push('/login');
     setTimeout(()=>{this.$auth.fetchUser()}, 500);
     this.status = this.$auth.user.status;
-    this.banker = this.$auth.user.role > 1;
+    this.banker = this.$auth.user.role >= 2;
+    this.moder  = this.$auth.user.role >= 3;
 
     this.$store.commit("setLogs", this.$auth.user.logs);
     this.socket = this.$nuxtSocket({persist: true});

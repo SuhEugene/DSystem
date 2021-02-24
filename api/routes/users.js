@@ -38,14 +38,15 @@ userRouter
     User.find({role: {$ne: 0}},(err, users) => {
       if (err) return;
       if (req.user.role > 2) return res.json(users.map(u => ({
-         id: u. id, username: u.username,
-        _id: u._id, balance:  u.balance
+        id: u.id, _id: u._id,
+        username: u.username,
+        frozen: u.frozen !== undefined && u.frozen !== null && u.frozen !== false
       })));
       if (req.user.role > 1) return res.json(users.map(u => ({
         id: u.id, _id: u._id,
         username: u.username
       })));
-      return res.json(users.map(u => ({ id: u.id, username: u.username })));
+      return res.json(users.map(u => ({ _id: u._id, username: u.username })));
     });
   })
   .get("/@me", async (req, res) => {
@@ -117,14 +118,18 @@ userRouter
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    req.subUser.frozen = !req.subUser.frozen;
+    if (req.body.frozen) {
+      req.subUser.frozen = req.body.comment;
+    } else {
+      req.subUser.frozen = null;
+    }
     await req.subUser.save();
 
     await session.commitTransaction();
     session.endSession();
 
-    logger.log("(Frozen)", req.user.id, "frozen", req.subUser.id );
-
+    logger.log("(Frozen)", req.user.id, `${req.body.frozen ? '' : 'un'}frozen`, req.subUser.id, 'because of', req.body.comment);
+    return res.send();
   });
 
   const alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-_+=$#";
