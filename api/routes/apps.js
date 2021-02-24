@@ -63,7 +63,7 @@ router
   .post("/", async (req, res) => {
     if (!req.body.name) return res.status(400).send({ error: "Invalid body" });
 
-    if (cooldown.apps[req.user._id] & cooldown.apps[req.user._id] > Date.now())
+    if (cooldown.apps[req.user._id] && cooldown.apps[req.user._id] > Date.now())
       return res.status(400).send({ error: "appCD" }) // APPlication CoolDown -> appCD
 
     let apps = await App.find({ owner: req.user._id });
@@ -73,10 +73,10 @@ router
     let app = new App();
     app._id = new mongoose.Types.ObjectId();
     app.name = req.body.name.substr(0, 32);
-    app.secret = Math.round(Math.random()*9999999);
+    app.secret = `${Math.round(Math.random()*9999999)}q${Math.round(Math.random()*9999999)}q${Math.round(Math.random()*9999999)}q${Math.round(Math.random()*9999999)}`;
     app.owner = req.user._id;
     app.shortname = String(app._id);
-    app.save();
+    await app.save();
 
     return res.send();
   })
