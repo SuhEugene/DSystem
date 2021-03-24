@@ -11,13 +11,13 @@ class Auth {
   }
 
   get user() { return this.$store.state.$auth.user; }
-  get loggedIn() { return this.$store.state.$auth.loggedIn; }
   get error () { return this.$store.state.$auth.error; }
+  get loggedIn() { return this.$store.state.$auth.loggedIn; }
   get bigError () { return this.$store.state.$auth.bigError; }
 
-  set loggedIn(bool) { this.$store.commit("setLoggedIn", bool)}
-  set user (user) { this.$store.commit("setUser", user);/* console.log("user set", user)*/ }
+  set user (user) { this.$store.commit("setUser", user); }
   set error (err) { this.$store.commit("setAuthError", err); }
+  set loggedIn(bool) { this.$store.commit("setLoggedIn", bool); }
   set bigError (err) { this.$store.commit("setAuthBigError", err); }
 
   async logout() {
