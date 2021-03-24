@@ -16,8 +16,7 @@ require("dotenv").config();
 const scopeUserData = {
   "data": ["uuid", "id", "_id", "username"],
   "status": ["status"],
-  "role": ["role"],
-  "balance": ["balance"]
+  "role": ["role"]
 }
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
@@ -25,13 +24,7 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
   useNewUrlParser: true
 });
 
-// TODO OAUTH BIG TODO
-// **GET `oauth.di-api.net.ru/user`**
-// Получение игрока
-// Принимает `{}`
-// Возвращает `{ uuid, username, id, _id }`
-// Дополнительные поля по scope: `status`, `balance`, `role` (имя scope соответствует имени поля)
-//
+// TODO OAUTH SET STATUS
 // **POST `oauth.di-api.net.ru/user/status`** __scope `set-status`__
 // Установка статуса игроку
 // Принимает `{ status }`
@@ -191,6 +184,9 @@ app
       if (!req.data.scope.includes(scope)) continue;
       for (let field of scopeUserData[scope])
         response[field] = req.user[field];
+    }
+    if (req.data.scope.includes("cards")) {
+      response["cards"] = await req.user.cards;
     }
     return res.send(response);
   })
