@@ -20,9 +20,13 @@ const cardsRouter = require("./routes/cards");
 const authRouter = require("./routes/auth");
 const md5 = require('js-md5');
 const Joi = require("joi");
+const morgan = require("morgan");
 require("dotenv").config();
 
 io.users = [];
+
+// TODO socket io rooms and microservices handling
+// TODO Transaction "try-catch" abort
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
   useUnifiedTopology: true,
@@ -43,6 +47,12 @@ global.logger = {
 }
 
 
+morgan.token('ip', (req) => req.headers["x-forwarded-for"]);
+morgan.token('uuid', (req) => req.user ? req.user.uuid || 'No uuid' : 'No uuid');
+morgan.token('username', (req) => req.user ? req.user.username || 'Unknown' : 'Unknown');
+app.use(morgan('-----\n:ip :username\n:uuid\n:method :url :status\n:res[content-length] - :response-time ms'));
+
+app.disable("x-powered-by");
 app.use(bodyParser.json({ limit: '6mb', extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
