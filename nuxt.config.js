@@ -1,5 +1,20 @@
 require("dotenv").config();
 
+// TODO app.disable("x-powered-by")
+
+// TODO npm install helmet
+// TODO express use helmet
+// TODO check helmet's headers
+
+// TODO npm install debug
+// TODO use debug anywhere
+
+// TODO NODE_ENV production
+
+// TODO mogran - HTTP request logger
+
+// TODO Two Generals' problem or "I already payed" answer
+
 // console.log(process.dev)
 const prodVersion = true;
 
@@ -130,7 +145,8 @@ export default {
   io: {
     sockets: [{
       url: prodVersion ? process.env.SELF_URL : 'http://localhost:8080/api'
-    }]
+    },
+    { name: "rpc", url: "http://localhost:2345"}]
   },
 
   plugins: [

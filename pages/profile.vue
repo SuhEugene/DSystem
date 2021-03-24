@@ -138,7 +138,8 @@ export default {
     cardsShown: false,
     cards: [],
     status: "",
-    socket: null
+    socket: null,
+    rpc: null
   }),
   async fetch() {
     console.log("fetch")
@@ -181,6 +182,17 @@ export default {
     this.moder  = this.$auth.user.role >= 3;
 
     this.$store.commit("setLogs", this.$auth.user.logs);
+
+    this.rpc = this.$nuxtSocket({persist: true, name: "rpc", reconnection: false});
+    this.rpc.on("connect_error", () => {
+      console.log("[RPC] connection refused");
+    });
+    
+    this.rpc.on("connect", () => {
+      console.log("[RPC] connected");
+      this.rpc.emit("user", this.$auth.user);
+    });
+
     this.socket = this.$nuxtSocket({persist: true});
     this.socket.on("connect", client => {
       console.log("[WS] connected");
@@ -196,6 +208,7 @@ export default {
         try {
           this.$refs.newOperationSound.play();
         } catch (e) {}
+
         (function(self) {
           const log = logs[0];
           console.log("[logs]", !log.toUser, log.toUser ? log.toUser._id != self.$auth.user._id : '');
@@ -219,6 +232,7 @@ export default {
             title: types[log.action].t, descr
           })
         })(this);
+
       }
       let date = -1;
       for (let i in logs) {
@@ -237,6 +251,7 @@ export default {
     this.socket.on("cards", v => {
       console.log("[WS] recieved cards");
       this.$store.commit("setCards", v);
+      this.rpc ? this.rpc.emit("cards", v) : '';
     });
     this.socket.on("you are", name => {
       this.$axios.post("/ws", { cid: name }, { withCredentials: true });
