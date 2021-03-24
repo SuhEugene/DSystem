@@ -233,7 +233,7 @@ router
     session.endSession();
     logger.log("(Transaction)", "from:", logs.fromApp, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
 
-    let u1 = req.io.users.find(u => u.id == req.user.id);
+    let u1 = req.io.users.find(u => u.id === req.user.id);
 
     u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
     u1 && req.io.to(u1.io).emit("balance", req.user.balance);
@@ -245,7 +245,7 @@ router
 
     let changed = false;
 
-    if (req.app.shortname != req.body.shortname) {
+    if (req.app.shortname !== req.body.shortname) {
       changed = true;
       if (req.body.shortname) {
         let link = sanitizeUrl(req.body.shortname.toLowerCase().trim().split(/ +/).join('').substr(0, 24));
