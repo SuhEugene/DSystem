@@ -615,7 +615,24 @@ export default {
 
     },
     async downloadLogs () {
-      let logs = await this.$api.get('/users/@me/logs/download', { withCredentials: true });
+      let logs;
+      try {
+        logs = await this.$api.get('/users/@me/logs/download', { withCredentials: true });
+      } catch (e) {        
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error === "Cooldown") {
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Так часто логи выгружать, к сожалению, нельзя'
+          });
+        }
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось получить логи: ${text}`
+        });
+      }
+      if (!logs) return;
       window.URL = window.URL || window.webkitURL;
       let downloadElement = document.createElement('a');
       downloadElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(logs.data));
@@ -625,6 +642,11 @@ export default {
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
+      this.back(false, true);
+      return this.$store.dispatch('addNotification', {
+          type: "success", title: "Скачивание логов",
+          descr: "Логи успешно запрошены и скачаны"
+        });
     },
     async clearAllSessions () {
       try {

@@ -72,6 +72,7 @@ userRouter
   })
   .get("/@me/logs/download", async (req, res) => {
     // TODO: cooldown
+    // TODO: maybe 500?
     let logs = await getLogs(req, 200);
     return res.send(logs.map(log => `[${getStringByDate(new Date(log.timestamp))}] `+
       `${log.fromUser ? log.fromUser.username : log.fromApp.name} `+
