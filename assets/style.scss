@@ -167,14 +167,18 @@ n {
   &.a2 svg { animation: blinkLogo2 2s ease-in-out infinite both; }
   &.a3 svg { animation: blinkLogo3 2s ease-in-out infinite both; }
   &.a4 svg { animation: blinkLogo4 2s ease-in-out infinite both; }
-  &.a5 svg { animation: blinkLogo5 2s linear infinite both; }
+  &.a5 svg { animation: blinkLogo5 0.7s ease-in-out infinite both; }
   &.a6 svg { animation: blinkLogo6 2s ease-in-out infinite both; }
 }
 
 @keyframes blinkLogo1 {
-  from { opacity: 1; }
-  50%  { opacity: 0.5; }
-  to   { opacity: 1; }
+  from { transform: scale3d(1, 1, 1); }
+  50%  { transform: scale3d(2, 0.7, 1); }
+  60%  { transform: scale3d(0.8, 1.5, 1); }
+  68%  { transform: scale3d(1.2, 0.8, 1); }
+  76%  { transform: scale3d(0.9, 1.1, 1); }
+  80%  { transform: scale3d(1.05, 0.95, 1); }
+  to, 83%   { transform: scale3d(1, 1, 1); }
 }
 @keyframes blinkLogo2 {
   from { transform: translateX(-30px); }

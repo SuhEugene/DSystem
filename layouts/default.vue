@@ -34,6 +34,7 @@ export default {
     // dark: false,
     readyState: true,
     rand: `a${(new Date().getHours() % 6) + 1}`
+    // rand: 'a1'
   }),
 
   head () {
