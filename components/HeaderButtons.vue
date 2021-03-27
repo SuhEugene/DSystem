@@ -442,7 +442,7 @@
             <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
               <BackIcon size="26"/>
             </div>
-            <div tooltip="Обновить никнейм" @click="back(false, true)" class="profile-nav__button">
+            <div tooltip="Обновить никнейм" @click="updateNickname" class="profile-nav__button">
               <AccountConvertOutlineIcon size="26"/>
             </div>
             <!-- <div tooltip="Безобидная кнопка" @click="back(false, true)" class="profile-nav__button profile-nav__button--disabled">
@@ -579,6 +579,40 @@ export default {
       this.comment = "";
       this.card = "";
       this.card2 = "";
+    },
+    async updateNickname () {
+      try {
+        let nick = await this.$api.get("/users/@me/updateNickname", { withCredentials: true });
+
+        if (nick.data == this.$auth.user.username) {
+          this.back(false, true);
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Никнейм не изменился",
+            descr: `Ваш никнейм - ${nick.data}. Если это не так, то попробуйте ещё раз через 12 часов`
+          });
+        }
+
+        this.$auth.fetchUser();
+        this.back(false, true);
+        return this.$store.dispatch('addNotification', {
+          type: "success", title: "Никнейм изменён",
+          descr: `Ваш новый никнейм - ${nick.data}. Вы уже можете им любоваться в профиле`
+        });
+      } catch (e) {
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error === "Cooldown") {
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Нельзя так часто обновлять никнейм'
+          });
+        }
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось обновить никнейм: ${text}`
+        });
+      }
+
     },
     async downloadLogs () {
       let logs = await this.$api.get('/users/@me/logs/download', { withCredentials: true });

@@ -1,5 +1,6 @@
 /* global require module */
 const express = require("express");
+const fetch = require("node-fetch");
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const Logs = require("../models/logs");
@@ -76,6 +77,15 @@ userRouter
       `${log.fromUser ? log.fromUser.username : log.fromApp.name} `+
       `-> ${log.toUser ? log.toUser.username : log.toApp.name} `+
       `# ${log.sum} АР | ${log.more}`).join("\n"));
+  })
+  .get("/@me/updateNickname", async (req, res) => {
+    // TODO: cooldown
+    let f = await fetch(`https://playerdb.co/api/player/minecraft/${req.user.uuid}`)
+    let r = await f.json()
+    if (r.code !== "player.found") return res.status(400).send(r);
+    req.user.username = r.data.player.username;
+    await req.user.save();
+    return res.send(r.data.player.username);
   })
   .patch("/@me/status", async (req, res) => {
     req.user.status = req.body.status.substr(0, 32) || null;
