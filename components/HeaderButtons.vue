@@ -103,14 +103,14 @@
             <div class="profile-nav__row">
               <HelpInput type="text" placeholder="Карта" v-model="card"
                          :items="$auth.user.cards.map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card.toLowerCase()))"
-                         @enterpress="!!currentCard ? next('t-2') : ''"/>
+                         @enterpress="(!!currentCard && !!currentCard.id) ? next('t-2') : ''"/>
             </div>
             <div class="profile-nav__row">
               <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
                 <BackIcon size="26"/>
               </div>
               <div @click="next('t-2')" class="profile-nav__button profile-nav__button--w3"
-                   :class="{'profile-nav__button--disabled': !currentCard}">
+                   :class="{'profile-nav__button--disabled': !currentCard || !currentCard.id}">
                 Далее
               </div>
             </div>
