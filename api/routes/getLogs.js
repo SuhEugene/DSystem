@@ -1,5 +1,5 @@
 const Logs = require("../models/logs");
-module.exports = (req) => {
+module.exports = (req, number=null) => {
   return new Promise(async (send, reject) => {
     try {
       let logs_data = await Logs.find({
@@ -8,7 +8,7 @@ module.exports = (req) => {
           { toUser: req.user._id }
         ]
       }, [], {
-        limit: 15,
+        limit: number || 15,
         sort:{ timestamp: -1 }
       }).populate({ path: "fromApp",  select: "_id shortname image name level avatar"})
         .populate({ path: "toApp",    select: "_id shortname image name level avatar"})

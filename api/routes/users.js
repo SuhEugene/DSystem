@@ -7,6 +7,18 @@ const userRouter = express.Router();
 let cooldown = {};
 const getLogs = require("./getLogs");
 
+const getStringByDate = (d) => {
+  let data = {
+    day:   `${String(d.getDate())   .padStart(2,'0')}`,
+    month: `${String(d.getMonth()+1).padStart(2,'0')}`,
+    year:     String(d.getFullYear()),
+
+    hour:   `${String(d.getHours())  .padStart(2,'0')}`,
+    minute: `${String(d.getMinutes()).padStart(2,'0')}`,
+    second: `${String(d.getSeconds()).padStart(2,'0')}`
+  };
+  return `${data.day}.${data.month}.${data.year} ${data.hour}:${data.minute}:${data.second}`;
+}
 
 async function getMe (req) {
   return ({
@@ -56,6 +68,14 @@ userRouter
     getLogs(req)
     .then(res.json)
     .catch(()=>{ res.status(500).send() })
+  })
+  .get("/@me/logs/download", async (req, res) => {
+    // TODO: cooldown
+    let logs = await getLogs(req, 200);
+    return res.send(logs.map(log => `[${getStringByDate(new Date(log.timestamp))}] `+
+      `${log.fromUser ? log.fromUser.username : log.fromApp.name} `+
+      `-> ${log.toUser ? log.toUser.username : log.toApp.name} `+
+      `# ${log.sum} АР | ${log.more}`).join("\n"));
   })
   .patch("/@me/status", async (req, res) => {
     req.user.status = req.body.status.substr(0, 32) || null;

@@ -430,7 +430,7 @@
             <div tooltip="Смена пароля" @click="back(false, true)" class="profile-nav__button">
               <FormTextboxPasswordIcon size="26"/>
             </div>
-            <div tooltip="Скачать логи" @click="back(false, true)" class="profile-nav__button">
+            <div tooltip="Скачать логи" @click="downloadLogs" class="profile-nav__button">
               <DatabaseArrowDownOutlineIcon size="26"/>
             </div>
             <div tooltip="Очистить все сессии" @click="next('s-eraser')" class="profile-nav__button">
@@ -579,6 +579,18 @@ export default {
       this.comment = "";
       this.card = "";
       this.card2 = "";
+    },
+    async downloadLogs () {
+      let logs = await this.$api.get('/users/@me/logs/download', { withCredentials: true });
+      window.URL = window.URL || window.webkitURL;
+      let downloadElement = document.createElement('a');
+      downloadElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(logs.data));
+      downloadElement.setAttribute('download', `logs-${this.$auth.user.username}-${Date.now()}.txt`);
+      downloadElement.style.display = 'none';
+
+      document.body.appendChild(downloadElement);
+      downloadElement.click();
+      document.body.removeChild(downloadElement);
     },
     async clearAllSessions () {
       try {
