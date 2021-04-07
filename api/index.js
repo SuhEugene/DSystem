@@ -282,7 +282,7 @@ app.post("/reg", (req, res) => {
         console.log(r.data.player);
         User.findOne({ $or: [{uuid: r.data.player.raw_id}, {username: r.data.player.username}], role: { $ne:0 } }, async (err, usr) => {
           let newCard = new Card();
-          newCard.id = newId();
+          newCard.id = await newId();
           newCard.owner = user._id;
           newCard.text = "Основная карта";
           // newCard.pro = Date.now() * 10
@@ -300,11 +300,13 @@ app.post("/reg", (req, res) => {
     });
 });
 
-global.newId = () => {
+global.newId = async () => {
   t = "";
   for (let i = 0; i < 8; i++) {
     t += String(Math.floor(Math.random()*10));
   }
+  if (await Card.findOne({ id: t }))
+    return await newId();
   return t;
 }
 

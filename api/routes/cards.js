@@ -51,7 +51,7 @@ moneyRouter
     let comApp = await App.findOne({ _id: process.env.COM_APP_ID });
 
     let newCard = new Card();
-    newCard.id = newId();
+    newCard.id = await newId();
     newCard.owner = req.user._id;
     newCard.text = "Новая карта";
 
