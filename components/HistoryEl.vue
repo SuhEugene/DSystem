@@ -28,6 +28,7 @@
 <!--               :alt="log.toUser.username">-->
         </div>
         <AppImg :tooltip="to" type="52" v-if="toType == 'app'" :app="log.toApp" class="history-el--may-have-tooltip" />
+        <div v-if="toType == false"></div>
       </div>
       <div class="history-el__comm">
         <div class="history-el__comm--title"> {{this.log.action != 'banker-void' ? 'Комментарий' : 'Операция'}}</div>
@@ -61,7 +62,8 @@ const tooltips = {
   "banker-void" : "Пополнение/снятие",
   "send-to": "Перевод",
   "app-to": "Приложение",
-  "app-from": "Приложение"
+  "app-from": "Приложение",
+  "dpay": "DPay ваучер"
 }
 
 export default {
@@ -76,7 +78,7 @@ export default {
         if (this.log.fromUser && this.log.fromUser._id == this.$auth.user._id) return -this.log.sum;
         return this.log.sum
       }
-      // return this.log.sum;
+      return this.log.sum;
     },
     date () {
       const now = new Date();
