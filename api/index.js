@@ -18,6 +18,7 @@ const appRouter = require("./routes/apps");
 const moneyRouter = require("./routes/money");
 const cardsRouter = require("./routes/cards");
 const authRouter = require("./routes/auth");
+const dpayRouter = require("./routes/dpay");
 const md5 = require('js-md5');
 const Joi = require("joi");
 const morgan = require("morgan");
@@ -213,6 +214,7 @@ app.use("/users", userRouter);
 app.use("/apps", appRouter);
 app.use("/money", moneyRouter);
 app.use("/cards", cardsRouter);
+app.use("/dpay", dpayRouter);
 
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(24).required(),
