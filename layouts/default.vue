@@ -1,5 +1,5 @@
 <template>
-  <div class="container" :class="{dark: $store.state.dark}">
+  <div class="container"> <!--  :class="{dark: $store.state.dark}" -->
     <client-only>
       <div id="nonetwork" v-if="$nuxt.isOffline">
         <div style="margin-bottom:2px"><b>Интернет соединение потеряно</b></div>
@@ -58,7 +58,10 @@ export default {
           content: "Новая платёжная система СПк, в которой можно оплатить всё что угодно, где угодно, когда угодно, кому угодно"
           // content: "Оплати всё и везде"
         }
-      ]
+      ],
+      bodyAttrs: {
+        class: this.$store.state.dark ? 'dark' : ''
+      }
     })
   },
   mounted() {

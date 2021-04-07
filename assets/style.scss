@@ -1,6 +1,37 @@
 @import "./vars.scss";
 
 
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  &-track {
+    background: $card-hover;
+  }
+  &-thumb {
+    background: #{$always-primary}60;
+  }
+  &-thumb {
+    background: #{$always-primary}60;
+    &:hover {
+      background: #{$always-primary}90;
+    }
+  }
+}
+.dark::-webkit-scrollbar, .dark ::-webkit-scrollbar {
+  &-track {
+    background: $dark-card-background;
+  }
+  &-thumb {
+    background: #{$always-primary}60;
+  }
+  &-thumb {
+    background: #{$always-primary}60;
+    &:hover {
+      background: #{$always-primary}90;
+    }
+  }
+}
+
 @mixin bcontainer {
   display: flex;
   flex-direction: column;
@@ -35,6 +66,7 @@ html {
 }
 body {
   overflow-x: hidden;
+  overflow-y: scroll;
 }
 body,
 #__layout,
@@ -51,10 +83,11 @@ body,
   margin: 0;
   outline: none!important;
 }
-.container {
+
+.container, body {
   background: $background;
   color: $text-simple;
-  &.dark {
+  &.dark, .dark & {
     background: $dark-background;
     color: $dark-text-simple;
   }
