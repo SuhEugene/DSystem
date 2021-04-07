@@ -125,13 +125,10 @@ moneyRouter
       logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
 
-      let u1 = req.io.users.find(u => u.id == req.user.id);
-      let u2 = req.io.users.find(u => u.id == user.id);
-
-      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
-      u1 && req.io.to(u1.io).emit("cards", await req.user.cards);
-      u2 && req.io.to(u2.io).emit("cards", await user.cards);
+      req.io.to(String(req.user._id)).emit("logs",  await getLogs(req));
+      req.io.to(String(req.user._id)).emit("cards", await req.user.cards);
+      req.io.to(String(user._id)).emit("logs",  await getLogs({ user }));
+      req.io.to(String(user._id)).emit("cards", await user.cards);
     });
   })
   .post("/send/self/:card", async (req, res) => {
@@ -191,9 +188,8 @@ moneyRouter
     logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
     res.send();
 
-    let u1 = req.io.users.find(u => u.id == req.user.id);
-    u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-    u1 && req.io.to(u1.io).emit("cards", await req.user.cards);
+    req.io.to(String(req.user._id)).emit("logs",  await getLogs(req));
+    req.io.to(String(req.user._id)).emit("cards", await req.user.cards);
   })
   .post("/pass/send/:id", async (req, res) => {
     const { error } = hex.validate(req.params.id);
@@ -252,13 +248,10 @@ moneyRouter
       logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
 
-      let u1 = req.io.users.find(u => u.id == req.user.id);
-      let u2 = req.io.users.find(u => u.id == user.id);
-
-      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
-      u1 && req.io.to(u1.io).emit("cards", await req.user.cards);
-      u2 && req.io.to(u2.io).emit("cards", await user.cards);
+      req.io.to(String(req.user._id)).emit("logs",  await getLogs(req));
+      req.io.to(String(req.user._id)).emit("cards", await req.user.cards);
+      req.io.to(String(user._id)).emit("logs",  await getLogs({ user }));
+      req.io.to(String(user._id)).emit("cards", await user.cards);
     });
   })
   .use((req, res, next) => {
@@ -310,12 +303,9 @@ moneyRouter
       logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
 
-      let u1 = req.io.users.find(u => u.id == req.user.id);
-      let u2 = req.io.users.find(u => u.id == user.id);
-
-      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
-      u2 && req.io.to(u2.io).emit("cards", await user.cards);
+      req.io.to(String(req.user._id)).emit("logs", await getLogs(req));
+      req.io.to(String(user._id)).emit("logs",  await getLogs({ user }));
+      req.io.to(String(user._id)).emit("cards", await user.cards);
     });
   })
 

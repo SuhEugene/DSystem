@@ -144,9 +144,9 @@ export default {
   },
   io: {
     sockets: [{
-      url: prodVersion ? process.env.SELF_URL : 'http://localhost:8080/api'
+      url: prodVersion ? process.env.SELF_WS : 'http://localhost:8080/api'
     },
-    { name: "rpc", url: "http://localhost:2345"}]
+    { name: "rpc", url: "ws://localhost:2345"}]
   },
 
   plugins: [

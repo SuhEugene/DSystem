@@ -193,10 +193,11 @@ export default {
       this.rpc.emit("user", this.$auth.user);
     });
 
-    this.socket = this.$nuxtSocket({persist: true});
+    this.socket = this.$nuxtSocket({ persist: true, withCredentials: true });
     this.socket.on("connect", client => {
       console.log("[WS] connected");
       this.$nuxt.$loading.start();
+      this.socket.emit("hello");
     });
     this.socket.on("hello", err => {
       this.$nuxt.$loading.finish();
@@ -253,9 +254,6 @@ export default {
       this.$store.commit("setCards", v);
       this.rpc ? this.rpc.emit("cards", v) : '';
     });
-    this.socket.on("you are", name => {
-      this.$axios.post("/ws", { cid: name }, { withCredentials: true });
-    })
   }
 };
 </script>

@@ -150,10 +150,8 @@ router
 
     logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toApp, "op:", logs.action, "sum:", logs.sum);
 
-    let u1 = req.io.users.find(u => u.id == req.user.id);
-
-    u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-    u1 && req.io.to(u1.io).emit("balance", req.user.balance);
+    req.io.to(String(req.user._id)).emit("logs", await getLogs(req));
+    req.io.to(String(req.user._id)).emit("cards", await req.user.cards);
 
     res.send({ success: true });
 
@@ -233,10 +231,8 @@ router
     session.endSession();
     logger.log("(Transaction)", "from:", logs.fromApp, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
 
-    let u1 = req.io.users.find(u => u.id === req.user.id);
-
-    u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-    u1 && req.io.to(u1.io).emit("balance", req.user.balance);
+    req.io.to(String(req.user._id)).emit("logs", await getLogs(req));
+    req.io.to(String(req.user._id)).emit("cards", await req.user.cards);
     return res.send({ success: true });
   })
   .put("/:id", async (req, res) => {

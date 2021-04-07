@@ -69,13 +69,10 @@ moneyRouter
       logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
 
-      let u1 = req.io.users.find(u => u.id == req.user.id);
-      let u2 = req.io.users.find(u => u.id == user.id);
-
-      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
-      u1 && req.io.to(u1.io).emit("balance", req.user.balance);
-      u2 && req.io.to(u2.io).emit("balance", user.balance);
+      req.io.to(String(req.user._id)).emit("logs", await getLogs(req));
+      req.io.to(String(req.user._id)).emit("balance", req.user.balance);
+      req.io.to(String(user._id)).emit("logs", await getLogs({ user }));
+      req.io.to(String(user._id)).emit("balance", user.balance);
     });
   }).post("/pass/send/:id", (req, res) => {
     const { error } = hex.validate(req.params.id);
@@ -113,12 +110,10 @@ moneyRouter
       logger.log("(Transaction)", "from:", logs.fromUser, "to:", logs.toUser, "op:", logs.action, "sum:", logs.sum);
       res.send();
 
-      let u1 = req.io.users.find(u => u.id == req.user.id);
-      let u2 = req.io.users.find(u => u.id == user.id);
-      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-      u1 && req.io.to(u1.io).emit("balance", req.user.balance);
-      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
-      u2 && req.io.to(u2.io).emit("balance", user.balance);
+      req.io.to(String(req.user._id)).emit("logs", await getLogs(req));
+      req.io.to(String(req.user._id)).emit("balance", req.user.balance);
+      req.io.to(String(user._id)).emit("logs", await getLogs({ user }));
+      req.io.to(String(user._id)).emit("balance", user.balance);
     });
   })
   .use((req, res, next) => {
@@ -165,12 +160,9 @@ moneyRouter
 
       res.send();
 
-      let u1 = req.io.users.find(u => u.id == req.user.id);
-      let u2 = req.io.users.find(u => u.id == user.id);
-
-      u1 && req.io.to(u1.io).emit("logs", await getLogs(req));
-      u2 && req.io.to(u2.io).emit("logs", await getLogs({ user }));
-      u2 && req.io.to(u2.io).emit("balance", user.balance);
+      req.io.to(String(req.user._id)).emit("logs", await getLogs(req));
+      req.io.to(String(user._id)).emit("logs", await getLogs({ user }));
+      req.io.to(String(user._id)).emit("balance", user.balance);
     });
   })
 

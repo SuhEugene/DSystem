@@ -23,8 +23,6 @@ const Joi = require("joi");
 const morgan = require("morgan");
 require("dotenv").config();
 
-io.users = [];
-
 // TODO socket io rooms and microservices handling
 // TODO Transaction "try-catch" abort
 
@@ -332,20 +330,45 @@ const getUser = (_id, login) => new Promise((send, reject) => {
   });
 });
 
-
-app.post("/ws", (req, res) => {
-  if (!req.body.cid) return res.send();
-  io.users = io.users.filter(u => u.id !== req.user.id);
-  io.users.push({id: req.user.id, io: req.body.cid});
-  io.to(req.body.cid).emit("hello");
-  return res.send();
-})
-
-
 io.on("connection", client => {
   console.log("connected", client.id);
-  client.emit("you are", client.id);
+  client.on("error", (err) => {
+    if (err && err.message === "unauthorized event") {
+      socket.disconnect();
+    }
+  });
+  client.on("hello", () => {
+    console.log("HEADERS", client.handshake.headers)
+    console.log("AUTH", client.handshake.auth)
+
+    // Handshake cookie to object
+    let cookies = {};
+    !client.handshake.headers.cookie && console.log("MUST BE DISCONNECTED - NO COOKIE");
+    if (!client.handshake.headers.cookie) return client.disconnect();
+    for (let pair of client.handshake.headers.cookie.split(";")) {
+      let [name, value] = pair.trim().split("=");
+      cookies[name] = value;
+    }
+
+    console.log("COOKIES", cookies);
+
+    // Token checks
+    let token = cookies && cookies.auth;
+    if (!token) return client.disconnect();
+    token = token.replace("Bearer ", "");
+
+    // Token decryption
+    try {
+      return jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
+        if (err) return client.disconnect();
+        client.join(user._id);
+        console.log(client.id, "joined to room", user._id);
+        client.emit("hello");
+      });
+    } catch (e) { return client.disconnect(); }
+  });
 });
+
 
 http.listen(8081, ()=>{console.log("Started at *:8081"); console.log(Date.now())});
 
