@@ -176,7 +176,8 @@ export default {
       lang: 'ru',
       useWebmanifestExtension: false,
       background_color: "#346db3",
-      theme_color: "#346db3"
+      theme_color: "#346db3",
+      start_url: "/"
     },
     workbox: {
       workboxURL: "https://cdn.jsdelivr.net/npm/workbox-cdn/workbox/workbox-sw.js",
