@@ -12,7 +12,7 @@
             <ArrowRightBoldOutlineIcon size="26"/>
           </div>
           <div tooltip="DPay" @click="next('d0')/*dpayOpened=true*/" class="profile-nav__button">
-            <AccountCashOutlineIcon size="26"/>
+            <DPayLogo size="32"/>
           </div>
           <div tooltip="Банкир панель" @click="next('b0')" v-if="banker" class="profile-nav__button">
             <AccountCashOutlineIcon size="26"/>
@@ -475,7 +475,7 @@
                 <BackIcon size="26"/>
               </div>
               <div @click="getCodeMoney" class="profile-nav__button profile-nav__button--w3"
-                   :class="code.receivedBy ? 'profile-nav__button--w3' : ''">
+                   :class="code.receivedBy ? 'profile-nav__button--disabled' : ''">
                 Активировать
               </div>
             </div>
@@ -598,8 +598,11 @@ import Modal from "~/components/Modal.vue";
 import FormTextboxPasswordIcon from "mdi-vue/FormTextboxPassword.vue";
 import AccountConvertOutlineIcon from "mdi-vue/AccountConvertOutline.vue";
 import CloseNetworkOutlineIcon from "mdi-vue/CloseNetworkOutline.vue";
+import DPayLogo from "~/components/DPayCleanLogo.vue";
 
 // import Settings from "~/components/HeaderButtons/Settings.vue";
+
+// TODO: error pasta spaghetti
 
 export default {
   props: ["moder", "banker", "posts", "users", "cards"],
@@ -618,19 +621,12 @@ export default {
     code: {},
   }),
   components: {
-    AccountTieVoiceOutlineIcon,
-    CubeScanIcon,
-    CogOutlineIcon,
-    ArrowRightBoldOutlineIcon,
-    WeatherNightIcon,
-    LogoutVariantIcon,
-    AccountCashOutlineIcon,
-    AccountGroupOutlineIcon,
-    FormTextboxPasswordIcon,
-    AccountConvertOutlineIcon,
-    CloseNetworkOutlineIcon,
-    BackIcon, HelpInput,
-    Modal,
+    AccountTieVoiceOutlineIcon, CubeScanIcon,
+    CogOutlineIcon, ArrowRightBoldOutlineIcon,
+    WeatherNightIcon, LogoutVariantIcon, Modal,
+    AccountCashOutlineIcon, AccountGroupOutlineIcon,
+    FormTextboxPasswordIcon, AccountConvertOutlineIcon,
+    CloseNetworkOutlineIcon, BackIcon, HelpInput, DPayLogo
     // Settings
   },
   computed: {
@@ -671,7 +667,8 @@ export default {
       this.card = "";
       this.card2 = "";
       this.localError = "";
-      this.code = "";
+      this.code = {};
+      this.codeInput = "";
     },
     copyCode (bool=false) {
       this.$refs.codeInput.select();
@@ -689,7 +686,35 @@ export default {
         // this.code = code.data;
         this.next(false, true);
       } catch (e) {
-        this.next("d-error");
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error === "Cooldown") {
+          this.back("d-get-1");
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Нельзя так часто использовать коды'
+          });
+        }
+        if (err.e === "ICd" || err.error === "Invalid code") {
+          text = "Неверный код"
+        }
+        if (err.e === "WNF" || err.error === "Woucher not found") {
+          text = "DPay-ваучер не найден"
+        }
+        if (err.e === "AOw" || err.error === "Already owned") {
+          text = "Код уже был активирован"
+        }
+        if (err.e === "WT" || err.error === "Wrong timing") {
+          text = "Вы активируете код либо слишком рано, либо слишком поздно"
+        }
+        if (err.e === "CNF" || err.error === "Card not found") {
+          text = "У вас нет ни единой карточки"
+        }
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось использовать код: ${text}`
+        });
+        this.back("d-get-1");
       }
     },
     async createCode () {
@@ -699,7 +724,32 @@ export default {
         this.code = code.data;
         this.next("d-code");
       } catch (e) {
-        this.next("d-error");
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error === "Cooldown") {
+          this.back("d-create-2");
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Нельзя так часто создавать коды'
+          });
+        }
+        if (err.e === "ICd" || err.error === "Invalid code") {
+          text = "Неверный код"
+        }
+        if (err.e === "WNF" || err.error === "Woucher not found") {
+          text = "DPay-ваучер не найден"
+        }
+        if (err.e === "CNF" || err.error === "Card not found") {
+          text = "У вас нет ни единой карточки"
+        }
+        if (err.e === "NEM" || err.error === "Not enough money") {
+          text = "Недостаточно средств на балансе"
+        }
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось создать код: ${text}`
+        });
+        this.back("d-create-2");
       }
     },
     async getCode () {
@@ -709,7 +759,26 @@ export default {
         this.code = code.data;
         this.next("d-get-1");
       } catch (e) {
-        this.next("d-error");
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error === "Cooldown") {
+          this.back("d-get-0");
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Нельзя так часто получать коды'
+          });
+        }
+        if (err.e === "ICd" || err.error === "Invalid code") {
+          text = "Неверный код"
+        }
+        if (err.e === "WNF" || err.error === "Woucher not found") {
+          text = "DPay-ваучер не найден"
+        }
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось получить код: ${text}`
+        });
+        this.back("d-get-0");
       }
     },
     async updateNickname () {
@@ -744,7 +813,6 @@ export default {
           descr: `Не удалось обновить никнейм: ${text}`
         });
       }
-
     },
     async downloadLogs () {
       let logs;

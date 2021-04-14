@@ -78,7 +78,7 @@ dpayRouter
 
     firstCard.balance += req.woucher.sum;
 
-    req.woucher.received = req.user._id;
+    req.woucher.receivedBy = req.user._id;
 
     await logs.save();
     await firstCard.save();
@@ -97,7 +97,7 @@ dpayRouter
   .post("/", async (req, res) => {
     const { error } = validNumber.validate(req.body.sum);
     if (error)
-      return res.status(400).json({ error: "Invalid body" });
+      return res.status(400).json({ error: "Invalid body", e: "IB" });
 
     let fromCard;
     logger.log("req card", req.body.card);
@@ -105,13 +105,13 @@ dpayRouter
       fromCard = await req.user.findCard(req.body.card);
     } catch (e) {
       logger.log("Not found error", e);
-      return res.status(404).json({ error: "Card not found" });
+      return res.status(404).json({ error: "Card not found", e: "CNF" });
     }
 
-    if (!fromCard) return res.status(404).json({ error: "Card not found" });
+    if (!fromCard) return res.status(404).json({ error: "Card not found", e: "CNF" });
 
     if (fromCard.balance - parseInt(req.body.sum, 10) < 0)
-      return res.status(400).json({ error: "Not enough money" });
+      return res.status(400).json({ error: "Not enough money", e: "NEM" });
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -125,7 +125,7 @@ dpayRouter
 
     logs.fromUser = req.user._id;
     logs.toApp = process.env.COM_APP_ID;
-    logs.sum = parseInt(req.body.sum, 10);
+    logs.sum = -parseInt(req.body.sum, 10);
     logs.action = "dpay";
     logs.more = "Создание DPay код-ваучера";
 
