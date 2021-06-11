@@ -74,10 +74,20 @@ userRouter
     // TODO: cooldown
     // TODO: maybe 500?
     let logs = await getLogs(req, 200);
-    return res.send(logs.map(log => `[${getStringByDate(new Date(log.timestamp))}] `+
-      `${log.fromUser ? log.fromUser.username : log.fromApp.name} `+
-      `-> ${log.toUser ? log.toUser.username : log.toApp.name} `+
-      `# ${log.sum} АР | ${log.more}`).join("\n"));
+    return res.send(logs.map(log => {
+      let from = "Неизвестно";
+      let to = "Неизвестно";
+
+      if (log.fromUser) { from = log.fromUser.username }
+      else if (log.fromApp) { from = log.fromApp.name }
+
+      if (log.toUser) { to = log.toUser.username }
+      else if (log.toApp) { to = log.toApp.name }
+
+      return (`[${getStringByDate(new Date(log.timestamp))}] `+
+              `${from} -> ${to} `+
+              `# ${log.sum} АР | ${log.more || '[Комментарий отсутствует]'}`);
+    }).join("\n"));
   })
   .get("/@me/updateNickname", async (req, res) => {
     // TODO: cooldown
