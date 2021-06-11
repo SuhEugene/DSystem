@@ -59,12 +59,6 @@ export default {
   // ssr: true,
   target: "server",
 
-  loadingIndicator: {
-    name: 'three-bounce',
-    color: '#346db3',
-    background: '#222222'
-  },
-
   /*
    ** Headers of the page
    ** Doc: https://vue-meta.nuxtjs.org/api/#metainfo-properties
@@ -94,6 +88,10 @@ export default {
       },
       {
         rel: "icon",
+        href: "/favicon.png"
+      },
+      {
+        rel: "shortcut icon",
         href: "/favicon.png"
       },
       {
@@ -197,8 +195,21 @@ export default {
     /*
      ** You can extend webpack config here
      */
+    loaders: {
+      vue: {
+        transformAssetUrls: {
+          audio: 'src'
+        }
+      }
+    },
     extend(config, ctx) {
-      config.module.rules.push({test: /\.(mp3|wav)$/i, use: [{loader: 'file-loader'}]});
+      config.module.rules.push({
+        test: /\.(ogg|mp3|wav|mpe?g)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[path][name].[ext]'
+        }
+      });
     },
   }
 };
