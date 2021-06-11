@@ -86,3 +86,4 @@ sw.*
 
 # Tern project :3
 .tern-project
+sftp-config.json
