@@ -93,6 +93,7 @@ app.get("/user/:id", (req, res) => {
     res.json({
       _id: user._id,
       id: user.id,
+      uuid: user.uuid,
       role: user.role,
       status: user.status,
       username: user.username,
@@ -296,6 +297,7 @@ app.post("/reg", (req, res) => {
           user.sex = parseInt(req.body.sex, 10);
           user.role = 2;
           await user.save();
+          await newCard.save();
           res.status(200).send();
         })
       });
