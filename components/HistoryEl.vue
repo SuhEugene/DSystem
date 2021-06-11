@@ -69,7 +69,7 @@ const tooltips = {
 export default {
   props: ["log"],
   mounted () {
-    console.log(this.log);
+    // console.log(this.log);
   },
   computed: {
     sum () {

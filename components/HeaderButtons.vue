@@ -141,14 +141,14 @@
             <div class="profile-nav__row">
               <HelpInput type="text" placeholder="Карта получения" v-model="card2"
                          :items="$auth.user.cards.filter(c => c.id != currentCard.id).map(c => `${c.text} [${c.id}]`).filter(c => c.toLowerCase().includes(card2.toLowerCase()))"
-                         @enterpress="!!currentCard2 ? next('tu1') : ''"/>
+                         @enterpress="(!!currentCard2 && !!currentCard2.id)  ? next('tu1') : ''"/>
             </div>
             <div class="profile-nav__row">
               <div tooltip="Назад" @click="back('t-2')" class="profile-nav__button">
                 <BackIcon size="26"/>
               </div>
               <div @click="next('tu1')" class="profile-nav__button profile-nav__button--w3"
-                   :class="{'profile-nav__button--disabled': !currentCard2}">
+                   :class="{'profile-nav__button--disabled': !currentCard2 || !currentCard2.id}">
                 Далее
               </div>
             </div>

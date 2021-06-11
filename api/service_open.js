@@ -75,8 +75,10 @@ app.use((req, res, next) => {
       return res.status(400).send({ error: "Invalid token", e: "IT" });
     }
 
+    if (!_id || !secret) return res.status(400).send({ error: "Invalid token", e: "IT" });
+
     App.findOne({ _id, secret }, (err, app) => {
-      if (err) return res.status(500).send();
+      if (err) return res.status(500).send("Oh... bye...");
       req.app = app;
       return next();
     });

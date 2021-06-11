@@ -105,6 +105,7 @@ export default {
   width: 280px !important;
   border-radius: 10.5px; // 320/280 = 12/10.5    280/320=0.875
   color: $always-white;
+  background: linear-gradient(135deg, #ffffff33, transparent);
   background-color: darken($always-primary, 5);
   display: -webkit-flex;
   display: -ms-flex;

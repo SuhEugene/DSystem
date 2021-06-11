@@ -243,7 +243,7 @@ export default {
         date = d.getDate();
         logs[i].firstOfDay = true;
       }
-      console.log("DDD", logs);
+      // console.log("DDD", logs);
       this.$store.commit("setLogs", logs);
     });
     this.socket.on("balance", bal => {

@@ -32,56 +32,43 @@ class Auth {
 
   async fetchUser(retry=false) {
     try {
-      debug("\n/*/ NEW FETCH USER");
       let r = await this.$api.get(this.$auth.discord.userinfo_endpoint, { withCredentials: true });
-      debug("/*/ req was");
       this.user = r.data;
       if (this.user.logs) {
         let logs = [...this.user.logs];
         let date = -1;
         for (let i in logs) {
           const d = new Date(logs[i].timestamp);
-          console.log("/*/ ds", d.getDate(), date);
           if (d.getDate() == date) continue;
           date = d.getDate();
           logs[i].firstOfDay = true;
         }
-        console.log("DDD", logs);
         this.$store.commit("setLogs", logs);
       }
-      debug("/*/ user set");
       this.loggedIn = true;
-      debug("/*/ logged in");
       this.error = false;
-      debug("/*/ no error");
       if (!retry && r.data.error == "retry"){
-        debug("/*/ refetch");
+        console.log("[Auth] Retrying to fetch user data...")
         await this.fetchUser(true);
       }
-      debug("/*/ END");
+      console.log("[Auth] Successfully fetched user data")
       return true;
     } catch (e) {
-      console.warn(e.response ? e.response.data : e);
-      debug("/*/ fuck error");
-      debug("/*/ Da response", e.response ? e.response.data : 'no data');
+      console.warn("[Auth] Error: can't fetch user data");
       this.user = (e.response && e.response.data && e.response.data.uuid) ? e.response.data : false;
-      debug("/*/ user", this.user);
       this.loggedIn = false;
-      debug("/*/ not logged in");
       this.error = e.response ? e.response.data : e;
       // На случай отключения сервера
       if (e.response && e.response.status == 502) this.error = { message: "Network Error" };
-      debug("/*/ error");
       if (!retry && e.response && e.response.data.error == "retry"){
-        debug("/*/ refetch");
+        console.log("[Auth] Retrying to fetch user data...")
         return await this.fetchUser(true);
       }
       if (e.response && (e.response.data.error == "Frozen" || e.response.data.e == "F")) {
-        debug("/*/ I'm frozen");
-        if (process.server) {debug("/*/ redirect"); this.redirect("/frozen");}
-        if (process.browser) {debug("/*/ push"); this.app.router.push("/frozen");}
+        if (process.server) { this.redirect("/frozen"); }
+        if (process.browser) { this.app.router.push("/frozen"); }
       }
-      debug("/*/ false\nEND\n");
+      console.error("[Auth] Unable to fetch user data");
       return false;
     }
   }
@@ -97,8 +84,10 @@ class Auth {
       if (r.data.token) {
         localStorage.setItem("access_token", r.data.token);
       }
+      console.log("[Auth] Successfully logged in")
       return true;
     } catch (e) {
+      console.warn("[Auth] Error: can't log in using Discord");
       this.bigError = e.response ? e.response.data : e;
       if (e.response && e.response.status == 502) this.bigError = { message: "Network Error" };
       return false;
@@ -143,18 +132,16 @@ function randString() {
   return text;
 }
 
-const debug = (...args) => console.log(...args);
 
 const free = ["/user", "/app", '/frozen', '/oauth2'];
 
 export default async function (ctx, inject) {
 
   let cookie;
-  console.log("I'm on server?", `${process.server ? 'Yes' : 'No'}`);
+  console.log(`[Auth] Trying to log in on ${process.server ? 'server' : 'client'}`);
 
   const api = axios.create({ baseURL: process.env.axiosBase });
   if (process.server && ctx.req.headers.cookie) { api.defaults.headers.common['cookie'] = ctx.req.headers.cookie; }
-  debug("/ test");
   if (ctx.route.path == "/") return ctx.redirect("/login");
 
 
@@ -180,37 +167,30 @@ export default async function (ctx, inject) {
     }
   };
 
-  debug("Auth injection");
   let $auth = new Auth(ctx, authData, api);
   inject("auth", $auth);
 
-  debug("Log in");
   if (process.browser) {
     console.log(ctx.query.code, ctx.query.state, localStorage.getItem("state"))
     if (ctx.query.code && ctx.query.state && ctx.query.state == localStorage.getItem("state")) {
+      console.log("[Auth] Logging in with Discord...")
       await $auth.logIn(ctx.query.code);
-      console.log("LOGGING IN")
     }
     if (ctx.query.state) {
-      debug("State removing")
       localStorage.removeItem("state");
     }
   }
-  debug("User Fetch")
+  console.log("[Auth] Fetching user data...")
   await $auth.fetchUser();
 
   for (let path of free) {
     if (ctx.route.path.startsWith(path))
       return;
   }
-  debug("Not logged in check")
   if (!$auth.loggedIn && !["/login", "/register"].includes(ctx.route.path)) {
-    debug("Not logged in !!!!")
     ctx.redirect("/login");
   }
-  debug("Logged in check")
   if ($auth.loggedIn && ["/login", "/register"].includes(ctx.route.path)) {
-    debug("Logged in !!!!")
     ctx.redirect("/profile");
   }
 }

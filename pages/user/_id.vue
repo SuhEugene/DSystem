@@ -201,7 +201,7 @@ export default {
         },
         {
           property: "og:image",
-          content: this.user.username ? `https://minotar.net/armor/bust/${this.user.username}/300.png` : ''
+          content: this.user.uuid ? `https://visage.surgeplay.com/bust/256/${this.user.uuid}` : ''
         },
       ],
       link: [

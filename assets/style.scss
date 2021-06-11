@@ -191,6 +191,9 @@ n {
 }
 .main-loading-page {
   background: $always-primary;
+  .dark & {
+    background: $dark-primary;
+  }
   svg {
     width: 70%;
     max-width: 200px;
@@ -316,7 +319,7 @@ input[type=text], input[type=password], input[type=number], input[type=email], i
       box-shadow: 0 0 0 1px $dark-text-light;
     }
     &:focus {
-      box-shadow: 0 0 0 2px $always-primary;
+      box-shadow: 0 0 0 2px $dark-primary;
     }
   }
 }
@@ -362,8 +365,8 @@ label.radio, label.checkbox {
       box-shadow: inset 0 0 0 2px $dark-text-subtext;
     }
     &.checked::before {
-      box-shadow: inset 0 0 0 2px $always-primary, inset 0 0 0 4px $dark-background;
-      background: $always-primary;
+      box-shadow: inset 0 0 0 2px $dark-primary, inset 0 0 0 4px $dark-background;
+      background: $dark-primary;
     }
   }
 }
@@ -379,7 +382,7 @@ a {
   .dark & {
     color: $dark-text-subtext;
     &:hover {
-      color: $dark-text-light;
+      color: $dark-primary;
     }
   }
 }
@@ -451,6 +454,17 @@ button, a.btn, .btn {
     opacity: 0.5;
   }
   .dark & {
+    &.primary {
+      background: $dark-primary;
+      color: white;
+      transition: background .13s, opacity .13s;
+      &:hover {
+        background: lighten($color: $dark-primary, $amount: 5);
+      }
+      &:active {
+        background: lighten($color: $dark-primary, $amount: 8);
+      }
+    }
     &.secondary {
       box-shadow: inset 0 0 0 3px $dark-text-light;
       color: $dark-text-light;
@@ -545,7 +559,7 @@ button, a.btn, .btn {
   from {opacity: 0;}
 }
 
-
+/* TODO CALLED REDISIGN */
 .called {
   position: fixed;
   bottom: 10px;
@@ -712,6 +726,11 @@ button, a.btn, .btn {
     &:focus {
       box-shadow: 0 0 0 2px $always-primary!important;
     }
+    .dark {
+      &:focus {
+        box-shadow: 0 0 0 2px $dark-primary!important;
+      }
+    }
   }
   &__button {
     width: 45px;
@@ -812,7 +831,7 @@ button, a.btn, .btn {
   background: url('~@/assets/profile_bg.webp') center center;
   background-size: cover;
   position: relative;
-  padding: 32px 64px;
+  padding: 48px 64px;
   &__overlay {
     position: absolute;
     left: 0;
@@ -1249,7 +1268,7 @@ button, a.btn, .btn {
         box-shadow: 0 0 0 1px $dark-card-stroke;
         color: $dark-text-simple;
         &:hover { box-shadow: 0 0 0 1px $dark-text-light; }
-        &:focus { box-shadow: 0 0 0 2px $always-primary; }
+        &:focus { box-shadow: 0 0 0 2px $dark-primary; }
       }
     }
     .dark & {
