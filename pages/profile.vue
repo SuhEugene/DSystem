@@ -95,6 +95,16 @@
       </div>
     </div>
     <Call v-for="call in calls" :key="call.id" :user="call.user" :bank="call.bank"/>
+    <div v-if="callsConnection == 1" class="connection">
+      <div class="connection__loading"></div>
+      <span>Подключение к вызовам...</span>
+    </div>
+    <div v-if="callsConnection == 2" class="connection">
+      <span>Вызовы подключены</span>
+    </div>
+    <div v-if="callsConnection == 3" class="connection">
+      <span>Ошибка подключения</span>
+    </div>
   </section>
 </template>
 
@@ -132,6 +142,7 @@ export default {
   data: () => ({
     moder: false,
     banker: false,
+    callsConnection: 0,
     calls: [],
     apps: [],
     users: [],
@@ -203,7 +214,18 @@ export default {
     this.socket.on("hello", err => {
       this.$nuxt.$loading.finish();
       console.log("[WS] logged in");
+      if (this.$auth.user.role > 1) {
+        this.callsConnection = 1;
+        this.socket.emit("banker");
+      }
     });
+    this.socket.on("banker", (isConnected) => {
+      if (isConnected) {
+        this.callsConnection = 2;
+      } else {
+        this.callsConnection = 3;
+      }
+    })
     this.socket.on("logs", logs => {
       console.log("[WS] recieved logs");
       if (logs != this.$store.state.logs) {
@@ -267,6 +289,33 @@ export default {
     align-items: flex-start;
     justify-content: space-between;
   }
+  .connection {
+    position: fixed;
+    bottom: 3px;
+    right: 3px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    &__loading {
+      margin-right: 5px;
+      height: 12px;
+      width: 12px;
+      border: 3px solid transparent;
+      border-top-color: #346db3;
+      border-left-color: #346db3;
+      border-radius: 50%;
+      animation: circled 0.5s linear 0s infinite both;
+    }
+  }
+  @keyframes circled {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
 </style>
 
 <!-- <div style="display: none;" class="mrFear">

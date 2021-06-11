@@ -19,6 +19,7 @@ const moneyRouter = require("./routes/money");
 const cardsRouter = require("./routes/cards");
 const authRouter = require("./routes/auth");
 const dpayRouter = require("./routes/dpay");
+const callRouter = require("./routes/call");
 const md5 = require('js-md5');
 const Joi = require("joi");
 const morgan = require("morgan");
@@ -216,6 +217,7 @@ app.use("/apps", appRouter);
 app.use("/money", moneyRouter);
 app.use("/cards", cardsRouter);
 app.use("/dpay", dpayRouter);
+app.use("/call", callRouter);
 
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(24).required(),
@@ -343,10 +345,21 @@ io.on("connection", client => {
       socket.disconnect();
     }
   });
-  client.on("hello", () => {
-    console.log("HEADERS", client.handshake.headers)
-    console.log("AUTH", client.handshake.auth)
+  client.on("banker", async () => {
+    if (!client.data.id) return client.emit("banker", false);
+    try {
+      let usr = await User.findOne({ _id: client.data.id });
+      if (!usr) return client.emit("banker", false);
+      if (usr.role < 2) return client.emit("banker", false);
+      console.log(client.id, "joined to room BANKERS");
+      client.join("BANKERS");
+      return client.emit("banker", true);
+    } catch (e) {
+      return client.emit("banker", false);
+    }
 
+  })
+  client.on("hello", () => {
     // Handshake cookie to object
     let cookies = {};
     !client.handshake.headers.cookie && console.log("MUST BE DISCONNECTED - NO COOKIE");
@@ -368,6 +381,10 @@ io.on("connection", client => {
       return jwt.verify(token, process.env.JWT_SECRET, async function(err, user) {
         if (err) return client.disconnect();
         client.join(user._id);
+        if (!client.data) {
+          client.data = {};
+        }
+        client.data.id = user._id;
         console.log(client.id, "joined to room", user._id);
         client.emit("hello");
       });

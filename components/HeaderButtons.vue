@@ -7,7 +7,7 @@
       <div v-if="!menu" :key="false" class="profile-nav">
         <div class="profile-nav__row">
           <!-- TODO ВЫЗОВ БАНКИРА -->
-          <div tooltip="Вызвать банкира" class="profile-nav__button">
+          <div tooltip="Вызвать банкира" @click="next('cl0')" class="profile-nav__button">
             <AccountTieVoiceOutlineIcon size="26"/>
           </div>
           <div tooltip="Перевод" @click="next('t-1')" class="profile-nav__button">
@@ -343,6 +343,77 @@
         </div>
       </template>
 
+      <!-- BANKER CALL -->
+      <template>
+        <!-- Post -->
+        <div v-if="menu === 'cl0'" key="cl0" class="profile-nav">
+          <div class="profile-nav__row">
+            <HelpInput type="text" placeholder="Отделение"
+                       v-model="post"
+                       :items="posts.map(p => p.name).filter(p => p && p.toLowerCase().includes(post.toLowerCase()))"
+                       @enterpress="!!posts.find(p => p.name === post) ? next('cl1') : ''"/>
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="sum=2;next('cl1');" class="profile-nav__button profile-nav__button--w3"
+                 :class="{'profile-nav__button--disabled': !posts.find(p => p.name == post)}">
+              Далее
+            </div>
+          </div>
+        </div>
+        <!-- Confirm -->
+        <div v-if="menu === 'cl1'" key="cl1" class="profile-nav">
+          <div class="profile-nav__row">
+            <div>
+              Отделение: <b>{{post}}</b>;<br/>
+              Вызов: <b>2 АР</b>;<br/>
+              Отменить вызов <b>невозможно</b><br/>
+            </div>
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back('cl0')" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="callBanker" class="profile-nav__button profile-nav__button--w3"
+            :class="{'profile-nav__button--disabled': sumCheck}">Оплатить</div>
+          </div>
+        </div>
+        <!-- Loading -->
+        <div v-if="menu === 'cl-loading'" key="cl-loading" class="profile-nav full-h">
+          <div class="profile-nav__row full-h full-w" style="justify-content: center">
+            <span class="rotate-anim">Загрузка</span>
+          </div>
+        </div>
+        <!-- Wait -->
+        <div v-if="menu === 'cl-wait'" key="cl-wait" class="profile-nav full-h">
+          <div class="profile-nav__row full-h full-w" style="justify-content: center">
+            <span>Ждём ответа банкира...</span>
+          </div>
+        </div>
+        <!-- Found -->
+        <div v-if="menu === 'cl-found'" key="cl-found" class="profile-nav full-h">
+          <div class="profile-nav__row full-w" style="justify-content: center">
+            <span>Банкир в пути: <b>{{foundBanker}}</b></span>
+          </div>
+        </div>
+        <!-- Error -->
+        <div v-if="menu === 'cl-error'" key="cl-error" class="profile-nav full-h">
+          <div class="profile-nav__row full-h full-w" style="justify-content: center">
+            <span><b>Ошибка: </b>{{localError}}</span>
+          </div>
+          <div class="profile-nav__row">
+            <div tooltip="Назад" @click="back(false, true)" class="profile-nav__button">
+              <BackIcon size="26"/>
+            </div>
+            <div @click="back(false, true)" class="profile-nav__button profile-nav__button--w3">
+              Готово
+            </div>
+          </div>
+        </div>
+      </template>
+
       <!-- DPay -->
       <template>
         <!-- Choise -->
@@ -616,6 +687,7 @@ export default {
     card2: "",
     codeInput: "",
     localError: "",
+    foundBanker: "",
     code: {},
   }),
   components: {
@@ -642,7 +714,19 @@ export default {
     },
     codeCheck () {
       return this.codeInput.replace(/ +/,'').replace("-",'').length == 10;
-    }
+    },
+  },
+  mounted () {
+    let socket = this.$nuxtSocket({ persist: true, withCredentials: true });
+    socket.on("banker search", () => { this.next("cl-wait"); });
+    socket.on("banker found", (username) => {
+      this.foundBanker = username;
+      this.next("cl-found");
+    });
+    socket.on("banker not found", () => {
+      this.localError = "Банкир не найден";
+      this.next("cl-error");
+    });
   },
   methods: {
     logout () {
@@ -667,6 +751,7 @@ export default {
       this.localError = "";
       this.code = {};
       this.codeInput = "";
+      this.foundBanker = "";
     },
     copyCode (bool=false) {
       this.$refs.codeInput.select();
@@ -676,6 +761,43 @@ export default {
         type: "primary", title: "Копирование",
         descr: "Код ваучера был успешно скопирован в буфер обмена"
       });
+    },
+    async callBanker () {
+      this.next("cl-load");
+      try {
+        let awaiting = await this.$api.post("/call");
+        this.next("cl-wait");
+      } catch (e) {
+        let err = e.response ? e.response.data || {} : {};
+        let text = "Неизвестная ошибка";
+        if (err.error === "Cooldown") {
+          this.back("cl1");
+          return this.$store.dispatch('addNotification', {
+            type: "danger", title: "Кулдаун",
+            descr: 'Слишком частые запросы'
+          });
+        }
+        if (err.e === "ALr" || err.error === "Already calling") {
+          return this.$store.dispatch('addNotification', {
+            type: "success", title: "Восстановление",
+            descr: 'Ваша сессия вызова банкира успешно восстановлена'
+          });
+        }
+        if (err.e === "IPost" || err.error === "Invalid post") {
+          text = "Отделение указано неверно";
+        }
+        if (err.e === "NEM" || err.error === "Not enough money") {
+          text = "Недостаточно средств на основной карточке";
+        }
+        if (err.e === "CNF" || err.error === "Card not found") {
+          text = "У вас нет ни единой карточки";
+        }
+        this.$store.dispatch('addNotification', {
+          type: "error", title: "Ошибка",
+          descr: `Не удалось совершить вызов: ${text}`
+        });
+        this.back("d-get-1");
+      }
     },
     async getCodeMoney () {
       this.next("d-wait");
