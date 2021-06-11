@@ -1,5 +1,6 @@
 <template>
   <div>
+    <audio ref="bankerSound" src="/banker.mp3"></audio>
     <transition :name="animBack ? 'swipe-menu-back' : 'swipe-menu'">
 
       <!-- MAIN MENU -->

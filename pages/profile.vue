@@ -84,7 +84,7 @@
         </div>
         <div class="profile-section__right">
           <div class="history">
-            <audio ref="newOperationSound" src="~/assets/ping.mp3"></audio>
+            <audio ref="newOperationSound" src="/ping2.mp3"></audio>
             <h1>История операций</h1>
             <div class="history__inner__data">
               <p v-if="!$store.state.logs || !$store.state.logs.length">Операций не найдено</p>
