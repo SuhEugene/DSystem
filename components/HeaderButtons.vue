@@ -9,7 +9,8 @@
           <!-- TODO ВЫЗОВ БАНКИРА -->
           <div tooltip="Вызвать банкира" class="profile-nav__button">
             <AccountTieVoiceOutlineIcon size="26"/>
-          </div><div tooltip="Перевод" @click="next('t-1')" class="profile-nav__button">
+          </div>
+          <div tooltip="Перевод" @click="next('t-1')" class="profile-nav__button">
             <ArrowRightBoldOutlineIcon size="26"/>
           </div>
           <div tooltip="DPay" @click="next('d0')/*dpayOpened=true*/" class="profile-nav__button">
@@ -92,7 +93,6 @@
           </div>
         </div>
       </template>
-
 
       <!-- MONEY SENDING -->
       <template>
@@ -180,7 +180,7 @@
               </div>
             </div>
             <div class="profile-nav__row">
-              <div tooltip="Назад" @click="back('t2')" class="profile-nav__button">
+              <div tooltip="Назад" @click="back('tu1')" class="profile-nav__button">
                 <BackIcon size="26"/>
               </div>
               <div @click="sendSelfMoney" class="profile-nav__button profile-nav__button--w3">
@@ -194,73 +194,73 @@
         <template>
           <!-- Username -->
           <div v-if="menu === 't0'" key="t0" class="profile-nav">
-          <div class="profile-nav__row">
-            <HelpInput type="text" placeholder="Никнейм" v-model="username"
-                       :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
-                       @enterpress="!!users.find(u => u.username === username) ? next('t1') : ''" />
-          </div>
-          <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back('t-2')" class="profile-nav__button">
-              <BackIcon size="26"/>
+            <div class="profile-nav__row">
+              <HelpInput type="text" placeholder="Никнейм" v-model="username"
+                         :items="users.map(u => u.username).filter(u => u && u.toLowerCase().includes(username.toLowerCase()) && u != $auth.user.username)"
+                         @enterpress="!!users.find(u => u.username === username) ? next('t1') : ''" />
             </div>
-            <div @click="next('t1')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': !users.find(u => u.username == username)}">
-              Далее
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t-2')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('t1')" class="profile-nav__button profile-nav__button--w3"
+                   :class="{'profile-nav__button--disabled': !users.find(u => u.username == username)}">
+                Далее
+              </div>
             </div>
           </div>
-        </div>
           <!-- Sum -->
           <div v-if="menu == 't1'" key="t1" class="profile-nav">
-          <div class="profile-nav__row">
-            <input type="number" v-model="sum" placeholder="Сумма"
-                   @keyup.enter="(!(sumCheck || sum <= 0 || sum > currentCard.balance)) ? next('t2') : ''"
-                   />
-          </div>
-          <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back('t0')" class="profile-nav__button">
-              <BackIcon size="26"/>
+            <div class="profile-nav__row">
+              <input type="number" v-model="sum" placeholder="Сумма"
+                     @keyup.enter="(!(sumCheck || sum <= 0 || sum > currentCard.balance)) ? next('t2') : ''"
+                     />
             </div>
-            <div @click="next('t2')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > currentCard.balance}">
-              Далее
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t0')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('t2')" class="profile-nav__button profile-nav__button--w3"
+                   :class="{'profile-nav__button--disabled': sumCheck || sum <= 0 || sum > currentCard.balance}">
+                Далее
+              </div>
             </div>
           </div>
-        </div>
           <!-- Comment -->
           <div v-if="menu == 't2'" key="t2" class="profile-nav">
-          <div class="profile-nav__row">
-            <input type="text" placeholder="Комментарий" v-model="comment"
-                   @keyup.enter="(comment.length <= 100) ? next('t3') : ''" />
-          </div>
-          <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back('t1')" class="profile-nav__button">
-              <BackIcon size="26"/>
+            <div class="profile-nav__row">
+              <input type="text" placeholder="Комментарий" v-model="comment"
+                     @keyup.enter="(comment.length <= 100) ? next('t3') : ''" />
             </div>
-            <div @click="next('t3')" class="profile-nav__button profile-nav__button--w3"
-                 :class="{'profile-nav__button--disabled': comment.length > 100}">
-              Далее
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t1')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="next('t3')" class="profile-nav__button profile-nav__button--w3"
+                   :class="{'profile-nav__button--disabled': comment.length > 100}">
+                Далее
+              </div>
             </div>
           </div>
-        </div>
           <!-- Confirm -->
           <div v-if="menu == 't3'" key="t3" class="profile-nav">
-          <div class="profile-nav__row">
-            <div>
-              Получатель: <b>{{username}}</b>;<br>
-              Сумма: <b>{{sum}} АР</b>;<br>
-              Комментарий:<br>
-              <span style="max-width: 225px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{comment}}</span>
+            <div class="profile-nav__row">
+              <div>
+                Получатель: <b>{{username}}</b>;<br>
+                Сумма: <b>{{sum}} АР</b>;<br>
+                Комментарий:<br>
+                <span style="max-width: 225px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{comment}}</span>
+              </div>
+            </div>
+            <div class="profile-nav__row">
+              <div tooltip="Назад" @click="back('t2')" class="profile-nav__button">
+                <BackIcon size="26"/>
+              </div>
+              <div @click="sendMoney" class="profile-nav__button profile-nav__button--w3">
+                Отправить
+              </div>
             </div>
           </div>
-          <div class="profile-nav__row">
-            <div tooltip="Назад" @click="back('t2')" class="profile-nav__button">
-              <BackIcon size="26"/>
-            </div>
-            <div @click="sendMoney" class="profile-nav__button profile-nav__button--w3">
-              Отправить
-            </div>
-          </div>
-        </div>
         </template>
       </template>
 
@@ -490,7 +490,7 @@
           </div>
         </div>
         <!-- Error -->
-        <div v-if="menu === 'd-error'" key="d-wait" class="profile-nav full-h">
+        <div v-if="menu === 'd-error'" key="d-error" class="profile-nav full-h">
           <div class="profile-nav__row full-h full-w" style="justify-content: center">
             <span><b>Ошибка: </b>{{localError}}</span>
           </div>
@@ -503,10 +503,7 @@
             </div>
           </div>
         </div>
-
-        
       </template>
-
 
       <!-- SETTINGS -->
       <template>
