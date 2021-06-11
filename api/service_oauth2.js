@@ -186,7 +186,9 @@ app
         response[field] = req.user[field];
     }
     if (req.data.scope.includes("cards")) {
-      response["cards"] = await req.user.cards;
+      response["cards"] = (await req.user.cards).map(
+        {id, text, owner, coowners, balance} => {id, text, owner, coowners, balance: req.data.scope.includes("cards-bal") ? balance : null }
+      );
     }
     return res.send(response);
   })
