@@ -338,8 +338,9 @@ const getUser = (_id, login) => new Promise((send, reject) => {
   });
 });
 
-io.on("connection", client => {
+io.of("/").on("connection", client => {
   console.log("connected", client.id);
+  console.log(client.handshake.headers.cookie)
   client.on("error", (err) => {
     if (err && err.message === "unauthorized event") {
       socket.disconnect();

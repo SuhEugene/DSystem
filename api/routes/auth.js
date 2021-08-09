@@ -82,73 +82,24 @@ router
     );
     console.log("SADSAD", id, req.body.client_id,
       req.body.code);
-    User.findOne({ id }, async (err, user) => {
-      if (err) return;
+    const user = await User.findOne({ id });
 
-
-      // IF USER EXISTS
-      if (user && user.role != 0) {
-        let token = jwt.sign(
-          { id: user.id, _id: user._id, login: user.login },
-          process.env.JWT_SECRET,
-          { expiresIn: 21600 } // 6h
-        );
-
-        let refresh = jwt.sign(
-          { id: user.id, _id: user._id, login: user.login },
-          process.env.JWT_REFRESH_SECRET,
-          { expiresIn: 2419200 } // 4 Weeks
-        );
-
-        logger.log("(Auth)", user.id, "logged in");
-        logger.log("(AUTH)", process.env.CLEAR_MAIN);
-        //  primary auth token
-        res.cookie("auth", token,
-            { expires: new Date(Date.now() + 21600000),
-              httpOnly: true, sameSite: true, secure: true })
-          // secondary token to refresh primary (default)
-          .cookie("refresh", refresh,
-            { expires: new Date(Date.now() + 2419200000),
-              httpOnly: true, sameSite: true, secure: true })
-
-          .send({ token: "We don't like hackers" });
-        return;
-      }
-
-      if (!id) return res.status(400).send({ error: "Invalid code", e: "IC" });
-
-      // ELSE REGISTER NEW USER
-      console.log("hello");
-      if (!(await isOurUser(id))) // (or not...)
-        return res.status(400).send({ error: "Non SPk gamer", e: "NSG" });
-
-
-      if (user && user.role == 0) await user.delete();
-      let newUser = new User({
-        id,
-        username,
-        password: getPasswordHash("123123"),
-        status: null,
-        balance: 0,
-        role: 0,
-        login: randStr()
-      });
-      await newUser.save();
-
-
+    // IF USER EXISTS
+    if (user && user.role != 0) {
       let token = jwt.sign(
-        { id: newUser.id, _id: newUser._id, login: newUser.login },
+        { id: user.id, _id: user._id, login: user.login },
         process.env.JWT_SECRET,
         { expiresIn: 21600 } // 6h
       );
+
       let refresh = jwt.sign(
-        { id: newUser.id, _id: newUser._id, login: newUser.login },
+        { id: user.id, _id: user._id, login: user.login },
         process.env.JWT_REFRESH_SECRET,
         { expiresIn: 2419200 } // 4 Weeks
       );
-      logger.log("(Auth)", newUser.id, "started registration");
-      // return res.json({ token });
 
+      logger.log("(Auth)", user.id, "logged in");
+      logger.log("(AUTH)", process.env.CLEAR_MAIN);
       //  primary auth token
       res.cookie("auth", token,
           { expires: new Date(Date.now() + 21600000),
@@ -160,8 +111,53 @@ router
 
         .send({ token: "We don't like hackers" });
       return;
+    }
 
+    if (!id) return res.status(400).send({ error: "Invalid code", e: "IC" });
+
+    // ELSE REGISTER NEW USER
+    console.log("hello");
+    if (!(await isOurUser(id))) // (or not...)
+      return res.status(400).send({ error: "Non SPk gamer", e: "NSG" });
+
+
+    if (user && user.role == 0) await user.delete();
+    let newUser = new User({
+      id,
+      username,
+      password: getPasswordHash("123123"),
+      status: null,
+      balance: 0,
+      role: 0,
+      login: randStr()
     });
+    await newUser.save();
+
+
+    let token = jwt.sign(
+      { id: newUser.id, _id: newUser._id, login: newUser.login },
+      process.env.JWT_SECRET,
+      { expiresIn: 21600 } // 6h
+    );
+    let refresh = jwt.sign(
+      { id: newUser.id, _id: newUser._id, login: newUser.login },
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: 2419200 } // 4 Weeks
+    );
+    logger.log("(Auth)", newUser.id, "started registration");
+    // return res.json({ token });
+
+    //  primary auth token
+    res.cookie("auth", token,
+        { expires: new Date(Date.now() + 21600000),
+          httpOnly: true, sameSite: true, secure: true })
+      // secondary token to refresh primary (default)
+      .cookie("refresh", refresh,
+        { expires: new Date(Date.now() + 2419200000),
+          httpOnly: true, sameSite: true, secure: true })
+
+      .send({ token: "We don't like hackers" });
+    return;
   });
 
 const alphabet = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-_+=$#";
