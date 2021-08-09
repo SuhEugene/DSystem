@@ -48,7 +48,7 @@ app.post("/user", async (req, res) => {
   if (!req.body.id) return res.status(400).send("FCK");
   try {
 		const gld = await client.guilds.fetch(mainGuild);
-		const mbr = await gld.members.fetch(req.body.id, { cache: false });
+    const mbr = await gld.members.fetch({ user: req.body.id, cache: false, force: true });
 		if (!mbr) return res.send({ gamer: false });
     return res.send({ gamer: mbr.roles.cache.has(mainRole) });
   } catch (e) { return res.status(500).send({ gamer: false, error: true }); }
