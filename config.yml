@@ -1,0 +1,30 @@
+apps:
+- name: dromon
+  script: node_modules/nuxt-start/bin/nuxt-start.js
+  cwd: /root/DBank
+  max_memory_restart: "500M"
+  args: "start"
+  env_production:
+    PORT: 8080
+    NODE_ENV: production
+
+- name: dapi
+  script: index.js 
+  cwd: /root/DBank/api
+  env_production:
+    PORT: 8081
+    NODE_ENV: production
+
+- name: doauth
+  script: service_oauth2.js 
+  cwd: /root/DBank/api
+  env_production:
+    PORT: 8082
+    NODE_ENV: production
+
+- name: dopen
+  script: service_oauth2.js 
+  cwd: /root/DBank/api
+  env_production:
+    PORT: 8083
+    NODE_ENV: production
