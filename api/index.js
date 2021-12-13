@@ -4,7 +4,6 @@ const express = require("express");
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -46,15 +45,21 @@ global.logger = {
   }
 }
 
-
+///////////////////////////////////
+//            LOGGER             //
+///////////////////////////////////
 morgan.token('ip', (req) => req.headers["x-forwarded-for"]);
 morgan.token('uuid', (req) => req.user ? req.user.uuid || 'No uuid' : 'No uuid');
 morgan.token('username', (req) => req.user ? req.user.username || 'Unknown' : 'Unknown');
 app.use(morgan('-----\n:ip :username\n:uuid\n:method :url :status\n:res[content-length] - :response-time ms'));
 
+
+///////////////////////////////////
+//          MIDDLEWARE           //
+///////////////////////////////////
 app.disable("x-powered-by");
-app.use(bodyParser.json({ limit: '6mb', extended: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json({ limit: '6mb', extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use((req, res, next) => {
   req.cookies = {};
@@ -65,10 +70,12 @@ app.use((req, res, next) => {
   }
   return next();
 });
-// app.use(multer.array());
 
+
+///////////////////////////////////
+//        DEFAULT HEADERS        //
+///////////////////////////////////
 app.use((req, res, next) => {
-
   res.append("Access-Control-Allow-Origin", process.env.SELF_URL);
   res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
@@ -78,6 +85,10 @@ app.use((req, res, next) => {
   next();
 });
 
+
+///////////////////////////////////
+//           OPEN DATA           //
+///////////////////////////////////
 // TODO: Кэширование
 app.get("/user/:id", (req, res) => {
   if (!/^[a-zA-Z0-9_]{3,40}$/.test(req.params.id)) return res.status(400).send({ error: "Invalid id" });
@@ -101,9 +112,7 @@ app.get("/user/:id", (req, res) => {
       badges: user.badges
     });
   });
-});
-
-app.get("/apps/:id", async (req, res) => {
+}).get("/apps/:id", async (req, res) => {
   console.log("APPS GET", req.params.id);
   if (!req.params.id) return res.status(400).send();
 
@@ -126,10 +135,11 @@ app.get("/apps/:id", async (req, res) => {
 });
 
 
+///////////////////////////////////
+//  BIG BLOCK FOR SMALL ROUTER   //
+///////////////////////////////////
 app.use("/auth", authRouter);
 
-// const oauth2Router = require("./service_oauth2");
-// app.use("/oauth2", oauth2Router);
 
 ///////////////////////////////////
 //           MAIN AUTH           //
@@ -206,12 +216,21 @@ function refreshToken(req, res, next, old_token) {
   }
 }
 
+
+///////////////////////////////////
+//        DEBUG BACKDOOR         //
+//    Don't forget to remove     //
+///////////////////////////////////
 app.get("/gimmesuperuser", async (req, res) => {
   req.user.role = 3;
   await req.user.save();
   res.sendStatus(200)
 })
 
+
+///////////////////////////////////
+//        ALL THE ROUTERS        //
+///////////////////////////////////
 app.use("/users", userRouter);
 app.use("/apps", appRouter);
 app.use("/money", moneyRouter);
@@ -219,6 +238,10 @@ app.use("/cards", cardsRouter);
 app.use("/dpay", dpayRouter);
 app.use("/call", callRouter);
 
+
+///////////////////////////////////
+//   IDK WHAT THE FUCK IS THAT   //
+///////////////////////////////////
 const getCode = Joi.object({
   client_id: Joi.string().hex().length(24).required(),
   response_type: Joi.string().allow('token', 'code').required(),
@@ -248,6 +271,10 @@ app.post("/oauth2/code", async (req, res) => {
   }
 })
 
+
+///////////////////////////////////
+//     BANKER POSTS ENDPOINT     //
+///////////////////////////////////
 app.get("/posts", (req, res) => {
     Post.find((err, posts) => {
       if (err) return;
@@ -272,6 +299,10 @@ app.get("/posts", (req, res) => {
     });
   });
 
+
+///////////////////////////////////
+//       REGISTRATION END        //
+///////////////////////////////////
 app.post("/reg", (req, res) => {
   if (!req.body.username || !req.body.username.length    ||
       !req.body.password || req.body.password.length < 6 ||
@@ -305,7 +336,6 @@ app.post("/reg", (req, res) => {
       });
     });
 });
-
 global.newId = async () => {
   t = "";
   for (let i = 0; i < 8; i++) {
@@ -316,6 +346,10 @@ global.newId = async () => {
   return t;
 }
 
+
+///////////////////////////////////
+//  REGISTRATION NICKNAME CHECK  //
+///////////////////////////////////
 app.get("/mine/:username", (req, res) => {
   if (!/^[a-zA-Z0-9_]{3,16}$/.test(req.params.username)) return res.status(200).send({ code: "player.not-found" });
   fetch(`https://playerdb.co/api/player/minecraft/${req.params.username}`)
@@ -338,6 +372,10 @@ const getUser = (_id, login) => new Promise((send, reject) => {
   });
 });
 
+
+///////////////////////////////////
+//     SOCKETIO CLIENT INIT      //
+///////////////////////////////////
 io.of("/").on("connection", client => {
   console.log("connected", client.id);
   console.log(client.handshake.headers.cookie)
@@ -395,5 +433,3 @@ io.of("/").on("connection", client => {
 
 
 http.listen(8081, ()=>{console.log("Started at *:8081"); console.log(Date.now())});
-
-// module.exports = app;
