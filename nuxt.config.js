@@ -15,7 +15,6 @@ require("dotenv").config();
 
 // TODO Two Generals' problem or "I already payed" answer
 
-// console.log(process.dev)
 const prodVersion = true;
 
 export default {
@@ -126,11 +125,12 @@ export default {
    */
   modules: [
     // Doc: https://http.nuxtjs.org
-    "@nuxtjs/axios",
+    '@nuxtjs/axios',
+    '@nuxtjs/pwa',
     // "@nuxtjs/auth",
     // "@nuxtjs/proxy",
     'portal-vue/nuxt',
-    "nuxt-socket-io"
+    'nuxt-socket-io'
   ],
 
   // proxy: {
@@ -148,12 +148,13 @@ export default {
   },
 
   plugins: [
+    //'~/plugins/portal.js',
     '~/plugins/api.js',
     '~/plugins/auth.js'
   ],
-  buildModules: [
+  /*buildModules: [
     '@nuxtjs/pwa',
-  ],
+  ],*/
   pwa: {
     meta: {
       name: null,
@@ -175,12 +176,43 @@ export default {
       useWebmanifestExtension: false,
       background_color: "#346db3",
       theme_color: "#346db3",
-      start_url: "/"
+      start_url: "/",
+      id: "/"
     },
     workbox: {
-      workboxURL: "https://cdn.jsdelivr.net/npm/workbox-cdn/workbox/workbox-sw.js",
+      enabled: false,
+      //workboxURL: "https://cdn.jsdelivr.net/npm/workbox-cdn/workbox/workbox-sw.js",
       autoRegister: true,
       offline: false,
+      cacheAssets: true,
+      assetsURLPattern: /\.(png|jpe?g|webp|svg|css|ogg|mp3|wav|mpe?g)$/i,
+      pagesURLPattern: 'nothing',
+      runtimeCaching: [
+        {
+          urlPattern: '.*/api/.*',
+          handler: 'networkFirst',
+          method: 'GET',
+          strategyOptions: { cacheableResponse: { statuses: [1] } }
+        },
+        //{
+        //  urlPattern: '.*/_nuxt/.*(png|jpe?g|webp|svg|css|ogg|mp3|wav|mpe?g)$',
+        //  handler: 'cacheFirst',
+        //  method: 'GET',
+        //  strategyOptions: { cacheableResponse: { statuses: [0, 1] } }
+        //},
+        {
+          urlPattern: 'https://fonts.googleapis.com/.*',
+          handler: 'cacheFirst',
+          method: 'GET',
+          strategyOptions: { cacheableResponse: { statuses: [0, 200] } }
+        },
+        {
+          urlPattern: 'https://fonts.gstatic.com/.*',
+          handler: 'cacheFirst',
+          method: 'GET',
+          strategyOptions: { cacheableResponse: { statuses: [0, 200] } }
+        }
+      ],
       offlinePage: "/offline",
       offlineAssets: ["login_bg.jpg"]
     }
@@ -192,9 +224,6 @@ export default {
    ** Doc: https://nuxtjs.org/api/configuration-build
    */
   build: {
-    /*
-     ** You can extend webpack config here
-     */
     loaders: {
       vue: {
         transformAssetUrls: {
@@ -203,6 +232,7 @@ export default {
       }
     },
     extend(config, ctx) {
+      console.log("Loaded plugins: ", config.plugins.map(pl => pl.constructor.name).join(", "))
       config.module.rules.push({
         test: /\.(ogg|mp3|wav|mpe?g)$/i,
         loader: 'file-loader',

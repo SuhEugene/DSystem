@@ -57,9 +57,9 @@
 // TODO: норм дизайн как и везде
 
 import CheckIcon from "mdi-vue/Check.vue";
-import AppImg from "~/components/AppImg";
-import SuccessOverlay from "~/components/SuccessOverlay";
-import ErrorOverlay from "~/components/ErrorOverlay";
+import AppImg from "~/components/global/AppImg.vue";
+import SuccessOverlay from "~/components/overlays/SuccessOverlay.vue";
+import ErrorOverlay from "~/components/overlays/ErrorOverlay.vue";
 import CloseIcon from "mdi-vue/Close.vue";
 
 const req = ["scope", "redirect_uri", "response_type"];

@@ -1,9 +1,13 @@
 <template>
   <div class="container console">
     <span v-html="strings.slice(0, insert).join('<br>')"></span>
-    <span v-if="this.insert >= strings.length">
-      <NLink to="/">Go to homepage</NLink> or
-      <a href="javascript:void(0)" onclick="window.location.reload()">Refresh page</a>
+  <span v-if="this.insert >= strings.length">
+      <br>
+      <span>
+        <NLink class="blue" to="/">Go to homepage</NLink> or
+        <a class="blue" href="javascript:void(0)" onclick="window.location.reload()">Refresh page</a>
+      </span>
+      <br>
       <br>
       <br>
       <span class="grey">{{(this.$auth.user && this.$auth.user.username) ? this.$auth.user.username.toLowerCase() : 'guest'}}@dromon:~$</span>
@@ -16,10 +20,10 @@ export default {
   props: ['error'],
   data: () => ({
     strings: [
-      "<span class='grey'>{2}@dromon:~$</span> npm run app",
+      "<span class='grey'>{2}@dromon:~$</span> yarn start",
       "",
-      "> dromon@2.0 app /home",
-      "> nuxt start",
+      "<span><b>yarn run v1.22.15</b></span>",
+      "<span class='grey'>$ nuxt start</span>",
       "",
       "Initializing app...",
       "Waiting for server...",
@@ -47,7 +51,7 @@ export default {
       "",
       'Message: {1}',
       "",
-      "<span class='grey'>{2}@dromon:~$</span> bash gotohomepage.sh",
+      "<span class='grey'>{2}@dromon:~$</span> ./gotohomepage.sh",
       ""
     ],
     insert: 0,
@@ -75,27 +79,34 @@ export default {
 </script>
 <style lang="scss">
 .console {
-  background: #080808 !important;
+  $bgColor: #080808;
+  background: $bgColor;
   padding: 10px;
   height: 100%;
   font-family: monospace;
-  color: silver!important;
+  color: silver;
   word-break: break-all;
-  .red {
-    color: red;
-  }
-  .green {
-    color: #00aa00;
-  }
-  .blue {
-    color: blue;
-  }
-  .grey {
-    color: grey;
+  $colors: (
+    red: #e30000,
+    green: #00ff00,
+    blue: #1e90ff,
+    grey: #808080
+  );
+  span, b { &::selection {
+    color: $bgColor!important;
+    background: silver!important;
+  }}
+  @each $name, $val in $colors {
+    .#{$name} {
+      color: $val;
+      &::selection {
+        background: $val!important;
+        color: $bgColor!important;
+      }
+    }
   }
   a {
     text-decoration: underline;
-    color: aqua;
     &:hover {
       opacity: 0.8;
     }

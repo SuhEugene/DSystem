@@ -2,16 +2,16 @@
   <div :class="$style.page" :style="$store.state.dark ? 'background:#222222' : ''">
     <div :class="$style.iconWrap">
       <div :class="$style.icon">
-        <CheckIcon size="56"/>
+        <CloseIcon size="56"/>
       </div>
     </div>
   </div>
 </template>
 <script>
-import CheckIcon from "mdi-vue/Check.vue";
+import CloseIcon from "mdi-vue/Close.vue";
 export default {
-  name: "SuccessOverlay",
-  components: { CheckIcon }
+  name: "ErrorOverlay",
+  components: { CloseIcon }
 };
 </script>
 <style module>
@@ -43,7 +43,7 @@ export default {
   height: 56px;
   box-sizing: content-box;
 }
-.icon { animation: spin-icon 3s ease-out both; color: #06b10e;}
+.icon { animation: spin-icon 3s ease-out both; color: #dd4444;}
 @keyframes spin {
   from {
     transform: rotate(-720deg);
@@ -62,7 +62,7 @@ export default {
     padding: 40px;
   }
   to {
-    border-color: #06b10e;
+    border-color: #dd4444;
   }
 }
 @keyframes spin-icon {

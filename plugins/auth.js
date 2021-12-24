@@ -43,6 +43,7 @@ class Auth {
           date = d.getDate();
           logs[i].firstOfDay = true;
         }
+        console.log("DDA", logs);
         this.$store.commit("setLogs", logs);
       }
       this.loggedIn = true;
@@ -139,11 +140,11 @@ export default async function (ctx, inject) {
 
   let cookie;
   console.log(`[Auth] Trying to log in on ${process.server ? 'server' : 'client'}`);
-
+  
+  console.log('[Auth] Creating cutom axios object...');
   const api = axios.create({ baseURL: process.env.axiosBase });
   if (process.server && ctx.req.headers.cookie) { api.defaults.headers.common['cookie'] = ctx.req.headers.cookie; }
-  if (ctx.route.path == "/") return ctx.redirect("/login");
-
+  console.log('[Auth] Successfully created axios object');
 
   const authData = {
     discord: {
@@ -166,12 +167,14 @@ export default async function (ctx, inject) {
       home: "/profile"
     }
   };
-
+  
+  console.log('[Auth] Creating auth object...');
   let $auth = new Auth(ctx, authData, api);
+  console.log('[Auth] Injecting auth object...');
   inject("auth", $auth);
+  console.log('[Auth] Successfully injected auth object');
 
   if (process.browser) {
-    console.log(ctx.query.code, ctx.query.state, localStorage.getItem("state"))
     if (ctx.query.code && ctx.query.state && ctx.query.state == localStorage.getItem("state")) {
       console.log("[Auth] Logging in with Discord...")
       await $auth.logIn(ctx.query.code);
@@ -188,9 +191,11 @@ export default async function (ctx, inject) {
       return;
   }
   if (!$auth.loggedIn && !["/login", "/register"].includes(ctx.route.path)) {
+    console.log("[Auth] redirecting to /login");
     ctx.redirect("/login");
   }
   if ($auth.loggedIn && ["/login", "/register"].includes(ctx.route.path)) {
+    console.log("[Auth] redirecting to /profile");
     ctx.redirect("/profile");
   }
 }

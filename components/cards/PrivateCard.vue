@@ -1,32 +1,32 @@
 <template lang="html">
   <div v-if="!type" @dragstart="drag" @drop="drop" @dragover.prevent="() => true" draggable="false" class="card">
-    <div class="card__pro" v-if="data.pro >= now">PRO</div>
+    <div class="card__pro" v-if="isPro">PRO</div>
     <div class="card__top">
       <div class="card__text">{{data.text}}</div>
       <div class="card__id">#{{id}}</div>
     </div>
     <div class="card__bottom">
       <div class="card__settings">
-<!--        <div class="button" tooltip="В разработке">-->
-<!--          <CogOutlineIcon v-if="settings" size="24" />-->
-<!--          <AccountSettingsIcon v-else size="24" />-->
-<!--        </div>-->
+        <div class="button" @click="openModal" tooltip="В разработке">
+          <CogOutlineIcon v-if="settings" size="24" />
+          <AccountSettingsIcon v-else size="24" />
+        </div>
       </div>
       <!-- TODO: sum change animation -->
       <div class="card__sum">{{data.balance}} АР</div>
     </div>
 
-    <portal to="modal">
+    <portal v-if="cardModal" to="modal">
       <transition name="page">
-        <Modal @close="cardModal = false" @btn="cardModal = false" v-if="cardModal" header="Перевод между картами"
+        <Modal @close="closeModal" @btn="closeModal" header="Перевод между картами"
                :buttons="[{name: 'Закрыть', type:'secondary'}]">
           <p>Oh, shit</p>
         </Modal>
       </transition>
     </portal>
   </div>
-  <div v-else-if="type == 'create'" class="card card--create" :class="{'card--create-hover': page == 0}">
-    <div v-if="page == 0" @click="page = 1" class="card__center">
+  <div v-else-if="type == 'create'" @click="page == 0 ? createCardPage() : false" class="card card--create" :class="{'card--create-hover': page == 0}">
+    <div v-if="page == 0" class="card__center">
       <PlusIcon size="60" />
       <div id="cr-text">Создать карточку</div>
     </div>
@@ -45,6 +45,8 @@ import CogOutlineIcon from 'mdi-vue/CogOutline.vue';
 import AccountSettingsIcon from 'mdi-vue/AccountSettings.vue';
 import PlusIcon from 'mdi-vue/Plus.vue';
 import TransferIcon from 'mdi-vue/SwapHorizontalBold.vue';
+import Modal from '~/components/cards/CardModal.vue';
+
 export default {
   name: "PrivateCard",
   props: ["data", "type", "settings"],
@@ -56,9 +58,21 @@ export default {
   computed: {
     id () {
       return String(this.data.id).substr(0,4) + " " + String(this.data.id).substr(4,4);
+    },
+    isPro () {
+      return new Date(this.data.pro).getTime() > this.now;
     }
   },
   methods: {
+    openModal() {
+      console.log("Modal is", this.cardModal?"open":"closed", "now")
+      console.log("Opening modal...");
+      this.cardModal = true;
+    },
+    closeModal() {
+      console.log("Closing modal...");
+      this.cardModal = false;
+    },
     drop (e) {
       let card = e.dataTransfer.getData("card");
       if (card && card._id) console.log("CARD!", card);
@@ -87,9 +101,12 @@ export default {
           title: "Ошибка", descr: `Не удалось создать карту: ${err}`, type: "error"
         })
       }
+    },
+    createCardPage () {
+      this.page = 1;
     }
   },
-  components: { CogOutlineIcon, PlusIcon, AccountSettingsIcon, TransferIcon }
+  components: { CogOutlineIcon, PlusIcon, AccountSettingsIcon, TransferIcon, Modal }
 }
 </script>
 
@@ -167,7 +184,8 @@ export default {
     padding: 3px 4px;
     font-weight: bold;
     font-size: 12px;
-    background: linear-gradient(135deg, #9598bd 0%, #892fa7 100%);
+    background: #F4999F;
+    background: linear-gradient(145deg, #F4999F, #08F59C);;
     border-radius: 3px;
   }
   &__top {

@@ -91,10 +91,10 @@
   </form>
 </template>
 <script>
-import AppImg from "~/components/AppImg";
-import SuccessOverlay from "~/components/SuccessOverlay";
-import ErrorOverlay from "~/components/ErrorOverlay";
-import HelpInput from "~/components/HelpInput.vue";
+import AppImg from "~/components/global/AppImg.vue";
+import SuccessOverlay from "~/components/overlays/SuccessOverlay.vue";
+import ErrorOverlay from "~/components/overlays/ErrorOverlay.vue";
+import HelpInput from "~/components/global/HelpInput.vue";
 
   export default {
     auth: false,

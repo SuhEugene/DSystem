@@ -120,10 +120,10 @@
 <!-- TODO адаптация под мобилки -->
 <script>
 /* global process */
-import UserAvatar from "~/components/UserAvatar.vue";
-import SuccessOverlay from "~/components/SuccessOverlay.vue";
-import ErrorOverlay from "~/components/ErrorOverlay.vue";
-import HelpInput from "~/components/HelpInput.vue";
+import UserAvatar from "~/components/global/UserAvatar.vue";
+import SuccessOverlay from "~/components/overlays/SuccessOverlay.vue";
+import ErrorOverlay from "~/components/overlays/ErrorOverlay.vue";
+import HelpInput from "~/components/global/HelpInput.vue";
 
 export default {
   auth: false,

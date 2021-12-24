@@ -1,6 +1,6 @@
 <template>
   <div class="main-element">
-    <div class="date" v-if="log.firstOfDay">{{date}}</div>
+    <client-only><div class="date" v-if="log.firstOfDay">{{date}}</div></client-only>
     <div class="history-el">
       <div class="history-el__time">{{time}}</div>
       <div class="history-el__users">
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import AppImg from "~/components/AppImg.vue";
+import AppImg from "~/components/global/AppImg.vue";
 import ArrowRightIcon from "mdi-vue/ArrowRight.vue";
 // import AccountArrowLeftOutlineIcon from "mdi-vue/AccountArrowLeftOutline.vue";
 // import CashPlusIcon from "mdi-vue/CashPlus.vue";

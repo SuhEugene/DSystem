@@ -653,21 +653,22 @@
   </div>
 </template>
 <script>
-import AccountTieVoiceOutlineIcon from "mdi-vue/AccountTieVoiceOutline.vue";
+
+import BackIcon from "mdi-vue/ArrowLeft.vue";
 import CubeScanIcon from "mdi-vue/CubeScan.vue";
 import CogOutlineIcon from "mdi-vue/CogOutline.vue";
-import ArrowRightBoldOutlineIcon from "mdi-vue/ArrowRightBoldOutline.vue";
 import WeatherNightIcon from "mdi-vue/WeatherNight.vue";
 import LogoutVariantIcon from "mdi-vue/LogoutVariant.vue";
 import AccountCashOutlineIcon from "mdi-vue/AccountCashOutline.vue";
 import AccountGroupOutlineIcon from "mdi-vue/AccountGroupOutline.vue";
-import BackIcon from "mdi-vue/ArrowLeft.vue";
-import HelpInput from "~/components/HelpInput.vue";
-import Modal from "~/components/Modal.vue";
 import FormTextboxPasswordIcon from "mdi-vue/FormTextboxPassword.vue";
-import AccountConvertOutlineIcon from "mdi-vue/AccountConvertOutline.vue";
 import CloseNetworkOutlineIcon from "mdi-vue/CloseNetworkOutline.vue";
-import DPayLogo from "~/components/DPayCleanLogo.vue";
+import AccountConvertOutlineIcon from "mdi-vue/AccountConvertOutline.vue";
+import ArrowRightBoldOutlineIcon from "mdi-vue/ArrowRightBoldOutline.vue";
+import AccountTieVoiceOutlineIcon from "mdi-vue/AccountTieVoiceOutline.vue";
+import Modal from "~/components/global/Modal.vue";
+import HelpInput from "~/components/global/HelpInput.vue";
+import DPayLogo from "~/components/global/icons/DPayCleanLogo.vue";
 
 // import Settings from "~/components/HeaderButtons/Settings.vue";
 

@@ -196,7 +196,7 @@
 
 import HomeOutlineIcon from "mdi-vue/HomeOutline.vue";
 import CheckIcon from "mdi-vue/Check.vue";
-import AppImg from "~/components/AppImg.vue";
+import AppImg from "~/components/global/AppImg.vue";
 
 const accept = ["image/png", "image/jpeg", "image/jpg"]
 

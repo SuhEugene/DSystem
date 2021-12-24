@@ -12,7 +12,7 @@
 <script>
 /* global process */
 
-import DromonLogo from "~/components/DromonLogo";
+import DromonLogo from "~/components/global/icons/DromonLogo.vue";
 
 // console.log(Date.now().getHour())
 

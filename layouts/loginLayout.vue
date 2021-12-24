@@ -13,7 +13,7 @@
 </template>
 <script>
 /* global process */
-import DromonLogo from "~/components/DromonLogo";
+import DromonLogo from "~/components/global/icons/DromonLogo.vue";
 export default {
   data: () => ({
     readyState: true,

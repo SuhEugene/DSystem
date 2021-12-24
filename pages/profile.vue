@@ -119,13 +119,13 @@ const types = {
 const sexes = ['','а','о','и'];
 
 /* global process */
-import HeaderButtons from "~/components/HeaderButtons.vue";
-import Call from "~/components/Call.vue";
-import AppImg from "~/components/AppImg.vue";
-import PrivateCard from "~/components/PrivateCard.vue";
-import Modal from "~/components/Modal.vue";
-import HistoryEl from "~/components/HistoryEl.vue";
-import UserAvatar from "~/components/UserAvatar.vue";
+import Call from "~/components/profile/Call.vue";
+import HistoryEl from "~/components/profile/HistoryEl.vue";
+import HeaderButtons from "~/components/profile/HeaderButtons.vue";
+import Modal from "~/components/global/Modal.vue";
+import AppImg from "~/components/global/AppImg.vue";
+import UserAvatar from "~/components/global/UserAvatar.vue";
+import PrivateCard from "~/components/cards/PrivateCard.vue";
 
 import ChevronDownIcon from "mdi-vue/ChevronDown.vue";
 import ChevronUpIcon from "mdi-vue/ChevronUp.vue";

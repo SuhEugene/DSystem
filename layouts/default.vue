@@ -17,14 +17,14 @@
       </div>
     </transition>
     <Nuxt/>
-    <portal-target name="modal" />
+    <portal-target name="modal" class="moadlrealban" />
   </div>
 </template>
 <script>
 /* global process */
 
-import DromonLogo from "~/components/DromonLogo";
-import Notification from "~/components/Notification";
+import DromonLogo from "~/components/global/icons/DromonLogo.vue";
+import Notification from "~/components/global/Notification.vue";
 
 // console.log(Date.now().getHour())
 
