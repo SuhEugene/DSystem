@@ -31,7 +31,7 @@
     "js-md5": "^0.7.3",
     "jsonwebtoken": "8.5.1",
     "mdi-vue": "1.6.3",
-    "mongoose": "5.11.15",
+    "mongoose": "5.13.20",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
     "nuxt": "^2.12.2",
