@@ -4,19 +4,23 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "8080:8080"
-    networks:
-      - common
+      - "51535:8080"
     expose:
       - 8080
       - 8082
       - 8083
   mongo:
-    image: mongo
+    image: mongo:4
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: toor
+      MONGO_INITDB_DATABASE: dromon
+    volumes:
+      - ./.data/mongo_db:/data/db
+      - ./.data/mongo_config:/data/configdb
+      - ./api/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    env_file: api/.env
     logging:
         options:
             max-size: 100M
@@ -24,16 +28,13 @@ services:
     image: mongo-express
     restart: unless-stopped
     ports:
-      - 8081:8085
+      - 51536:8081
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: toor
       ME_CONFIG_MONGODB_URL: mongodb://root:toor@mongo:27017/
     depends_on:
       - mongo
-    expose:
-      - 8085
-
   app:
     restart: unless-stopped
     build:
@@ -41,8 +42,6 @@ services:
       dockerfile: Dockerfile.app
     depends_on:
       - mongo
-    networks:
-      - common
     
   api:
     restart: unless-stopped
@@ -52,10 +51,9 @@ services:
         - API_FILENAME=index.js
         - API_PORT=8081
       dockerfile: Dockerfile.api
+    env_file: "api/.env"
     depends_on:
       - mongo
-    networks:
-      - common
 
   oauth2_api:
     restart: unless-stopped
@@ -65,10 +63,9 @@ services:
         - API_FILENAME=service_oauth2.js
         - API_PORT=8082
       dockerfile: Dockerfile.api
+    env_file: "api/.env"
     depends_on:
       - mongo
-    networks:
-      - common
 
   open_api:
     restart: unless-stopped
@@ -78,11 +75,6 @@ services:
         - API_FILENAME=service_open.js
         - API_PORT=8083
       dockerfile: Dockerfile.api
+    env_file: "api/.env"
     depends_on:
       - mongo
-    networks:
-      - common
-
-networks:
-  common:
-    name: common-network

@@ -26,8 +26,9 @@ require("dotenv").config();
 
 // TODO socket io rooms and microservices handling
 // TODO Transaction "try-catch" abort
-
-mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
+console.log("LOGGING IN AS", `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}`);
+//
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}`, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });

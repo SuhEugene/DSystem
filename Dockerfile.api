@@ -1,13 +1,18 @@
-FROM node:latest AS prod
+FROM node:latest AS base
 WORKDIR /usr/src/app
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+FROM base AS dependencies
 ARG API_FILENAME
 ARG API_PORT
+ENV API_FILENAME=${API_FILENAME:-"-e \"console.log('You've fucked up!);process.exit(228);\""}
 
-COPY package.json yarn.lock ./
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --production
+
+FROM dependencies AS deploy
 COPY ./api ./
-
-RUN yarn install --production
-
-# EXPOSE ${API_PORT}
-CMD "node ${API_FILENAME}"
+CMD node $API_FILENAME
