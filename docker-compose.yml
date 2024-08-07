@@ -40,6 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.app
+    env_file: ".env"
     depends_on:
       - mongo
     
