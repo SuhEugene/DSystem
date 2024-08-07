@@ -1,4 +1,4 @@
-FROM node:latest AS base
+FROM node:18-alpine AS base
 WORKDIR /app
 
 ENV PNPM_HOME="/pnpm"
@@ -11,7 +11,7 @@ FROM base AS dependencies
 ENV NODE_OPTIONS=--openssl-legacy-provider
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 
 
 FROM dependencies AS build
@@ -33,7 +33,7 @@ RUN pnpm build
 FROM base AS deploy-deps
 ENV NODE_OPTIONS=--openssl-legacy-provider
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --production
+RUN pnpm install --production --frozen-lockfile
 
 FROM deploy-deps AS deploy
 

@@ -13,7 +13,7 @@ services:
       - 8082
       - 8083
   mongo:
-    image: mongo:4
+    image: mongo:4-focal
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -42,7 +42,6 @@ services:
     restart: unless-stopped
     build:
       context: .
-      dockerfile: Dockerfile.app
     env_file: ".env"
     depends_on:
       - mongo
@@ -50,11 +49,10 @@ services:
   api:
     restart: unless-stopped
     build:
-      context: .
+      context: ./api
       args:
         - API_FILENAME=index.js
         - API_PORT=8081
-      dockerfile: Dockerfile.api
     env_file: "api/.env"
     depends_on:
       - mongo
@@ -62,11 +60,10 @@ services:
   oauth2_api:
     restart: unless-stopped
     build:
-      context: .
+      context: ./api
       args:
         - API_FILENAME=service_oauth2.js
         - API_PORT=8082
-      dockerfile: Dockerfile.api
     env_file: "api/.env"
     depends_on:
       - mongo
@@ -74,11 +71,10 @@ services:
   open_api:
     restart: unless-stopped
     build:
-      context: .
+      context: ./api
       args:
         - API_FILENAME=service_open.js
         - API_PORT=8083
-      dockerfile: Dockerfile.api
     env_file: "api/.env"
     depends_on:
       - mongo

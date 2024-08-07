@@ -1,4 +1,4 @@
-FROM node:latest AS base
+FROM node:18-alpine AS base
 WORKDIR /usr/src/app
 
 ENV PNPM_HOME="/pnpm"
@@ -11,8 +11,12 @@ ARG API_PORT
 ENV API_FILENAME=${API_FILENAME:-"-e \"console.log('You've fucked up!);process.exit(228);\""}
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --production
+RUN pnpm install --frozen-lockfile --production
 
 FROM dependencies AS deploy
-COPY ./api ./
+COPY ./.env ./
+COPY ./$API_FILENAME ./
+COPY ./models ./models
+COPY ./routes ./routes
+
 CMD node $API_FILENAME
