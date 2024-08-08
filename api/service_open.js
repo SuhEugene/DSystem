@@ -80,7 +80,6 @@ app.use((req, res, next) => {
       return next();
     });
   })
-  .get("/", (req, res) => {res.send()})
   // **GET `open.di-api.net.ru/isSPkUser/<:id>`**
   // Получение bool играет ли user с данным discord id на СПк
   // Принимает `{}`

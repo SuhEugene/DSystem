@@ -72,7 +72,6 @@ app.use((req, res, next) => {
   return next();
 });
 
-
 ///////////////////////////////////
 //        DEFAULT HEADERS        //
 ///////////////////////////////////
@@ -329,7 +328,7 @@ app.post("/reg", (req, res) => {
           user.uuid = r.data.player.raw_id;
           user.password = await getPasswordHash(req.body.password);
           user.sex = parseInt(req.body.sex, 10);
-          user.role = 2;
+          user.role = 1;
           await user.save();
           await newCard.save();
           res.status(200).send();

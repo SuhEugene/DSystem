@@ -163,7 +163,7 @@ app
   })
   .use(async (req, res, next) => {
     let token = req.headers.authorization && req.headers.authorization.replace("Bearer ", "");
-    if (!token) return res.send({ error: "Invalid token", e: "IT" });
+    if (!token) return res.status(400).send({ error: "Invalid token", e: "IT" });
     jwt.verify(token, process.env.ACCESS_SECRET, async (err, data) => {
       console.log('errar', err);
       if (err) return res.status(400).send({ error: "Invalid token", e: "IT" });
