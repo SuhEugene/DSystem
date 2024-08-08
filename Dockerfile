@@ -11,7 +11,7 @@ FROM base AS dependencies
 ENV NODE_OPTIONS=--openssl-legacy-provider
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 
 FROM dependencies AS build
@@ -30,12 +30,13 @@ COPY nuxt.config.js ./
 
 RUN pnpm build
 
-FROM base AS deploy-deps
-ENV NODE_OPTIONS=--openssl-legacy-provider
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --production --frozen-lockfile
+# They're the same as deps
+#FROM base AS deploy-deps
+#ENV NODE_OPTIONS=--openssl-legacy-provider
+#COPY package.json pnpm-lock.yaml ./
+#RUN pnpm install --production --frozen-lockfile
 
-FROM deploy-deps AS deploy
+FROM dependencies AS deploy
 
 COPY --from=build /app/.nuxt ./.nuxt
 COPY static ./static

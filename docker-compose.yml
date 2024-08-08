@@ -7,7 +7,7 @@ services:
       - ./static/login_bg.jpg:/usr/share/nginx/html/login_bg.jpg:ro
       - ./static/favicon.png:/usr/share/nginx/html/favicon.png:ro
     ports:
-      - "51535:8080"
+      - "51535:80"
     expose:
       - 8080
       - 8082
@@ -43,9 +43,7 @@ services:
     build:
       context: .
     env_file: ".env"
-    depends_on:
-      - mongo
-    
+
   api:
     restart: unless-stopped
     build:

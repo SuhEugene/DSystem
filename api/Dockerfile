@@ -11,7 +11,7 @@ ARG API_PORT
 ENV API_FILENAME=${API_FILENAME:-"-e \"console.log('You've fucked up!);process.exit(228);\""}
 
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --production
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --production
 
 FROM dependencies AS deploy
 COPY ./.env ./
