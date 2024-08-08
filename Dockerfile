@@ -1,17 +1,15 @@
 FROM node:18-alpine AS base
 WORKDIR /app
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
 
 FROM base AS dependencies
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
-COPY package.json pnpm-lock.yaml ./
+COPY package.json yarn.lock ./
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.yarn YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
 
 
 FROM dependencies AS build
@@ -28,13 +26,13 @@ COPY store ./store
 COPY .env ./
 COPY nuxt.config.js ./
 
-RUN pnpm build
+RUN yarn build
 
 # They're the same as deps
-#FROM base AS deploy-deps
-#ENV NODE_OPTIONS=--openssl-legacy-provider
-#COPY package.json pnpm-lock.yaml ./
-#RUN pnpm install --production --frozen-lockfile
+# FROM base AS deploy-deps
+# ENV NODE_OPTIONS=--openssl-legacy-provider
+# COPY package.json yarn.lock ./
+# RUN yarn install --production --frozen-lockfile
 
 FROM dependencies AS deploy
 
@@ -44,4 +42,4 @@ COPY static ./static
 COPY .env ./
 
 EXPOSE 8080
-CMD ["pnpm", "start"]
+CMD ["yarn", "start"]
