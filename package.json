@@ -10,7 +10,7 @@
     "ddev2": "nuxt --port 8080 & sh 2.sh & sh 3.sh & sh 4.sh & sh 5.sh",
     "build": "nuxt build",
     "rebuild": "nuxt build; pm2 restart dromon",
-    "start": "nuxt start --port 8080",
+    "start": "nuxt start --port 8080 -H 0.0.0.0",
     "generate": "nuxt generate",
     "post-update": "yarn upgrade --latest"
   },

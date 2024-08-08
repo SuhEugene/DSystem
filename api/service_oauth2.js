@@ -193,6 +193,7 @@ app
     return res.send(response);
   })
 
-app.listen(8082, () => console.log("> OAuth2 service started on *:8082"))
+const API_PORT = process.env.API_PORT || 8082;
+app.listen(API_PORT, () => console.log(`> OAuth2 service started on *:${API_PORT}`))
 
 module.exports = router;

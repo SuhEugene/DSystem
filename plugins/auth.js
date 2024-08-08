@@ -155,7 +155,7 @@ export default async function (ctx, inject) {
       response_type: "code",
       token_type: "Bearer",
       redirect_uri: `${ctx.env.thisUrl}/login`,
-      client_id: "701439769133187092",
+      client_id: ctx.env.discordClient,
       token_key: null,
       prompt: "none"
     },

@@ -186,6 +186,7 @@ async function isOurUser(id) {
   }
 }
 
-app.listen(8083, () => console.log("> Open API service started on *:8083"))
+const API_PORT = process.env.API_PORT || 8083;
+app.listen(API_PORT, () => console.log(`> Open API service started on *:${API_PORT}`))
 
 module.exports = router;
