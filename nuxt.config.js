@@ -36,6 +36,7 @@ export default {
   },
   // loading: "~/components/LoadingBar.vue",
   env: {
+    discordClient: process.env.DISCORD_CLIENT || '12345678901234567',
     axiosBase: prodVersion ? process.env.API_URL : 'http://localhost:8080/api',
     // oauthBase: prodVersion ? process.env.OAUTH_URL : 'http://localhost:8082',
     thisUrl: prodVersion ? process.env.SELF_URL : 'http://localhost:8080'

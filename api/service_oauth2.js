@@ -19,7 +19,7 @@ const scopeUserData = {
   "role": ["role"]
 }
 
-mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}`, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
@@ -163,7 +163,7 @@ app
   })
   .use(async (req, res, next) => {
     let token = req.headers.authorization && req.headers.authorization.replace("Bearer ", "");
-    if (!token) return res.send({ error: "Invalid token", e: "IT" });
+    if (!token) return res.status(400).send({ error: "Invalid token", e: "IT" });
     jwt.verify(token, process.env.ACCESS_SECRET, async (err, data) => {
       console.log('errar', err);
       if (err) return res.status(400).send({ error: "Invalid token", e: "IT" });
@@ -193,6 +193,7 @@ app
     return res.send(response);
   })
 
-app.listen(8082, () => console.log("> OAuth2 service started on *:8082"))
+const API_PORT = process.env.API_PORT || 8082;
+app.listen(API_PORT, () => console.log(`> OAuth2 service started on *:${API_PORT}`))
 
 module.exports = router;

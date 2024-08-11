@@ -26,8 +26,9 @@ require("dotenv").config();
 
 // TODO socket io rooms and microservices handling
 // TODO Transaction "try-catch" abort
-
-mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
+console.log("LOGGING IN AS", `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}`);
+//
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}`, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
@@ -70,7 +71,6 @@ app.use((req, res, next) => {
   }
   return next();
 });
-
 
 ///////////////////////////////////
 //        DEFAULT HEADERS        //
@@ -328,7 +328,7 @@ app.post("/reg", (req, res) => {
           user.uuid = r.data.player.raw_id;
           user.password = await getPasswordHash(req.body.password);
           user.sex = parseInt(req.body.sex, 10);
-          user.role = 2;
+          user.role = 1;
           await user.save();
           await newCard.save();
           res.status(200).send();
@@ -431,5 +431,5 @@ io.of("/").on("connection", client => {
   });
 });
 
-
-http.listen(8081, ()=>{console.log("Started at *:8081"); console.log(Date.now())});
+const API_PORT = process.env.API_PORT || 8081;
+http.listen(API_PORT, ()=>{console.log(`Started at *:${API_PORT}`); console.log(Date.now())});

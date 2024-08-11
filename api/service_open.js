@@ -12,7 +12,6 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/user");
 const App = require("./models/app");
 const Logs = require("./models/logs");
-const atob = require('atob');
 require("dotenv").config();
 
 let cooldown = {};
@@ -20,9 +19,7 @@ let cooldown = {};
 // DA BIG TODO VERY BIG TODO
 
 
-
-
-mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_NAME}`, {
   useUnifiedTopology: true,
   useNewUrlParser: true
 });
@@ -69,7 +66,7 @@ app.use((req, res, next) => {
 
     let _id, secret;
     try {
-      const token = atob(headerToken);
+      const token = Buffer.from(headerToken, 'base64').toString('utf8');
       [ _id, secret ] = token.split(":");
     } catch (_e) {
       return res.status(400).send({ error: "Invalid token", e: "IT" });
@@ -83,7 +80,6 @@ app.use((req, res, next) => {
       return next();
     });
   })
-  .get("/", (req, res) => {res.send()})
   // **GET `open.di-api.net.ru/isSPkUser/<:id>`**
   // Получение bool играет ли user с данным discord id на СПк
   // Принимает `{}`
@@ -189,6 +185,7 @@ async function isOurUser(id) {
   }
 }
 
-app.listen(8083, () => console.log("> Open API service started on *:8083"))
+const API_PORT = process.env.API_PORT || 8083;
+app.listen(API_PORT, () => console.log(`> Open API service started on *:${API_PORT}`))
 
 module.exports = router;
