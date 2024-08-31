@@ -15,7 +15,6 @@ COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --production
 
 FROM dependencies AS deploy
-COPY ./.env ./
 COPY ./$API_FILENAME ./
 COPY ./models ./models
 COPY ./routes ./routes

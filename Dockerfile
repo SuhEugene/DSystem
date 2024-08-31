@@ -23,7 +23,6 @@ COPY plugins ./plugins
 COPY static ./static
 COPY store ./store
 
-COPY .env ./
 COPY nuxt.config.js ./
 
 RUN yarn build
@@ -38,8 +37,6 @@ FROM dependencies AS deploy
 
 COPY --from=build /app/.nuxt ./.nuxt
 COPY static ./static
-
-COPY .env ./
 
 EXPOSE 8080
 CMD ["yarn", "start"]
