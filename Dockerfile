@@ -24,6 +24,7 @@ COPY static ./static
 COPY store ./store
 
 COPY nuxt.config.js ./
+COPY ./.env /app/.env
 
 RUN yarn build
 
