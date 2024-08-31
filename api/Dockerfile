@@ -18,6 +18,7 @@ FROM dependencies AS deploy
 COPY ./$API_FILENAME ./
 COPY ./models ./models
 COPY ./routes ./routes
+COPY ./.env ./
 
 EXPOSE $API_PORT
 CMD node $API_FILENAME
