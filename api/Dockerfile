@@ -8,8 +8,8 @@ RUN corepack enable
 FROM base AS dependencies
 ARG API_FILENAME
 ARG API_PORT
-ENV API_FILENAME=${API_FILENAME:-"-e \"console.log('You've fucked up!);process.exit(228);\""}
-ENV API_PORT=${API_PORT:-8888}
+ENV API_FILENAME=${API_FILENAME:-"index.js"}
+ENV API_PORT=${API_PORT:-8081}
 
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --production
