@@ -84,7 +84,7 @@
         </div>
         <div class="profile-section__right">
           <div class="history">
-            <audio ref="newOperationSound" src="/ping2.mp3"></audio>
+            <audio ref="newOperationSound" src="/ping3.mp3"></audio>
             <h1>История операций</h1>
             <div class="history__inner__data">
               <p v-if="!$store.state.logs || !$store.state.logs.length">Операций не найдено</p>
@@ -199,7 +199,7 @@ export default {
     this.rpc.on("connect_error", () => {
       console.log("[RPC] connection refused");
     });
-    
+
     this.rpc.on("connect", () => {
       console.log("[RPC] connected");
       this.rpc.emit("user", this.$auth.user);
